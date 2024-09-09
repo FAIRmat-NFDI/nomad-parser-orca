@@ -1,6 +1,6 @@
 # nomad-parser-orca
 
-Nomad example template
+An ORCA parser while extending the schema for coupled cluster
 
 This `nomad` plugin was generated with `Cookiecutter` along with `@nomad`'s [`cookiecutter-nomad-plugin`](https://github.com/FAIRmat-NFDI/cookiecutter-nomad-plugin) template.
 
