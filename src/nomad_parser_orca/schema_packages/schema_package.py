@@ -53,15 +53,17 @@ class CoupledCluster(ModelMethodElectronic):
 
     valid_base_methods = [
         'CC2', 'CC3', 'CC4', 'CCD', 'CCSD', 'CCSDT', 'CCSDTQ',
-        'BCCD', 'QCCD', 'VQCCD', 'LCCD', 'LCCSD', 'DLPNO-CCSD'
+        'BCCD', 'QCCD', 'VQCCD', 'LCCD', 'LCCSD', 'DLPNO-CCSD',
+        'MP2', 'MP3', 'MP4', 'MP5'
     ]
 
     # Define valid perturbative corrections and correlation methods
-    perturbative_corrections = ['(T)', '(Q)', '(2)', '(fT)', '(dT)']
+    perturbative_corrections = ['(T)', '(T0)', '(T1)', '[T]', '[T0]',
+                                '(Q)', '(2)', '(fT)', '(dT)']
     correlation_methods = ['-F12', '-R12']
 
     # Solver prefixes
-    solver_prefixes = ['QV', 'B']
+    solver_prefixes = ['QV', 'B', 'Q']
 
     type = Quantity(
         type=str,
@@ -92,7 +94,7 @@ class CoupledCluster(ModelMethodElectronic):
         the type of reference determinant.
         """,
         a_eln=ELNAnnotation(component='EnumEditQuantity'),
-    )  # TODO: add kohn-sham references
+    )  
 
     perturbative_order = Quantity(
         type=np.int32,
@@ -104,17 +106,8 @@ class CoupledCluster(ModelMethodElectronic):
         a_eln=ELNAnnotation(component='NumberEditQuantity'),
     )
 
-    is_perturbative_iterative = Quantity(
-        type=bool,
-        description="""
-        If the perturbative corrections are non-iterative: (T0)
-        If iterative, (T)
-        """,
-        a_eln=ELNAnnotation(component='BoolEditQuantity'),
-    )
-
     explicit_correlation = Quantity(
-        type=MEnum('F12', 'F12a', 'F12b'
+        type=MEnum('F12', 'F12a', 'F12b', 'F12c',
                    'R12', ''),
         default='',
         description="""
@@ -125,6 +118,33 @@ class CoupledCluster(ModelMethodElectronic):
         """,
         a_eln=ELNAnnotation(component='EnumEditQuantity'),
     )
+
+    ri_approximation = Quantity(
+        type=str,
+        description="""
+        Flavor of RI approximation.
+        In MOLPRO, it is denoted as density fitting!
+        """,
+        a_eln=ELNAnnotation(component='StringEditQuantity'),
+    )  # TODO: add important stuff
+
+
+    ri_approximation_f12 = Quantity(
+        type=str,
+        description="""
+        Flavor of RI approximation in explicit correlation.
+        """,
+        a_eln=ELNAnnotation(component='StringEditQuantity'),
+    )  # TODO: add important stuff
+
+    frozencore_approximation = Quantity(
+        type=str,
+        description="""
+        frozen core approximation
+        """,
+        a_eln=ELNAnnotation(component='StringEditQuantity'),
+    )  # TODO: add important stuff
+
 
     local_approximation = Quantity(
         type=MEnum('LPNO', 'DLPNO', ''),
@@ -292,7 +312,7 @@ class LocMet(NumericalSettings):
         Name of the localization method
         """,
         a_eln=ELNAnnotation(component='EnumEditQuantity'),
-    )
+    ) # Extend from molpro
 
     n_max_iterations = Quantity(
         type=np.int32,
@@ -316,7 +336,7 @@ class LocMet(NumericalSettings):
         The Energy window for the first OCC MO to be localized (in a.u.).
         """,
         a_eln=ELNAnnotation(component='NumberEditQuantity'),
-    )
+    ) 
 
     #NORMALIZE
     pass

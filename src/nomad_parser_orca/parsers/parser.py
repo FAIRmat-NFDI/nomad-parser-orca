@@ -72,7 +72,7 @@ class LogParser(TextParser):
             ),
             ParsedQuantity(
                 't1_diagnostic',
-            r'T1 diagnostic\s+\.\.\.\s+([\d\.]+)',
+                r'T1 diagnostic\s+\.\.\.\s+([\d\.]+)',
             ),
             ParsedQuantity(
                 'largest_t2_amplitudes',
