@@ -21,8 +21,10 @@ from nomad_simulations.schema_packages.model_method import ModelMethod
 from nomad_simulations.schema_packages.model_system import (AtomicCell,
                                                             ModelSystem)
 
-from nomad_parser_orca.schema_packages.schema_package import (CCOutputs,
-                                                              CoupledCluster)
+from nomad_parser_orca.schema_packages.schema_package import CoupledCluster
+from nomad_parser_orca.schema_packages.outputs import CCOutputs
+
+
 
 configuration = config.get_plugin_entry_point(
     'nomad_parser_orca.parsers:parser_entry_point'
@@ -106,8 +108,8 @@ class ORCAParser(MatchingParser):
 
         if isinstance(atoms_information, list):
             symbols, coordinates = str_to_cartesian_coordinates(atoms_information)
-            print(symbols)
-            print(coordinates)
+            #print(symbols)
+            #print(coordinates)
         else:
             print("No atoms information found or incorrect format.")
 

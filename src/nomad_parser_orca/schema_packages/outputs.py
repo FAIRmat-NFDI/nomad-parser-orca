@@ -31,8 +31,6 @@ from nomad.metainfo import (
     SchemaPackage
 )
 
-
-
 class CCOutputs(Outputs):
     """
     This section contains the relevant output information from a Coupled-Cluster run.
