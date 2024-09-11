@@ -31,38 +31,102 @@ from nomad.metainfo import (
     SchemaPackage
 )
 
-class PairNaturalOrbitalAnsatz(NumericalSettings):
-    """ Numerical settings that control pair natural orbitals (PNOs)."""
-
-"""
-    t_cut_pairs = Quantity(
-        type=np.int32,
-        shape=['*'],
-        description="""
-        the cut-off for pairs
-        """,
-        a_eln=ELNAnnotation(component='NumberEditQuantity'),
+class PNOSettings(NumericalSettings):
+    """ Numerical settings that control pair natural orbitals (PNOs).
+        The nomenclature has been adapted from Molpro.
+    """
+    domain_connectivity = Quantity(
+         type=int,
+         description="""
+        the connectivity parameter for domain extension.
+        """
     )
 
-    t_cut_pno = Quantity(
-        type=np.int32,
-        shape=['*'],
-        description="""
-        the threshold which controls how many PNO's are retained.
-        """,
-        a_eln=ELNAnnotation(component='NumberEditQuantity'),
+    domain_radius = Quantity(
+         type=int,
+         description="""
+        the radius parameter for domain extension.
+        """
     )
 
-    t_cut_mkn = Quantity(
-        type=np.int32,
-        shape=['*'],
-        description="""
-        controls how large the domains that PNOs expand over.
-        """,
-        a_eln=ELNAnnotation(component='NumberEditQuantity'),
+    t_domain_osv_occ = Quantity(
+         type=np.float32,
+         description="""
+        OSV domain occupation number threshold.
+        """
+    )
+
+    t_occ_lmp2 = Quantity(
+         type=np.float32,
+         description="""
+        LMP2 PNO domains (occ. number threshold).
+        """
+    )
+
+    t_energy_lmp2 = Quantity(
+         type=np.float32,
+         description="""
+        LMP2 PNO domains (energy threshold).
+        """
+    )
+
+    t_occ_lccsd = Quantity(
+         type=np.float32,
+         description="""
+        LCCSD PNO domains (occ. number threshold).
+        """
+    )
+
+    t_energy_lccsd = Quantity(
+         type=np.float32,
+         description="""
+        LCCSD PNO domains (energy threshold).
+        """
+    )
+
+    t_close_pair = Quantity(
+         type=np.float32,
+         description="""
+        close pair energy threshold.
+        """
+    )
+
+    t_weak_pair = Quantity(
+         type=np.float32,
+         description="""
+        weak pair energy threshold.
+        """
+    )
+
+    t_distant_pair = Quantity(
+         type=np.float32,
+         description="""
+        distant pair energy threshold
+        """
+    )
+
+    t_verydistant_pair = Quantity(
+         type=np.float32,
+         description="""
+        very distant pair energy threshold
+        """
+    )
+
+    t_triples_preselection = Quantity(
+         type=np.float32,
+         description="""
+        preselection of triples list.
+        """
+    )
+
+    t_triples_iteration = Quantity(
+         type=np.float32,
+         description="""
+        selection of triples for iterations
+        """
     )
     pass
-"""
+
 
 class LocMet(NumericalSettings):
     """ Numerical settings that control orbital localization."""
@@ -77,7 +141,6 @@ class LocMet(NumericalSettings):
         description="""
         Name of the localization method
         """,
-        a_eln=ELNAnnotation(component='EnumEditQuantity'),
     ) # Extend from molpro
 
     n_max_iterations = Quantity(
@@ -85,7 +148,6 @@ class LocMet(NumericalSettings):
         description="""
         Specifies the maximum number of iterations for the orbital localization.
         """,
-        a_eln=ELNAnnotation(component='NumberEditQuantity'),
     )
 
     threshold_change = Quantity(
@@ -93,7 +155,6 @@ class LocMet(NumericalSettings):
         description="""
         Specifies the convergence tolerance.
         """,
-        a_eln=ELNAnnotation(component='NumberEditQuantity'),
     )
 
     threshold_core = Quantity(
@@ -101,7 +162,6 @@ class LocMet(NumericalSettings):
         description="""
         The Energy window for the first OCC MO to be localized (in a.u.).
         """,
-        a_eln=ELNAnnotation(component='NumberEditQuantity'),
     )
 
     #NORMALIZE
