@@ -38,13 +38,6 @@ configuration = config.get_plugin_entry_point(
 
 m_package = SchemaPackage()
 
-#███╗   ███╗ ██████╗ ██████╗ ███████╗██╗     ███╗   ███╗███████╗████████╗██╗  ██╗ ██████╗ ██████╗
-#████╗ ████║██╔═══██╗██╔══██╗██╔════╝██║     ████╗ ████║██╔════╝╚══██╔══╝██║  ██║██╔═══██╗██╔══██╗
-#██╔████╔██║██║   ██║██║  ██║█████╗  ██║     ██╔████╔██║█████╗     ██║   ███████║██║   ██║██║  ██║
-#██║╚██╔╝██║██║   ██║██║  ██║██╔══╝  ██║     ██║╚██╔╝██║██╔══╝     ██║   ██╔══██║██║   ██║██║  ██║
-#██║ ╚═╝ ██║╚██████╔╝██████╔╝███████╗███████╗██║ ╚═╝ ██║███████╗   ██║   ██║  ██║╚██████╔╝██████╔╝
-#╚═╝     ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝╚══════╝╚═╝     ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚═════╝
-
 
 class CoupledCluster(ModelMethodElectronic):
     order_map = {k: v for k, v in enumerate(('S', 'D', 'T', 'Q'))}
@@ -84,8 +77,7 @@ class CoupledCluster(ModelMethodElectronic):
         Note that coupled cluster typically start from doubles.
         Singles excitations in a Koopman-compliant scheme only make sense as a response to a perturbation.
         """,
-        a_eln=ELNAnnotation(component='NumberEditQuantity'),
-    ) # may be irrelevant
+    )
 
     reference_determinant = Quantity(
         type=MEnum('UHF','RHF','ROHF'
@@ -93,8 +85,7 @@ class CoupledCluster(ModelMethodElectronic):
         description="""
         the type of reference determinant.
         """,
-        a_eln=ELNAnnotation(component='EnumEditQuantity'),
-    )  
+    )
 
     perturbative_order = Quantity(
         type=np.int32,
@@ -103,7 +94,6 @@ class CoupledCluster(ModelMethodElectronic):
         Excitation order at which the perturbative correction is used.
         1 = single, 2 = double, 3 = triple, 4 = quadruple, etc.
         """,
-        a_eln=ELNAnnotation(component='NumberEditQuantity'),
     )
 
     explicit_correlation = Quantity(
@@ -116,7 +106,6 @@ class CoupledCluster(ModelMethodElectronic):
         directly into the wavefunction to treat dynamical electron correlation.
         It can be added linearly (R12) or exponentially (F12).
         """,
-        a_eln=ELNAnnotation(component='EnumEditQuantity'),
     )
 
     ri_approximation = Quantity(
@@ -125,7 +114,6 @@ class CoupledCluster(ModelMethodElectronic):
         Flavor of RI approximation.
         In MOLPRO, it is denoted as density fitting!
         """,
-        a_eln=ELNAnnotation(component='StringEditQuantity'),
     )  # TODO: add important stuff
 
 
@@ -134,15 +122,13 @@ class CoupledCluster(ModelMethodElectronic):
         description="""
         Flavor of RI approximation in explicit correlation.
         """,
-        a_eln=ELNAnnotation(component='StringEditQuantity'),
     )  # TODO: add important stuff
 
-    frozencore_approximation = Quantity(
+    is_frozencore = Quantity(
         type=str,
         description="""
         frozen core approximation
         """,
-        a_eln=ELNAnnotation(component='StringEditQuantity'),
     )  # TODO: add important stuff
 
 
@@ -152,20 +138,7 @@ class CoupledCluster(ModelMethodElectronic):
         Is there a local approximation with pair natural orbitals
         or domain-based pair natural orbitals etc.
         """,
-        a_eln=ELNAnnotation(component='EnumEditQuantity'),
     )
-
-    # pno_cutoff = Quantity(
-    #     type=np.int32,
-    #     description="""
-    #     In PNO-CC, the virtual space is spanned by a highly compact set of
-    #     pair-natural-orbitals (PNOs). The threshold of TcutPNO controls
-    #     the balance between accuracy and cost.
-    #     e.g. For DLPNO-CCSD(T), a TcutPNO of around 1e-7 recovers 99.9
-    #     percent of the canonical CCSD(T) energy.
-    #     """,
-    #     a_eln=ELNAnnotation(component='NumberEditQuantity'),
-    # ) #to do: PAO based local-CC, especially in MOLPRO
 
     def check_orders(self, logger) -> bool:
         """Perform a sanity check on the excitation and perturbation order.
@@ -267,183 +240,6 @@ class CoupledCluster(ModelMethodElectronic):
             self.excitation_order = np.sort(self.excitation_order)
         if isinstance(self.perturbative_order, list):
             self.perturbative_order = np.sort(self.perturbative_order)
-
-
-class PairNaturalOrbitalAnsatz(NumericalSettings):
-    """ Numerical settings that control pair natural orbitals (PNOs)."""
-    t_cut_pairs = Quantity(
-        type=np.int32,
-        shape=['*'],
-        description="""
-        the cut-off for pairs
-        """,
-        a_eln=ELNAnnotation(component='NumberEditQuantity'),
-    )
-
-    t_cut_pno = Quantity(
-        type=np.int32,
-        shape=['*'],
-        description="""
-        the threshold which controls how many PNO's are retained.
-        """,
-        a_eln=ELNAnnotation(component='NumberEditQuantity'),
-    )
-
-    t_cut_mkn = Quantity(
-        type=np.int32,
-        shape=['*'],
-        description="""
-        controls how large the domains that PNOs expand over.
-        """,
-        a_eln=ELNAnnotation(component='NumberEditQuantity'),
-    )
-    pass
-
-class LocMet(NumericalSettings):
-    """ Numerical settings that control orbital localization."""
-    type = Quantity(
-        type=MEnum('FB',
-                   'PM',
-                   'IAOIBO',
-                   'IAOBOYS'
-                   'NEWBOYS'
-                   'AHFB'),
-        description="""
-        Name of the localization method
-        """,
-        a_eln=ELNAnnotation(component='EnumEditQuantity'),
-    ) # Extend from molpro
-
-    n_max_iterations = Quantity(
-        type=np.int32,
-        description="""
-        Specifies the maximum number of iterations for the orbital localization.
-        """,
-        a_eln=ELNAnnotation(component='NumberEditQuantity'),
-    )
-
-    threshold_change = Quantity(
-        type=np.float64,
-        description="""
-        Specifies the convergence tolerance.
-        """,
-        a_eln=ELNAnnotation(component='NumberEditQuantity'),
-    )
-
-    threshold_core = Quantity(
-        type = np.float64,
-        description="""
-        The Energy window for the first OCC MO to be localized (in a.u.).
-        """,
-        a_eln=ELNAnnotation(component='NumberEditQuantity'),
-    ) 
-
-    #NORMALIZE
-    pass
-
-
-# ██████╗ ██╗   ██╗████████╗██████╗ ██╗   ██╗████████╗███████╗
-#██╔═══██╗██║   ██║╚══██╔══╝██╔══██╗██║   ██║╚══██╔══╝██╔════╝
-#██║   ██║██║   ██║   ██║   ██████╔╝██║   ██║   ██║   ███████╗
-#██║   ██║██║   ██║   ██║   ██╔═══╝ ██║   ██║   ██║   ╚════██║
-#╚██████╔╝╚██████╔╝   ██║   ██║     ╚██████╔╝   ██║   ███████║
-# ╚═════╝  ╚═════╝    ╚═╝   ╚═╝      ╚═════╝    ╚═╝   ╚══════╝
-
-
-class CCOutputs(Outputs):
-    """
-    This section contains the relevant output information from a Coupled-Cluster run.
-    """
-    corr_energy_strong = Quantity(
-        type=np.float32,
-        description="""
-        Correlation energy contribution for the strong pairs.
-        This contribution doesnt involve perturbative corrections!
-        """,
-        a_eln=ELNAnnotation(component='NumberEditQuantity'),
-    )
-
-    corr_energy_weak = Quantity(
-        type=np.float32,
-        description="""
-        Correlation energy contribution for the weak pairs.
-        This contribution doesnt involve perturbative corrections!
-        """,
-        a_eln=ELNAnnotation(component='NumberEditQuantity'),
-    )
-
-    corr_energy_perturbative = Quantity(
-        type=np.float32,
-        description="""
-        Correlation energy contribution from perturbative treatment.
-        """,
-        a_eln=ELNAnnotation(component='NumberEditQuantity'),
-    )
-
-    t1_norm = Quantity(
-        type=np.float32,
-        description="""
-        The norm of T1 amplitudes.
-        Sanity check number 1.
-        """,
-        a_eln=ELNAnnotation(component='NumberEditQuantity'),
-    )
-
-    largest_t2_amplitude = Quantity(
-        type=np.float32,
-        shape=['*'],
-        description="""
-        The largest T2 amplitude.
-        Sanity check number 2.
-        """,
-        a_eln=ELNAnnotation(component='NumberEditQuantity'),
-    )
-
-    def t1_diagnostic(self, logger) -> None:
-        '''Perform a sanity check based on t1 norm.
-
-        Raise a logging error if its larger than 0.02.'''
-
-        if self.t1_norm > 0.02:
-            logger.info(
-                f'T1 diagnostic warning: T1 norm ({self.t1_norm}) exceeds the 0.02 threshold.'
-            )
-        else:
-            logger.info(
-                f'T1 diagnostic passed: T1 norm ({self.t1_norm}) is within the acceptable range.'
-            )
-
-    def t2_diagnostic(self, logger) -> None:
-        '''Perform a sanity check based on the largest t2 amplitude.
-        Log a warning if it's larger than 0.02.
-        '''
-        if not self.largest_t2_amplitude:
-            logger.warning('T2 diagnostic warning: The list of largest T2 amplitudes is empty.')
-            return
-
-        max_amplitude = max(self.largest_t2_amplitude)
-
-        if max_amplitude > 0.05:
-            logger.info(
-                f'T2 diagnostic warning: Largest T2 amplitude ({max_amplitude})'
-                f'exceeds the 0.05 threshold. This may indicate a multiconfigurational character!'
-            )
-        else:
-            logger.info(
-                f'T2 diagnostic passed: Largest T2 amplitude ({max_amplitude})'
-                f'is within the acceptable range.'
-            )
-
-    def normalize(self, archive, logger) -> None:
-        '''Normalize the coupled-cluster output quantities and run diagnostic checks.
-
-        Log warnings if any diagnostic thresholds are exceeded.
-        '''
-        super().normalize(archive, logger)  # Call the parent's normalize method
-
-        # Run diagnostic checks
-        self.t1_diagnostic(logger)
-        self.t2_diagnostic(logger)
 
 
 m_package.__init_metainfo__()
