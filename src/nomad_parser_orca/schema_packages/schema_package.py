@@ -114,23 +114,21 @@ class CoupledCluster(ModelMethodElectronic):
         Flavor of RI approximation.
         In MOLPRO, it is denoted as density fitting!
         """,
-    )  # TODO: add important stuff
-
+    ) 
 
     ri_approximation_f12 = Quantity(
         type=str,
         description="""
         Flavor of RI approximation in explicit correlation.
         """,
-    )  # TODO: add important stuff
+    ) 
 
     is_frozencore = Quantity(
-        type=str,
+        type=bool,
         description="""
         frozen core approximation
         """,
-    )  # TODO: add important stuff
-
+    )  
 
     local_approximation = Quantity(
         type=MEnum('LPNO', 'DLPNO', ''),
@@ -140,25 +138,50 @@ class CoupledCluster(ModelMethodElectronic):
         """,
     )
 
-    def check_orders(self, logger) -> bool:
-        """Perform a sanity check on the excitation and perturbation order.
-        Raise a logging error if any inconsistency is found.
-        (From ndaelman)
+    def dissect_cc_method(self, method_name):
         """
-        if self.excitation_order is None:
-            logger.warning('`CoupledCluster.excitation_order` is undefined.')
-            return False
-        if len(self.excitation_order) > 1:
-            if 2 not in self.excitation_order:
-                logger.error('Coupled Cluster typically starts from doubles.')
-                return False
-        for order in (3, 4):
-            if order in self.excitation_order and order in self.perturbative_order:
-                logger.error(
-                    f'Order {order} is defined as both excitation and perturbative.'
-                )
-                return False
-        return True
+        Parses the Coupled Cluster method string and updates the corresponding attributes of the class.
+        """
+
+        # regex to account for explicit correlation variants and perturbative corrections
+        pattern = re.compile(
+            r'^(DLPNO|LPNO)?(QV|B)?(CCSD|CCD|CCSDT|LCCSD)(\([TQ2fTdT0]\))?(-F12[a-cx]?)?$'
+        )
+        match = pattern.match(method_name)
+
+        if not match:
+            raise ValueError(f"Invalid Coupled Cluster method: {method_name}")
+
+        # Extract components from the regex match
+        self.local_approximation = match.group(1)  # DLPNO or LPNO
+        self.solver = match.group(2)  # QV or B solver
+        self.type = match.group(3)  # Main CC method (e.g., CCSD, CCD, etc.)
+        perturbative_correction = match.group(4)  # Perturbative correction (e.g., (T))
+        self.explicit_correlation = match.group(5)  # Explicit correlation (e.g., -F12a, -F12b, etc.)
+
+        # Parse excitation order based on method_type and perturbative_correction
+        self.excitation_order = []
+        if self.type == 'CCSD':
+            self.excitation_order.append(2)  # Double excitation for CCSD
+        if perturbative_correction == '(T)':
+            self.perturbative_order = [3]  # Triple perturbative correction for (T)
+
+        # Handle other perturbative corrections and excitation orders
+        if perturbative_correction in ['(Q)', '(T0)', '(T1)', '(2)', '(fT)', '(dT)']:
+            if perturbative_correction == '(Q)':
+                self.perturbative_order = [4]  # Quadruple for (Q)
+            # Additional cases can be handled similarly as per the specific correction
+
+        # Ensure the lists are sorted for consistency
+        if isinstance(self.excitation_order, list):
+            self.excitation_order = np.sort(self.excitation_order)
+        if isinstance(self.perturbative_order, list):
+            self.perturbative_order = np.sort(self.perturbative_order)
+
+        # Optionally log the parsed method components (this requires a logger passed into the function)
+        # logger.info(f"Parsed method: {method_name}, local_approximation: {self.local_approximation}, "
+        #             f"solver: {self.solver}, type: {self.type}, perturbative_correction: {perturbative_correction}, "
+        #             f"explicit_correlation: {self.explicit_correlation}")
 
     def cc_to_type(self) -> None:
         """Produce an educated guess based on the other parameters."""
