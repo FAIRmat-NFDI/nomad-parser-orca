@@ -6,6 +6,9 @@ from nomad_simulations.schema_packages.model_method import \
 from nomad_simulations.schema_packages.numerical_settings import \
     NumericalSettings
 from nomad_simulations.schema_packages.outputs import Outputs
+from nomad_simulations.schema_packages.properties.energies import \
+    BaseEnergy, EnergyContribution, TotalEnergy
+
 
 if TYPE_CHECKING:
     from nomad.datamodel.datamodel import (
@@ -31,27 +34,45 @@ from nomad.metainfo import (
     SchemaPackage
 )
 
-class CoupledClusterEnergy(Section):
-    method = Quantity(
-        type=str,
-        description="The name of the energy calculation method (e.g., 'pno_lmp2', 'pno_lmp2_f12')."
-    )
-    
-    domain_correction = Quantity(
-        type=np.float32,
-        description="Domain correction energy."
-    )
-    
-    correlation = Quantity(
-        type=np.float32,
-        description="Correlation energy."
-    )
-    
-    total = Quantity(
-        type=np.float32,
-        description="Total energy."
-    )
+class DomainCorrection(EnergyContribution):
+    """This is the definition
+    """
+    pass
 
+class CorrelationEnergy(EnergyContribution):
+    """This is the definition
+    """
+    pass
+
+class PerturbativeCorrection(EnergyContribution):
+    """This is the definition
+    """
+    pass
+
+class WeakPairEnergy(EnergyContribution):
+    """This is the definition
+    """
+    pass
+
+class StrongPairEnergy(EnergyContribution):
+    """This is the definition
+    """
+    pass
+
+class DistantPairEnergy(EnergyContribution):
+    """This is the definition
+    """
+    pass
+
+class ClosePairEnergy(EnergyContribution):
+    """This is the definition
+    """
+    pass
+
+class SinglesEnergy(EnergyContribution):
+    """This is the definition
+    """
+    pass
 
 class CCOutputs(Outputs):
     """
@@ -85,25 +106,6 @@ class CCOutputs(Outputs):
         a_eln=ELNAnnotation(component='NumberEditQuantity'),
     )
 
-    # Use a list of MethodEnergy SubSections to store different methods' energies
-    energies = SubSection(
-        section=CoupledClusterEnergy,
-        repeats=True,
-        description="A list of energies corresponding to different methods."
-    )
-
-    def add_energy(self, method, domain_correction, correlation, total):
-        """
-        Add energies corresponding to a specific method dynamically.
-        """
-        energy_entry = MethodEnergy(
-            method=method,
-            domain_correction=domain_correction,
-            correlation=correlation,
-            total=total
-        )
-        self.energies.append(energy_entry)
-
     def get_energy(self, method, energy_type='total'):
         """
         Retrieve energy for a specific method and type.
@@ -113,22 +115,6 @@ class CCOutputs(Outputs):
             return self.energies[method].get(energy_type, None)
         else:
             raise ValueError(f"No energy found for method '{method}' or energy type '{energy_type}'.")
-
-    def energy_diagnostic(self, method, logger) -> None:
-        """
-        Perform diagnostic checks on the energy values for a given method.
-        Log a warning if the energy is significantly high or low (example threshold 1e-5).
-        """
-        total_energy = self.get_energy(method, 'total')
-        if total_energy is None:
-            logger.warning(f"No total energy found for method '{method}'.")
-            return
-
-        # Perform a diagnostic check (you can change this threshold logic)
-        if abs(total_energy) < 1e-5:
-            logger.warning(f"Energy diagnostic warning: {method} total energy ({total_energy}) is very small.")
-        else:
-            logger.info(f"Energy diagnostic passed for method '{method}': Total energy is {total_energy}.")
 
     def t1_diagnostic(self, logger) -> None:
         '''Perform a sanity check based on t1 norm.'''

@@ -45,12 +45,12 @@ def str_to_cartesian_coordinates(val_in):
 
         # Convert lists to numpy arrays
         coordinates = np.array(coordinates, dtype=float)
-        return symbols, coordinates * ureg.angstrom
+        return symbols, coordinates 
     else:
         raise ValueError("Expected a list input for cartesian coordinates.")
 
 
-class LogParser(TextParser):
+class OutParser(TextParser):
     def init_quantities(self):
         self._quantities = [
             ParsedQuantity(
@@ -92,11 +92,11 @@ class ORCAParser(MatchingParser):
         logger: 'BoundLogger',
         child_archives: dict[str, 'EntryArchive'] = None,
     ) -> None:
-        log_parser = LogParser(mainfile=mainfile, logger=logger)
+        out_parser = OutParser(mainfile=mainfile, logger=logger)
 
         simulation = Simulation()
         program = Program(
-            name='EBB2675', version=log_parser.get('program_version')
+            name='EBB2675', version=out_parser.get('program_version')
         )
         simulation.program = program
 
@@ -104,7 +104,7 @@ class ORCAParser(MatchingParser):
         archive.data = simulation
 
         # Retrieve atoms information
-        atoms_information = log_parser.get('atoms_information', [])
+        atoms_information = out_parser.get('atoms_information', [])
 
         if isinstance(atoms_information, list):
             symbols, coordinates = str_to_cartesian_coordinates(atoms_information)
@@ -138,16 +138,17 @@ class ORCAParser(MatchingParser):
             raise ValueError("Mismatch between number of symbols and coordinates.")
 
         # Extract other quantities
-        cc_type = log_parser.get('coupled_cluster_type')
-        cc_reference_wavefunction = log_parser.get('cc_reference_wavefunction')
-        t1_diagnostic = log_parser.get('t1_diagnostic')
-        largest_t2_amplitudes = log_parser.get('largest_t2_amplitudes')
+        cc_type = out_parser.get('coupled_cluster_type')
+        cc_reference_wavefunction = out_parser.get('cc_reference_wavefunction')
+        t1_diagnostic = out_parser.get('t1_diagnostic')
+        largest_t2_amplitudes = out_parser.get('largest_t2_amplitudes')
 
         model_method = CoupledCluster(type=cc_type, reference_determinant=cc_reference_wavefunction)
         output = CCOutputs(largest_t2_amplitude=largest_t2_amplitudes, t1_norm=t1_diagnostic)
 
         simulation.model_method.append(model_method)
         simulation.outputs.append(output)
+        simulation.model_system.append(model_system)
 '''
 class ORCAParser(MatchingParser):
     def parse(

@@ -6,6 +6,7 @@ from nomad_simulations.schema_packages.model_method import \
 from nomad_simulations.schema_packages.numerical_settings import \
     NumericalSettings
 from nomad_simulations.schema_packages.outputs import Outputs
+from nomad_simulations.schema_packages.physical_property import PhysicalProperty
 
 if TYPE_CHECKING:
     from nomad.datamodel.datamodel import (
@@ -37,6 +38,15 @@ configuration = config.get_plugin_entry_point(
 
 
 m_package = SchemaPackage()
+
+
+class BaseCoupledCluster(PhysicalProperty):
+    """
+    A base class used to define shared commonalities between coupled-cluster related properties.
+    """
+    
+    pass
+
 
 
 class CoupledCluster(ModelMethodElectronic):
