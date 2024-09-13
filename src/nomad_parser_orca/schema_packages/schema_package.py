@@ -40,15 +40,6 @@ configuration = config.get_plugin_entry_point(
 m_package = SchemaPackage()
 
 
-class BaseCoupledCluster(PhysicalProperty):
-    """
-    A base class used to define shared commonalities between coupled-cluster related properties.
-    """
-    
-    pass
-
-
-
 class CoupledCluster(ModelMethodElectronic):
     order_map = {k: v for k, v in enumerate(('S', 'D', 'T', 'Q'))}
     solver_map = {'QV': 'quasi-variational', 'B': 'Brueckner'}
@@ -97,14 +88,22 @@ class CoupledCluster(ModelMethodElectronic):
         """,
     )
 
-    perturbative_order = Quantity(
-        type=np.int32,
-        shape=['*'],
+#    perturbative_order = Quantity(
+#        type=np.int32,
+#        shape=['*'],
+#        description="""
+#        Excitation order at which the perturbative correction is used.
+#        1 = single, 2 = double, 3 = triple, 4 = quadruple, etc.
+#        """,
+#    )
+
+    perturbative_correction = Quantity(
+        type=MEnum('(T), '[T]'),
         description="""
-        Excitation order at which the perturbative correction is used.
-        1 = single, 2 = double, 3 = triple, 4 = quadruple, etc.
+        The type of perturbative corrections
         """,
     )
+
 
     explicit_correlation = Quantity(
         type=MEnum('F12', 'F12a', 'F12b', 'F12c',
@@ -123,13 +122,6 @@ class CoupledCluster(ModelMethodElectronic):
         description="""
         Flavor of RI approximation.
         In MOLPRO, it is denoted as density fitting!
-        """,
-    ) 
-
-    ri_approximation_f12 = Quantity(
-        type=str,
-        description="""
-        Flavor of RI approximation in explicit correlation.
         """,
     ) 
 
