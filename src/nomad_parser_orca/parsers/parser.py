@@ -33,24 +33,8 @@ configuration = config.get_plugin_entry_point(
 
 re_n = r'\r*\n'
 
-def str_to_cartesian_coordinates(val_in):
-    if isinstance(val_in, list):
-        # Separate symbols and coordinates
-        symbols = []
-        coordinates = []
-
-        # Iterate over the list in chunks of 4 (symbol + 3 coordinates)
-        for i in range(0, len(val_in), 4):
-            symbols.append(val_in[i])
-            coordinates.append(val_in[i+1:i+4])
-
-        # Convert lists to numpy arrays
-        coordinates = np.array(coordinates, dtype=float)
-        return symbols, coordinates
-    else:
-        raise ValueError("Expected a list input for cartesian coordinates.")
-
 class OutParser(TextParser):
+
     def init_quantities(self):
         self._quantities = [
             ParsedQuantity(
@@ -98,6 +82,7 @@ class OutParser(TextParser):
                 repeats=False
             )
         ]
+
 
 
 def str_to_cartesian_coordinates(val_in):
@@ -163,31 +148,7 @@ class ORCAParser(MatchingParser):
         old_quantities = {
             'basis_set_atom_labels': old_out_parser.get('basis_set_atom_labels'),
             'basis_set': old_out_parser.get('basis_set'),
-            'basis_set_contracted': old_out_parser.get('basis_set_contracted'),
-            'nb_of_primitive_gaussian_shells': old_out_parser.get('nb_of_primitive_gaussian_shells'),
-            'nb_of_primitive_gaussian_functions': old_out_parser.get('nb_of_primitive_gaussian_functions'),
-            'nb_of_contracted_shells': old_out_parser.get('nb_of_contracted_shells'),
-            'nb_of_contracted_basis_functions': old_out_parser.get('nb_of_contracted_basis_functions'),
-            'highest_angular_moment': old_out_parser.get('highest_angular_moment'),
-            'maximum_contraction_depth': old_out_parser.get('maximum_contraction_depth'),
-            'gral_integ_accuracy': old_out_parser.get('gral_integ_accuracy'),
-            'radial_grid_type': old_out_parser.get('radial_grid_type'),
-            'angular_grid': old_out_parser.get('angular_grid'),
-            'grid_pruning_method': old_out_parser.get('grid_pruning_method'),
-            'weight_gener_scheme': old_out_parser.get('weight_gener_scheme'),
-            'basis_fn_cutoff': old_out_parser.get('basis_fn_cutoff'),
-            'integr_weight_cutoff': old_out_parser.get('integr_weight_cutoff'),
-            'nb_grid_pts_after_initial_pruning': old_out_parser.get('nb_grid_pts_after_initial_pruning'),
-            'nb_grid_pts_after_weights_screening': old_out_parser.get('nb_grid_pts_after_weights_screening'),
-            'total_nb_grid_pts': old_out_parser.get('total_nb_grid_pts'),
-            'total_nb_batches': old_out_parser.get('total_nb_batches'),
-            'avg_nb_points_per_batch': old_out_parser.get('avg_nb_points_per_batch'),
-            'avg_nb_grid_pts_per_atom': old_out_parser.get('avg_nb_grid_pts_per_atom'),
-            'scf_convergence': {
-                'last_energy_change': old_out_parser.get('last_energy_change'),
-                'last_max_density_change': old_out_parser.get('last_max_density_change'),
-                'last_rms_density_change': old_out_parser.get('last_rms_density_change')
-            }
+            'basis_set_contracted': old_out_parser.get('basis_set_contracted')
         }
         return old_quantities
 
