@@ -125,7 +125,9 @@ class PNOSettings(NumericalSettings):
         selection of triples for iterations
         """
     )
-    pass
+
+    def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
+        super().normalize(archive, logger)
 
 
 class LocMet(NumericalSettings):
@@ -164,7 +166,7 @@ class LocMet(NumericalSettings):
         """,
     )
 
-    #NORMALIZE
-    pass
+    def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
+        super().normalize(archive, logger)
 
 

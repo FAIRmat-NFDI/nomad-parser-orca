@@ -88,17 +88,17 @@ class CoupledCluster(ModelMethodElectronic):
         """,
     )
 
-#    perturbative_order = Quantity(
-#        type=np.int32,
-#        shape=['*'],
-#        description="""
-#        Excitation order at which the perturbative correction is used.
-#        1 = single, 2 = double, 3 = triple, 4 = quadruple, etc.
-#        """,
-#    )
+    perturbative_order = Quantity(
+        type=np.int32,
+        shape=['*'],
+        description="""
+        Excitation order at which the perturbative correction is used.
+        1 = single, 2 = double, 3 = triple, 4 = quadruple, etc.
+        """,
+    )
 
     perturbative_correction = Quantity(
-        type=MEnum('(T), '[T]'),
+        type=MEnum('(T)', '[T]'),
         description="""
         The type of perturbative corrections
         """,
@@ -123,14 +123,14 @@ class CoupledCluster(ModelMethodElectronic):
         Flavor of RI approximation.
         In MOLPRO, it is denoted as density fitting!
         """,
-    ) 
+    )
 
     is_frozencore = Quantity(
         type=bool,
         description="""
         frozen core approximation
         """,
-    )  
+    )
 
     local_approximation = Quantity(
         type=MEnum('LPNO', 'DLPNO', ''),

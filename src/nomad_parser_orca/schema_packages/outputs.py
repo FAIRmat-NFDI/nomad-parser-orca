@@ -6,9 +6,6 @@ from nomad_simulations.schema_packages.model_method import \
 from nomad_simulations.schema_packages.numerical_settings import \
     NumericalSettings
 from nomad_simulations.schema_packages.outputs import Outputs
-from nomad_simulations.schema_packages.properties.energies import \
-    BaseEnergy, EnergyContribution, TotalEnergy
-
 
 if TYPE_CHECKING:
     from nomad.datamodel.datamodel import (
@@ -34,57 +31,40 @@ from nomad.metainfo import (
     SchemaPackage
 )
 
-class DomainCorrection(EnergyContribution):
-    """This is the definition
-    """
-    pass
-
-class CorrelationEnergy(EnergyContribution):
-    """This is the definition
-    """
-    pass
-
-class PerturbativeCorrection(EnergyContribution):
-    """This is the definition
-    """
-    pass
-
-class WeakPairEnergy(EnergyContribution):
-    """This is the definition
-    """
-    pass
-
-class StrongPairEnergy(EnergyContribution):
-    """This is the definition
-    """
-    pass
-
-class DistantPairEnergy(EnergyContribution):
-    """This is the definition
-    """
-    pass
-
-class ClosePairEnergy(EnergyContribution):
-    """This is the definition
-    """
-    pass
-
-class SinglesEnergy(EnergyContribution):
-    """This is the definition
-    """
-    pass
 
 class CCOutputs(Outputs):
     """
     This section contains the relevant output information from a Coupled-Cluster run.
     """
 
-    # Store general quantities
     reference_energy = Quantity(
         type=np.float32,
         description="""
-        The converged energy of the reference determinant. Can be DFT, HF, etc.
-        """
+        Converged SCF energy of the reference determinant.
+        """,
+    )
+
+    corr_energy_strong = Quantity(
+        type=np.float32,
+        description="""
+        Correlation energy contribution for the strong pairs.
+        This contribution doesnt involve perturbative corrections!
+        """,
+    )
+
+    corr_energy_weak = Quantity(
+        type=np.float32,
+        description="""
+        Correlation energy contribution for the weak pairs.
+        This contribution doesnt involve perturbative corrections!
+        """,
+    )
+
+    corr_energy_perturbative = Quantity(
+        type=np.float32,
+        description="""
+        Correlation energy contribution from perturbative treatment.
+        """,
     )
 
     t1_norm = Quantity(
@@ -93,7 +73,6 @@ class CCOutputs(Outputs):
         The norm of T1 amplitudes.
         Sanity check number 1.
         """,
-        a_eln=ELNAnnotation(component='NumberEditQuantity'),
     )
 
     largest_t2_amplitude = Quantity(
@@ -103,21 +82,13 @@ class CCOutputs(Outputs):
         The largest T2 amplitude.
         Sanity check number 2.
         """,
-        a_eln=ELNAnnotation(component='NumberEditQuantity'),
     )
 
-    def get_energy(self, method, energy_type='total'):
-        """
-        Retrieve energy for a specific method and type.
-        Default is 'total' energy, but can also be 'correlation' or 'domain_correction'.
-        """
-        if self.energies and method in self.energies:
-            return self.energies[method].get(energy_type, None)
-        else:
-            raise ValueError(f"No energy found for method '{method}' or energy type '{energy_type}'.")
-
     def t1_diagnostic(self, logger) -> None:
-        '''Perform a sanity check based on t1 norm.'''
+        '''Perform a sanity check based on t1 norm.
+
+        Raise a logging error if its larger than 0.02.'''
+
         if self.t1_norm > 0.02:
             logger.info(
                 f'T1 diagnostic warning: T1 norm ({self.t1_norm}) exceeds the 0.02 threshold.'
@@ -128,7 +99,9 @@ class CCOutputs(Outputs):
             )
 
     def t2_diagnostic(self, logger) -> None:
-        '''Perform a sanity check based on the largest t2 amplitude.'''
+        '''Perform a sanity check based on the largest t2 amplitude.
+        Log a warning if it's larger than 0.02.
+        '''
         if not self.largest_t2_amplitude:
             logger.warning('T2 diagnostic warning: The list of largest T2 amplitudes is empty.')
             return
@@ -147,15 +120,13 @@ class CCOutputs(Outputs):
             )
 
     def normalize(self, archive, logger) -> None:
-        '''Normalize the coupled-cluster output quantities and run diagnostic checks.'''
+        '''Normalize the coupled-cluster output quantities and run diagnostic checks.
+
+        Log warnings if any diagnostic thresholds are exceeded.
+        '''
         super().normalize(archive, logger)  # Call the parent's normalize method
 
         # Run diagnostic checks
         self.t1_diagnostic(logger)
         self.t2_diagnostic(logger)
-
-        # Perform energy diagnostics for various methods
-        if self.energies:
-            for method in self.energies:
-                self.energy_diagnostic(method, logger)
 
