@@ -592,8 +592,8 @@ class ORCAParser(MatchingParser):
             simulation.model_system.append(model_system)
         
         #numerical_settings = self.out_parser.get('scf_settings', {}).get('max_n_iterations')
-        
-        #print(numerical_settings)
+        numerical_settings = self.out_parser.get('scf_settings', {})
+        print(numerical_settings)
         # Parse coupled cluster data
         model_method, output = self.parse_coupled_cluster(self.out_parser, logger)
         if model_method:
