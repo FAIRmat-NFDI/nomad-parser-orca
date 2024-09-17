@@ -85,7 +85,7 @@ class PNOSettings(NumericalSettings):
     )
 
     t_close_pair = Quantity(
-         type=np.float32,
+         type=str,
          description="""
         close pair energy threshold.
         """

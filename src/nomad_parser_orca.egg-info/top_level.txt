@@ -1,2 +1,1 @@
 nomad_parser_orca
-nomad_parser_pyscf

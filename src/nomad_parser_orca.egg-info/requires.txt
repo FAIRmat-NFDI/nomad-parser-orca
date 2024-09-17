@@ -1,5 +1,5 @@
 nomad-lab>=1.3.0
-nomad-simulations>=0.0.3
+nomad-simulations>=0.0.6
 
 [dev]
 ruff

@@ -123,14 +123,14 @@ class CoupledCluster(ModelMethodElectronic):
         Flavor of RI approximation.
         In MOLPRO, it is denoted as density fitting!
         """,
-    )
+    ) 
 
     is_frozencore = Quantity(
         type=bool,
         description="""
         frozen core approximation
         """,
-    )
+    )  
 
     local_approximation = Quantity(
         type=MEnum('LPNO', 'DLPNO', ''),
@@ -193,6 +193,7 @@ class CoupledCluster(ModelMethodElectronic):
             if 1 in self.excitation_order:
                 name += 'SD'
             name += 'D'
+        
         # cover extended excitations
         for order, abbrev in {3: 'T', 4: 'Q'}.items():
             if order in self.excitation_order:
