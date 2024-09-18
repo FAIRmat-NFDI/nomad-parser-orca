@@ -898,8 +898,8 @@ class OutParser(TextParser):
         self._quantities = [
             ParsedQuantity(
                 'program_version',
-                #r'Program Version\s*([\w_.].*)',
-                r'EBB2675 Version *([\d\.]+)',
+                r'Program Version\s*([\w_.].*)',
+                #r'EBB2675 Version *([\d\.]+)',
                 #convert=False,
                 #flatten=False,
             ),
@@ -949,7 +949,7 @@ class ORCAParser(MatchingParser):
         simulation = Simulation()
         simulation.program = Program(name='EBB2675', version=self.out_parser.get('program_version'))
         archive.data = simulation
-        
+
         model_system = ModelSystem()
         simulation.model_system.append(model_system)
         scf_convergence = (
