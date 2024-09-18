@@ -812,11 +812,11 @@ class OutParser(TextParser):
         ]
 
         calculation_quantities = [
-            #ParsedQuantity(
-            #    'cartesian_coordinates',
-            #    rf'CARTESIAN COORDINATES \(ANGSTROEM\)\s*\-+\s*([\s\S]+?){re_n}{re_n}',
-            #    str_operation=str_to_cartesian_coordinates,
-            #),
+            ParsedQuantity(
+                'cartesian_coordinates',
+                rf'CARTESIAN COORDINATES \(ANGSTROEM\)\s*\-+\s*([\s\S]+?){re_n}{re_n}',
+                str_operation=str_to_cartesian_coordinates,
+            ),
             ParsedQuantity(
                 'basis_set',
                 r'\n *BASIS SET INFORMATION\s*\-+([\s\S]+?)\-{10}',
@@ -934,11 +934,49 @@ class OutParser(TextParser):
             ),
         ]
 
+
+def str_to_cartesian_coordinates(val_in):
+    if isinstance(val_in, list):
+        symbols = []
+        coordinates = []
+        for i in range(0, len(val_in), 4):
+            symbols.append(val_in[i])
+            coordinates.append(val_in[i+1:i+4])
+        coordinates = np.array(coordinates, dtype=float)
+        return symbols, coordinates
+    else:
+        raise ValueError("Expected a list input for cartesian coordinates.")
+
+
 class ORCAParser(MatchingParser):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.out_parser = OutParser()
+
+
+    def parse_coordinates(self, out_parser, logger):
+        cartesian_coordinates = out_parser.get('cartesian_coordinates', [])
+        if isinstance(cartesian_coordinates, list):
+            symbols, coordinates = str_to_cartesian_coordinates(cartesian_coordinates)
+            if len(symbols) == len(coordinates):
+                model_system = ModelSystem()
+                atomic_cell = AtomicCell()
+                for symbol, coord in zip(symbols, coordinates):
+                    try:
+                        atom_state = AtomsState(chemical_symbol=symbol)
+                        atomic_cell.atoms_state.append(atom_state)
+                    except Exception as e:
+                        logger.warning(f'Error creating AtomsState: {e}')
+                atomic_cell.positions = coordinates
+                model_system.cell.append(atomic_cell)
+                return model_system
+            else:
+                logger.error('Mismatch between number of symbols and coordinates.')
+        else:
+            logger.warning("No atoms information found or incorrect format.")
+        return None
+
 
     def parse(self, mainfile, archive: 'EntryArchive', logger: 'BoundLogger', child_archives=None) -> None:
         self.out_parser.mainfile = mainfile
@@ -950,8 +988,12 @@ class ORCAParser(MatchingParser):
         simulation.program = Program(name='EBB2675', version=self.out_parser.get('program_version'))
         archive.data = simulation
 
-        model_system = ModelSystem()
-        simulation.model_system.append(model_system)
+        
+        model_system = self.parse_coordinates(self.out_parser, logger)
+        if model_system:
+            simulation.model_system.append(model_system)
+
+
         scf_convergence = (
              self.out_parser.get('single_point', {})
             .get('self_consistent', {})
