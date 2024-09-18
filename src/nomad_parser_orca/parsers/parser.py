@@ -21,6 +21,8 @@ from nomad_simulations.schema_packages.model_method import ModelMethod
 from nomad_simulations.schema_packages.model_system import (AtomicCell,
                                                             ModelSystem)
 from nomad_simulations.schema_packages.numerical_settings import SelfConsistency
+
+
 from nomad_parser_orca.schema_packages.schema_package import CoupledCluster
 from nomad_parser_orca.schema_packages.numerical_settings import PNOSettings
 from nomad_parser_orca.schema_packages.outputs import CCOutputs
@@ -71,17 +73,13 @@ class OutParser(TextParser):
             'Grid generation': 'grid_generation',
             'Total SCF gradient time': 'scf_gradient',
         }
-        # Initial quantities (e.g., program version, atoms information)
-        # this will be removed soon!
-        initial_quantities = [
-            ParsedQuantity(
-                'program_version', r'EBB2675 Version *([\d\.]+)', repeats=False
-            ),
-            ParsedQuantity(
-                'atoms_information',
-                rf'CARTESIAN COORDINATES \(ANGSTROEM\)\s*\-+\s*([\s\S]+?){re_n}{re_n}',
-            )
-        ]
+
+
+        def str_to_cartesian_coordinates(val_in):
+            val = [v.split() for v in val_in.strip().split('\n')]
+            symbols = [v[0][:2] for v in val]
+            coordinates = np.array([v[1:4] for v in val], dtype=float)
+            return symbols, coordinates * ureg.angstrom
 
         # Coupled cluster related quantities
         coupled_cluster_quantities = [
@@ -900,9 +898,10 @@ class OutParser(TextParser):
         self._quantities = [
             ParsedQuantity(
                 'program_version',
-                r'Program Version\s*([\w_.].*)',
-                convert=False,
-                flatten=False,
+                #r'Program Version\s*([\w_.].*)',
+                r'EBB2675 Version *([\d\.]+)',
+                #convert=False,
+                #flatten=False,
             ),
             ParsedQuantity(
                 'program_svn', r'\(SVN:\s*\$([^$]+)\$\)\s', convert=False, flatten=False
@@ -918,8 +917,8 @@ class OutParser(TextParser):
                 r'INPUT FILE\s*\=+([\s\S]+?)END OF INPUT',
                 sub_parser=TextParser(
                     quantities=[
-                        Quantity('xc_functional', r'\d+>\s*!\s*(\S+)'),
-                        Quantity('tier', r'(\w+SCF)'),
+                        ParsedQuantity('xc_functional', r'\d+>\s*!\s*(\S+)'),
+                        ParsedQuantity('tier', r'(\w+SCF)'),
                     ]
                 ),
             ),
@@ -935,39 +934,32 @@ class OutParser(TextParser):
             ),
         ]
 
-        # # Combine all quantities
-        # self._quantities = initial_quantities + \
-        #                     coupled_cluster_quantities + \
-        #                     basis_set_quantities + \
-        #                     basis_set_statistics_quantities + \
-        #                     grid_quantities + \
-        #                     scf_convergence_quantities + \
-        #                     self_consistent_quantities + \
-        #                     population_quantities + \
-        #                     tddft_quantities + \
-        #                     mp2_quantities + \
-        #                     calculation_quantities + \
-        #                     geometry_optimization_quantities + \
-        #                     localization_quantities
-
-
-
-def str_to_cartesian_coordinates(val_in):
-    if isinstance(val_in, list):
-        symbols = []
-        coordinates = []
-        for i in range(0, len(val_in), 4):
-            symbols.append(val_in[i])
-            coordinates.append(val_in[i+1:i+4])
-        coordinates = np.array(coordinates, dtype=float)
-        return symbols, coordinates
-    else:
-        raise ValueError("Expected a list input for cartesian coordinates.")
-
 class ORCAParser(MatchingParser):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.out_parser = OutParser()
 
- 
+    def parse(self, mainfile, archive: 'EntryArchive', logger: 'BoundLogger', child_archives=None) -> None:
+        self.out_parser.mainfile = mainfile
+        self.out_parser.logger = logger
+
+        # Perform parsing
+        self.out_parser.parse()
+        simulation = Simulation()
+        simulation.program = Program(name='EBB2675', version=self.out_parser.get('program_version'))
+        archive.data = simulation
+        
+        model_system = ModelSystem()
+        simulation.model_system.append(model_system)
+        scf_convergence = (
+             self.out_parser.get('single_point', {})
+            .get('self_consistent', {})
+            .get('scf_settings', {})
+        )
+
+
+
+
+
+
