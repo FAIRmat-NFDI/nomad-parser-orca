@@ -74,13 +74,6 @@ class OutParser(TextParser):
             'Total SCF gradient time': 'scf_gradient',
         }
 
-
-        def str_to_cartesian_coordinates(val_in):
-            val = [v.split() for v in val_in.strip().split('\n')]
-            symbols = [v[0][:2] for v in val]
-            coordinates = np.array([v[1:4] for v in val], dtype=float)
-            return symbols, coordinates * ureg.angstrom
-
         # Coupled cluster related quantities
         coupled_cluster_quantities = [
             ParsedQuantity(
@@ -299,7 +292,7 @@ class OutParser(TextParser):
                 ),
             ),
         ]
-        
+
         # scf quantities
         self_consistent_quantities = [
             ParsedQuantity(
@@ -797,7 +790,7 @@ class OutParser(TextParser):
         localization_quantities = [
             ParsedQuantity('type',
                 r'Localization creterion\s*\.+\s*(\S+)',
-                convert=False,               
+                convert=False,
             ),
             ParsedQuantity('max_n_iterations',
                 rf'Max. number of iterations\s*\.+\s*({re_float})',
@@ -815,7 +808,7 @@ class OutParser(TextParser):
             ParsedQuantity(
                 'cartesian_coordinates',
                 rf'CARTESIAN COORDINATES \(ANGSTROEM\)\s*\-+\s*([\s\S]+?){re_n}{re_n}',
-                str_operation=str_to_cartesian_coordinates,
+                #str_operation=str_to_cartesian_coordinates,
             ),
             ParsedQuantity(
                 'basis_set',
@@ -934,7 +927,6 @@ class OutParser(TextParser):
             ),
         ]
 
-
 def str_to_cartesian_coordinates(val_in):
     if isinstance(val_in, list):
         symbols = []
@@ -947,16 +939,14 @@ def str_to_cartesian_coordinates(val_in):
     else:
         raise ValueError("Expected a list input for cartesian coordinates.")
 
-
 class ORCAParser(MatchingParser):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.out_parser = OutParser()
 
-
     def parse_coordinates(self, out_parser, logger):
-        cartesian_coordinates = out_parser.get('cartesian_coordinates', [])
+        cartesian_coordinates = out_parser.get('single_point', {}).get('cartesian_coordinates', [])
         if isinstance(cartesian_coordinates, list):
             symbols, coordinates = str_to_cartesian_coordinates(cartesian_coordinates)
             if len(symbols) == len(coordinates):
@@ -978,7 +968,7 @@ class ORCAParser(MatchingParser):
         return None
 
 
-    def parse(self, mainfile, archive: 'EntryArchive', logger: 'BoundLogger', child_archives=None) -> None:
+    def parse(self, mainfile, archive: 'EntryArchive', logger: 'BoundLogger', child_archives=None):
         self.out_parser.mainfile = mainfile
         self.out_parser.logger = logger
 
@@ -988,7 +978,6 @@ class ORCAParser(MatchingParser):
         simulation.program = Program(name='EBB2675', version=self.out_parser.get('program_version'))
         archive.data = simulation
 
-        
         model_system = self.parse_coordinates(self.out_parser, logger)
         if model_system:
             simulation.model_system.append(model_system)
