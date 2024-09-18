@@ -254,6 +254,26 @@ class CoupledCluster(ModelMethodElectronic):
             self.solver = self.solver_map[match.group(1)]
         if match.group(6):
             self.explicit_correlation = match.group(6)[1:]  # remove the dash
+        
+
+    def check_orders(self, logger) -> bool:
+        """Perform a sanity check on the excitation and perturbation order.
+        Raise a logging error if any inconsistency is found.
+        """
+        if self.excitation_order is None:
+            logger.warning('`CoupledCluster.excitation_order` is undefined.')
+            return False
+        if len(self.excitation_order) > 1:
+            if 2 not in self.excitation_order:
+                logger.error('Coupled Cluster typically starts from doubles.')
+                return False
+        for order in (3, 4):
+            if order in self.excitation_order and order in self.perturbative_order:
+                logger.error(
+                    f'Order {order} is defined as both excitation and perturbative.'
+                )
+                return False
+        return True
 
     def normalize(self, archive, logger) -> None:
         super().normalize(archive, logger)
@@ -262,10 +282,17 @@ class CoupledCluster(ModelMethodElectronic):
                 self.cc_to_type()
         else:
             self.type_to_cc()
-        if isinstance(self.excitation_order, list):
-            self.excitation_order = np.sort(self.excitation_order)
-        if isinstance(self.perturbative_order, list):
-            self.perturbative_order = np.sort(self.perturbative_order)
+        #if isinstance(self.excitation_order, list):
+        #    self.excitation_order = np.sort(self.excitation_order)
+        #if isinstance(self.perturbative_order, list):
+        #    self.perturbative_order = np.sort(self.perturbative_order)
 
+
+        # Sort excitation_order if it's a list and has elements
+        if isinstance(self.excitation_order, list) and len(self.excitation_order) > 0:
+            self.excitation_order = max(self.excitation_order)
+        # Sort perturbative_order if it's a list and has elements
+        if isinstance(self.perturbative_order, list) and len(self.perturbative_order) > 0:
+            self.perturbative_order = sorted(self.perturbative_order)
 
 m_package.__init_metainfo__()

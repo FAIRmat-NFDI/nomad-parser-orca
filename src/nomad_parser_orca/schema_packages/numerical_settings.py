@@ -4,7 +4,7 @@ import nomad_simulations.schema_packages
 from nomad_simulations.schema_packages.model_method import \
     ModelMethodElectronic
 from nomad_simulations.schema_packages.numerical_settings import \
-    NumericalSettings
+    NumericalSettings, SelfConsistency
 from nomad_simulations.schema_packages.outputs import Outputs
 
 if TYPE_CHECKING:
@@ -30,6 +30,8 @@ from nomad.metainfo import (
     Context,
     SchemaPackage
 )
+
+
 
 class PNOSettings(NumericalSettings):
     """ Numerical settings that control pair natural orbitals (PNOs).
@@ -159,12 +161,8 @@ class LocMet(NumericalSettings):
         """,
     )
 
-    threshold_core = Quantity(
-        type = np.float64,
-        description="""
-        The Energy window for the first OCC MO to be localized (in a.u.).
-        """,
-    )
+    # TODO : add more method-dependent quantities
+
 
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
         super().normalize(archive, logger)

@@ -88,7 +88,7 @@ class CCOutputs(Outputs):
         '''Perform a sanity check based on t1 norm.
 
         Raise a logging error if its larger than 0.02.'''
-
+        
         if self.t1_norm > 0.02:
             logger.info(
                 f'T1 diagnostic warning: T1 norm ({self.t1_norm}) exceeds the 0.02 threshold.'
@@ -102,12 +102,13 @@ class CCOutputs(Outputs):
         '''Perform a sanity check based on the largest t2 amplitude.
         Log a warning if it's larger than 0.02.
         '''
-        if not self.largest_t2_amplitude:
-            logger.warning('T2 diagnostic warning: The list of largest T2 amplitudes is empty.')
-            return
 
         max_amplitude = max(self.largest_t2_amplitude)
 
+        if not max_amplitude:
+            logger.warning('T2 diagnostic warning: The list of largest T2 amplitudes is empty.')
+            return
+        
         if max_amplitude > 0.05:
             logger.info(
                 f'T2 diagnostic warning: Largest T2 amplitude ({max_amplitude})'

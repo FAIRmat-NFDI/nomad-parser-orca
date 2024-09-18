@@ -72,6 +72,7 @@ class OutParser(TextParser):
             'Total SCF gradient time': 'scf_gradient',
         }
         # Initial quantities (e.g., program version, atoms information)
+        # this will be removed soon!
         initial_quantities = [
             ParsedQuantity(
                 'program_version', r'EBB2675 Version *([\d\.]+)', repeats=False
@@ -83,7 +84,7 @@ class OutParser(TextParser):
         ]
 
         # Coupled cluster related quantities
-        cc_quantities = [
+        coupled_cluster_quantities = [
             ParsedQuantity(
                 'coupled_cluster_type',
                 r'Correlation treatment\s+\.\.\.\s+([A-Z]+)',
@@ -505,16 +506,450 @@ class OutParser(TextParser):
             ),
         ]
 
+        # TODO parse more properties, add to metainfo
+        tddft_quantities = [
+            ParsedQuantity(
+                'absorption_spectrum_electric',
+                r'ABSORPTION SPECTRUM VIA TRANSITION ELECTRIC DIPOLE MOMENTS\s*'
+                r'\-+[\s\S]+?\-+\n([\s\S]+?)\-{10}',
+                str_operation=lambda x: [v.split() for v in x.strip().split('\n')],
+            )
+        ]
 
-        # Combine all quantities
-        self._quantities = initial_quantities + \
-                            cc_quantities + \
-                            basis_set_quantities + \
-                            basis_set_statistics_quantities + \
-                            grid_quantities + \
-                            scf_convergence_quantities + \
-                            self_consistent_quantities + \
-                            population_quantities
+        def str_to_iteration_energy(val_in):
+            val = [v.split() for v in val_in.strip().split('\n')]
+            keys = val[0]
+            val = np.transpose(
+                np.array([v for v in val[1:] if len(v) == len(keys)], dtype=float)
+            )
+            return {keys[i]: val[i] for i in range(len(keys))}
+
+        ci_quantities = [
+            ParsedQuantity(
+                'electronic_structure_method',
+                r'Correlation treatment\s*\.+\s*(\S+)',
+                convert=False,
+            ),
+            ParsedQuantity(
+                'single_excitations_on_off',
+                r'Single excitations\s*\.+\s*(\S+)',
+                convert=False,
+            ),
+            ParsedQuantity(
+                'orbital_opt_on_off',
+                r'Orbital optimization\s*\.+\s*(\S+)',
+                convert=False,
+            ),
+            ParsedQuantity(
+                'z_vector_calc_on_off',
+                r'Calculation of Z vector\s*\.+\s*(\S+)',
+                convert=False,
+            ),
+            ParsedQuantity(
+                'Brueckner_orbitals_calc_on_off',
+                r'Calculation of Brueckner orbitals\s*\.+\s*(\S+)',
+                convert=False,
+            ),
+            ParsedQuantity(
+                'perturbative_triple_excitations_on_off',
+                r'Perturbative triple excitations\s*\.+\s*(\S+)',
+                convert=False,
+            ),
+            ParsedQuantity(
+                'f12_correction_on_off',
+                r'Calculation of F12 correction\s*\.+\s*(\S+)',
+                convert=False,
+            ),
+            ParsedQuantity(
+                'frozen_core_treatment',
+                r'Frozen core treatment\s*\.+\s*(.+)',
+                flatten=False,
+                convert=False,
+            ),
+            ParsedQuantity(
+                'reference_wave_function',
+                r'Reference Wavefunction\s*\.+\s*(.+)',
+                flatten=False,
+                convert=False,
+            ),
+            ParsedQuantity(
+                'nb_of_atomic_orbitals', r'Number of AO\'s\s*\.+\s*(\d+)', dtype=int
+            ),
+            ParsedQuantity(
+                'nb_of_electrons', r'Number of electrons\s*\.+\s*(\d+)', dtype=int
+            ),
+            ParsedQuantity(
+                'nb_of_correlated_electrons',
+                r'Number of correlated electrons\s*\.+\s*(\d+)',
+                dtype=int,
+            ),
+            ParsedQuantity(
+                'integral_transformation',
+                r'Integral transformation\s*\.+\s*(.+)',
+                flatten=False,
+                convert=False,
+            ),
+            ParsedQuantity(
+                'level_shift_amplitude_update',
+                rf'Level shift for amplitude update\s*\.+\s*({re_float})',
+                dtype=float,
+            ),
+            ParsedQuantity(
+                'coulomb_transformation_type',
+                r'Transformation type\s*\.+\s*(.+)',
+                flatten=False,
+                convert=False,
+            ),
+            ParsedQuantity(
+                'coulomb_transformation_dimension_basis',
+                r'Dimension of the basis\s*\.+\s*(\d+)',
+                dtype=int,
+            ),
+            ParsedQuantity(
+                'nb_internal_alpha_mol_orbitals',
+                r'Number of internal alpha\-MOs\s*\.+\s*(\d+)',
+                dtype=int,
+            ),
+            ParsedQuantity(
+                'nb_internal_beta_mol_orbitals',
+                r'Number of internal beta\-MOs\s*\.+\s*(\d+)',
+                dtype=int,
+            ),
+            ParsedQuantity('pair_cutoff', rf'Pair cutoff\s*\.+\s*({re_float})', dtype=float),
+            ParsedQuantity(
+                'atomic_orbital_integral_source',
+                r'AO\-integral source\s*\.+\s*(.+)',
+                flatten=False,
+                convert=False,
+            ),
+            ParsedQuantity(
+                'integral_package_used',
+                r'Integral package used\s*\.+\s*(.+)',
+                flatten=False,
+                convert=False,
+            ),
+            ParsedQuantity(
+                'nb_alpha_pairs_included',
+                r'Number of Alpha\-MO pairs included\s*\.+\s*(\d+)',
+                dtype=int,
+            ),
+            ParsedQuantity(
+                'nb_beta_pairs_included',
+                r'Number of Beta\-MO pairs included\s*\.+\s*(\d+)',
+                dtype=int,
+            ),
+            ParsedQuantity(
+                'mp2_energy_spin_aa',
+                rf'EMP2\(aa\)=\s*({re_float})',
+                dtype=float,
+                unit=ureg.hartree,
+            ),
+            ParsedQuantity(
+                'mp2_energy_spin_bb',
+                rf'EMP2\(bb\)=\s*({re_float})',
+                dtype=float,
+                unit=ureg.hartree,
+            ),
+            ParsedQuantity(
+                'mp2_energy_spin_ab',
+                rf'EMP2\(ab\)=\s*({re_float})',
+                dtype=float,
+                unit=ureg.hartree,
+            ),
+            ParsedQuantity(
+                'mp2_initial_guess',
+                rf'E\(0\)\s*\.+\s*({re_float})',
+                dtype=float,
+                unit=ureg.hartree,
+            ),
+            ParsedQuantity(
+                'mp2_energy',
+                rf'E\(MP2\)\s*\.+\s*({re_float})',
+                dtype=float,
+                unit=ureg.hartree,
+            ),
+            ParsedQuantity(
+                'mp2_total_energy',
+                rf'Initial E\(tot\)\s*\.+\s*({re_float})',
+                dtype=float,
+                unit=ureg.hartree,
+            ),
+            ParsedQuantity(
+                'T_and_T_energy',
+                rf'<T\|T>\s*\.+\s*({re_float})',
+                dtype=float,
+                unit=ureg.hartree,
+            ),
+            ParsedQuantity(
+                'total_nb_pairs_included',
+                r'Number of pairs included\s*\.+\s*(\d+)',
+                dtype=int,
+            ),
+            ParsedQuantity(
+                'iteration_energy',
+                r'(Iter\s*E\(tot\)[\s\S]+?)\-{3}',
+                str_operation=str_to_iteration_energy,
+                convert=False,
+            ),
+            ParsedQuantity(
+                'ccsd_correlation_energy',
+                rf'E\(CORR\)\s*\.+\s*({re_float})',
+                dtype=float,
+                unit=ureg.hartree,
+            ),
+            ParsedQuantity(
+                'ccsd_total_energy',
+                rf'E\(TOT\)\s*\.+\s*({re_float})',
+                dtype=float,
+                unit=ureg.hartree,
+            ),
+            ParsedQuantity(
+                'single_norm_half_ss',
+                rf'Singles Norm <S\|S>\*\*1/2\s*\.+\s*({re_float})',
+                dtype=float,
+                unit=ureg.hartree,
+            ),
+            ParsedQuantity(
+                't1_diagnostic',
+                rf'T1 diagnostic\s*\.+\s*({re_float})',
+                dtype=float,
+                unit=ureg.hartree,
+            ),
+            ParsedQuantity(
+                'ccsdt_total_triples_correction',
+                rf'Triples Correction \(T\)\s*\.+\s*({re_float})',
+                dtype=float,
+                unit=ureg.hartree,
+            ),
+            ParsedQuantity(
+                'ccsdt_aaa_triples_contribution',
+                rf'alpha\-alpha\-alpha\s*\.+\s*({re_float})',
+                dtype=float,
+                unit=ureg.hartree,
+            ),
+            ParsedQuantity(
+                'ccsdt_aab_triples_contribution',
+                rf'alpha\-alpha\-beta\s*\.+\s*({re_float})',
+                dtype=float,
+                unit=ureg.hartree,
+            ),
+            # typo in metainfo?
+            ParsedQuantity(
+                'ccsdt_aba_triples_contribution',
+                rf'alpha\-beta\-beta\s*\.+\s*({re_float})',
+                dtype=float,
+                unit=ureg.hartree,
+            ),
+            ParsedQuantity(
+                'ccsdt_bbb_triples_contribution',
+                rf'beta\-beta\-beta\s*\.+\s*({re_float})',
+                dtype=float,
+                unit=ureg.hartree,
+            ),
+            ParsedQuantity(
+                'ccsdt_final_corr_energy',
+                rf'Final correlation energy\s*\.+\s*({re_float})',
+                dtype=float,
+                unit=ureg.hartree,
+            ),
+            ParsedQuantity(
+                'ccsd_final_energy',
+                rf'E\(CCSD\)\s*\.+\s*({re_float})',
+                dtype=float,
+                unit=ureg.hartree,
+            ),
+            ParsedQuantity(
+                'energy_total',
+                rf'E\(CCSD\(T\)\)\s*\.+\s*({re_float})',
+                dtype=float,
+                unit=ureg.hartree,
+            ),
+        ]
+
+        mp2_quantities = [
+            ParsedQuantity(
+                'mp2_basis_dimension',
+                r'Dimension of the basis\s*\.+\s*(\d+)',
+                dtype=int,
+            ),
+            ParsedQuantity(
+                'scaling_mp2_energy',
+                rf'Overall scaling of the MP2 energy\s*\.+\s*({re_float})',
+                dtype=float,
+            ),
+            ParsedQuantity(
+                'mp2_aux_basis_dimension',
+                r'Dimension of the aux\-basis\s*\.+\s*(\d+)',
+                dtype=int,
+            ),
+            ParsedQuantity(
+                'energy_method_current',
+                rf'RI\-MP2 CORRELATION ENERGY:\s*({re_float})',
+                dtype=float,
+                unit=ureg.hartree,
+            ),
+            ParsedQuantity(
+                'energy_total',
+                rf'MP2 TOTAL ENERGY:\s*({re_float})',
+                dtype=float,
+                unit=ureg.hartree,
+            ),
+        ]
+
+        localization_quantities = [
+            ParsedQuantity('type',
+                r'Localization creterion\s*\.+\s*(\S+)',
+                convert=False,               
+            ),
+            ParsedQuantity('max_n_iterations',
+                rf'Max. number of iterations\s*\.+\s*({re_float})',
+                dtype=float,
+            ),
+            ParsedQuantity(
+                'energy_change_tolerance',
+                rf'Convergence tolerance\s*\.+\s*({re_float})',
+                dtype=float,
+                unit=ureg.hartree,
+            ),
+        ]
+
+        calculation_quantities = [
+            #ParsedQuantity(
+            #    'cartesian_coordinates',
+            #    rf'CARTESIAN COORDINATES \(ANGSTROEM\)\s*\-+\s*([\s\S]+?){re_n}{re_n}',
+            #    str_operation=str_to_cartesian_coordinates,
+            #),
+            ParsedQuantity(
+                'basis_set',
+                r'\n *BASIS SET INFORMATION\s*\-+([\s\S]+?)\-{10}',
+                sub_parser=TextParser(quantities=basis_set_quantities),
+            ),
+            ParsedQuantity(
+                'auxiliary_basis_set',
+                r'\n *AUXILIARY BASIS SET INFORMATION\s*\-+([\s\S]+?)\-{10}',
+                sub_parser=TextParser(quantities=basis_set_quantities),
+            ),
+            ParsedQuantity(
+                'basis_set_statistics',
+                r'BASIS SET STATISTICS AND STARTUP INFO([\s\S]+?)\-{10}',
+                sub_parser=TextParser(quantities=basis_set_statistics_quantities),
+            ),
+            ParsedQuantity(
+                'self_consistent',
+                r'((?:ORCA SCF|DFT GRID GENERATION)\s*\-+[\s\S]+?(?:\-{70}|\Z))',
+                sub_parser=TextParser(quantities=self_consistent_quantities),
+            ),
+            ParsedQuantity(
+                'tddft',
+                r'ORCA TD\-DFT(?:/TDA)* CALCULATION\s*\-+\s*([\s\S]+?E\(tot\).*)',
+                sub_parser=TextParser(quantities=tddft_quantities),
+            ),
+            ParsedQuantity(
+                'mp2',
+                r'ORCA MP2 CALCULATION([\s\S]+?MP2 TOTAL ENERGY:.+)',
+                sub_parser=TextParser(quantities=mp2_quantities),
+            ),
+            ParsedQuantity(
+                'ci',
+                r'ORCA\-MATRIX DRIVEN CI([\s\S]+?E\(CCSD\(T\)\).*)',
+                sub_parser=TextParser(quantities=ci_quantities),
+            ),
+            ParsedQuantity(
+                'loc',
+                r'\n *ORCA ORBITAL LOCALIZATION\s*\-+([\s\S]+?)\-{10}',
+                sub_parser=TextParser(quantities=localization_quantities),
+            )
+        ]
+
+        geometry_optimization_quantities = [
+            ParsedQuantity(
+                '%s_tol' % key.lower().replace(' ', '_').replace('.', ''),
+                rf'%s\s*(\w+)\s*\.+\s*({re_float})' % key,
+                dtype=float,
+            )
+            for key in [
+                'Energy Change',
+                'Max. Gradient',
+                'RMS Gradient',
+                'Max. Displacement',
+                'RMS Displacement',
+            ]
+        ]
+
+        geometry_optimization_quantities += [
+            ParsedQuantity('update_method', r'Update method\s*(\w+)\s*\.+\s*(.+)'),
+            ParsedQuantity('coords_choice', r'Choice of coordinates\s*(\w+)\s*\.+\s*(.+)'),
+            ParsedQuantity('initial_hessian', r'Initial Hessian\s*(\w+)\s*\.+\s*(.+)'),
+        ]
+
+        geometry_optimization_quantities += [
+            ParsedQuantity(
+                'cycle',
+                r'OPTIMIZATION CYCLE\s*\d+\s*\*\s*\*+([\s\S]+?)(?:\*\s*GEOMETRY|OPTIMIZATION RUN DONE|\Z)',
+                repeats=True,
+                sub_parser=TextParser(quantities=calculation_quantities),
+            ),
+            ParsedQuantity(
+                'final_energy_evaluation',
+                r'FINAL ENERGY EVALUATION AT THE STATIONARY POINT([\s\S]+?FINAL SINGLE POINT ENERGY.*)',
+                sub_parser=TextParser(quantities=calculation_quantities),
+            ),
+        ]
+
+
+        self._quantities = [
+            ParsedQuantity(
+                'program_version',
+                r'Program Version\s*([\w_.].*)',
+                convert=False,
+                flatten=False,
+            ),
+            ParsedQuantity(
+                'program_svn', r'\(SVN:\s*\$([^$]+)\$\)\s', convert=False, flatten=False
+            ),
+            ParsedQuantity(
+                'program_compilation_date',
+                r'\(\$Date\:\s*(\w.+?)\s*\$\)',
+                convert=False,
+                flatten=False,
+            ),
+            ParsedQuantity(
+                'input_file',
+                r'INPUT FILE\s*\=+([\s\S]+?)END OF INPUT',
+                sub_parser=TextParser(
+                    quantities=[
+                        Quantity('xc_functional', r'\d+>\s*!\s*(\S+)'),
+                        Quantity('tier', r'(\w+SCF)'),
+                    ]
+                ),
+            ),
+            ParsedQuantity(
+                'single_point',
+                r'\* Single Point Calculation \*\s*\*+([\s\S]+?(?:FINAL SINGLE POINT ENERGY.*|\Z))',
+                sub_parser=TextParser(quantities=calculation_quantities),
+            ),
+            ParsedQuantity(
+                'geometry_optimization',
+                r'\* Geometry Optimization Run \*\s*\*+([\s\S]+?(?:OPTIMIZATION RUN DONE|\Z))',
+                sub_parser=TextParser(quantities=geometry_optimization_quantities),
+            ),
+        ]
+
+        # # Combine all quantities
+        # self._quantities = initial_quantities + \
+        #                     coupled_cluster_quantities + \
+        #                     basis_set_quantities + \
+        #                     basis_set_statistics_quantities + \
+        #                     grid_quantities + \
+        #                     scf_convergence_quantities + \
+        #                     self_consistent_quantities + \
+        #                     population_quantities + \
+        #                     tddft_quantities + \
+        #                     mp2_quantities + \
+        #                     calculation_quantities + \
+        #                     geometry_optimization_quantities + \
+        #                     localization_quantities
+
 
 
 def str_to_cartesian_coordinates(val_in):
@@ -535,70 +970,4 @@ class ORCAParser(MatchingParser):
         super().__init__(*args, **kwargs)
         self.out_parser = OutParser()
 
-    def parse_atomic_structure(self, out_parser, logger):
-        atoms_information = out_parser.get('atoms_information', [])
-        if isinstance(atoms_information, list):
-            symbols, coordinates = str_to_cartesian_coordinates(atoms_information)
-            if len(symbols) == len(coordinates):
-                model_system = ModelSystem()
-                atomic_cell = AtomicCell()
-                for symbol, coord in zip(symbols, coordinates):
-                    try:
-                        atom_state = AtomsState(chemical_symbol=symbol)
-                        atomic_cell.atoms_state.append(atom_state)
-                    except Exception as e:
-                        logger.warning(f'Error creating AtomsState: {e}')
-                atomic_cell.positions = coordinates
-                model_system.cell.append(atomic_cell)
-                return model_system
-            else:
-                logger.error('Mismatch between number of symbols and coordinates.')
-        else:
-            logger.warning("No atoms information found or incorrect format.")
-        return None
-
-    def parse_coupled_cluster(self, out_parser, logger):
-        cc_type = out_parser.get('coupled_cluster_type')
-        if cc_type:
-            model_method = CoupledCluster(
-                type=cc_type,
-                reference_determinant=out_parser.get('cc_reference_wavefunction')
-            )
-            #numerical_settings = PNOSettings(t_close_pair=out_parser.get('tCutPairs'))
-            output = CCOutputs(
-                largest_t2_amplitude=out_parser.get('largest_t2_amplitudes'),
-                t1_norm=out_parser.get('t1_diagnostic'),
-                reference_energy=out_parser.get('reference_energy'),
-                corr_energy_strong=out_parser.get('corr_energy_strong'),
-                corr_energy_weak=out_parser.get('corr_energy_weak')
-            )
-            return model_method, output
-        logger.warning('No coupled cluster data found.')
-        return None, None
-
-    def parse(self, mainfile, archive: 'EntryArchive', logger: 'BoundLogger', child_archives=None):
-        self.out_parser.mainfile = mainfile
-        self.out_parser.logger = logger
-
-        # Perform parsing
-        self.out_parser.parse()
-        simulation = Simulation()
-        simulation.program = Program(name='EBB2675', version=self.out_parser.get('program_version'))
-        archive.data = simulation
-
-        # Parse coordinates
-        model_system = self.parse_atomic_structure(self.out_parser, logger)
-        if model_system:
-            simulation.model_system.append(model_system)
-        
-        #numerical_settings = self.out_parser.get('scf_settings', {}).get('max_n_iterations')
-        numerical_settings = self.out_parser.get('scf_settings', {})
-        print(numerical_settings)
-        # Parse coupled cluster data
-        model_method, output = self.parse_coupled_cluster(self.out_parser, logger)
-        if model_method:
-            simulation.model_method.append(model_method)
-        if output:
-            simulation.outputs.append(output)
-
-
+ 
