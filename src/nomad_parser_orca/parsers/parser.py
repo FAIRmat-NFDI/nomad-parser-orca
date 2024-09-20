@@ -959,19 +959,21 @@ class ORCAParser(MatchingParser):
             symbols, coordinates = str_to_cartesian_coordinates(cartesian_coordinates)
             if len(symbols) == len(coordinates):
                 model_system = ModelSystem()
-                atomic_cell = AtomicCell()
-                #Set the number of atoms
-                atomic_cell.n_atoms = len(symbols)
-                #Create AtomsState instance and append them to atomic_cell
+                atomic_cell_data = {
+                    'atoms_state': [],
+                    'positions': coordinates,
+                    'n_atoms': len(symbols)
+                }
+                
                 for symbol in symbols:
                     try:
                         atom_state = AtomsState(chemical_symbol=symbol)
-                        atomic_cell.atoms_state.append(atom_state)
+                        atomic_cell_data['atoms_state'].append(atom_state)
                     except Exception as e:
                         logger.warning(f'Error creating AtomsState: {e}')
-                atomic_cell.positions = coordinates
-                model_system.cell.append(atomic_cell)
-                return model_system
+                
+                # You can now use atomic_cell_data for your purposes
+                return atomic_cell_data  # Return the dictionary instead of AtomicCell
             else:
                 logger.error('Mismatch between number of symbols and coordinates.')
         else:
@@ -1023,12 +1025,16 @@ class ORCAParser(MatchingParser):
         simulation.program = Program(name='EBB2675', version=self.out_parser.get('program_version'))
         archive.data = simulation
 
-        model_system = self.parse_coordinates(self.out_parser, logger)
-        if model_system:
-            simulation.model_system.append(model_system)
+        atomic_cell_data = self.parse_coordinates(self.out_parser, logger)
+        if atomic_cell_data:
+            # Convert atomic_cell_data to an AtomicCell or process as needed
+            atomic_cell = AtomicCell()
+            atomic_cell.atoms_state = atomic_cell_data['atoms_state']
+            atomic_cell.positions = atomic_cell_data['positions']
+            atomic_cell.n_atoms = atomic_cell_data['n_atoms']
+            simulation.model_system.append(atomic_cell)
 
         model_method, output = self.parse_coupled_cluster(self.out_parser, logger)
-
         simulation.model_method.append(model_method)
         simulation.outputs.append(output)
 
@@ -1038,15 +1044,14 @@ class ORCAParser(MatchingParser):
             .get('scf_settings', {})
         )
 
-        scf  = SelfConsistency(n_max_iterations = scf_convergence['n_max_iterations'],
-                               threshold_change = scf_convergence['energy_change_tolerance']
+        scf = SelfConsistency(n_max_iterations=scf_convergence['n_max_iterations'],
+                              threshold_change=scf_convergence['energy_change_tolerance']
         )
         model_method.numerical_settings.append(scf)
 
-        # parse orbital localization information
-        # append to ModelMethod / NumericalSettings
-        #localization = self.parse_localization(self.out_parser, logger)
-        #model_method.numerical_settings.append(localization)
+
+
+
 
 
 
