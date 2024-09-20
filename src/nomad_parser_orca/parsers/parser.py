@@ -126,10 +126,10 @@ class OutParser(TextParser):
         basis_set_naming_quantities = [
             ParsedQuantity('main_basis_set',
                 r'Your calculation utilizes the basis:\s*(.*)',
-                repeats=False),
+                repeats=False, convert=False, flatten=False),
             ParsedQuantity('aux_basis_set',
                 r'Your calculation utilizes the auxiliary basis:\s*(.*)',
-                repeats=True)]
+                repeats=True, convert=False, flatten=False)]
 
         # Basis set statistics quantities
         basis_set_statistics_quantities = [
@@ -1048,6 +1048,6 @@ class ORCAParser(MatchingParser):
             )
             model_method.numerical_settings.append(scf)
 
-        #basis_set = self.out_parser.get('basis_set_name', {})
-        #print(basis_set)
+        basis_set = self.out_parser.get('basis_set_name', {})
+
 
