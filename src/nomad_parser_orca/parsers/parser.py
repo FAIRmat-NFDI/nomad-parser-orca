@@ -22,7 +22,6 @@ from nomad_simulations.schema_packages.model_system import (AtomicCell,
                                                             ModelSystem)
 from nomad_simulations.schema_packages.numerical_settings import SelfConsistency
 
-
 from nomad_parser_orca.schema_packages.schema_package import CoupledCluster
 from nomad_parser_orca.schema_packages.numerical_settings import PNOSettings, LocMet
 from nomad_parser_orca.schema_packages.outputs import CCOutputs
@@ -122,8 +121,15 @@ class OutParser(TextParser):
         basis_set_quantities = [
             ParsedQuantity('basis_set_atom_labels', r'Type\s*(\w+)', repeats=True),
             ParsedQuantity('basis_set', r':\s*(\w+)\s*contracted\s*to', repeats=True),
-            ParsedQuantity('basis_set_contracted', r'(\w+)\s*pattern', repeats=True),
-        ]
+            ParsedQuantity('basis_set_contracted', r'(\w+)\s*pattern', repeats=True) ]
+        
+        basis_set_naming_quantities = [
+            ParsedQuantity('main_basis_set',
+                r'Your calculation utilizes the basis:\s*(.*)',
+                repeats=False),
+            ParsedQuantity('aux_basis_set',
+                r'Your calculation utilizes the auxiliary basis:\s*(.*)',
+                repeats=True)]
 
         # Basis set statistics quantities
         basis_set_statistics_quantities = [
@@ -804,6 +810,7 @@ class OutParser(TextParser):
             ),
         ]
 
+
         calculation_quantities = [
             ParsedQuantity(
                 'cartesian_coordinates',
@@ -924,6 +931,11 @@ class OutParser(TextParser):
                 ),
             ),
             ParsedQuantity(
+                'basis_set_name',
+                r'----- Orbital basis set information -----([\s\S]+?)\={10}',
+                sub_parser=TextParser(quantities=basis_set_naming_quantities),
+            ),
+            ParsedQuantity(
                 'single_point',
                 r'\* Single Point Calculation \*\s*\*+([\s\S]+?(?:FINAL SINGLE POINT ENERGY.*|\Z))',
                 sub_parser=TextParser(quantities=calculation_quantities),
@@ -1036,4 +1048,6 @@ class ORCAParser(MatchingParser):
             )
             model_method.numerical_settings.append(scf)
 
+        #basis_set = self.out_parser.get('basis_set_name', {})
+        #print(basis_set)
 
