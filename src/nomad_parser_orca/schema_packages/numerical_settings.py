@@ -135,17 +135,18 @@ class PNOSettings(NumericalSettings):
 class LocMet(NumericalSettings):
     """ Numerical settings that control orbital localization."""
     type = Quantity(
-        type=MEnum('FB',
-                   'PM',
-                   'IBO',
-                   'IAOIBO',
-                   'IAOBOYS'
-                   'NEWBOYS'
-                   'AHFB'),
+        #type=MEnum('FB',
+        #           'PM',
+        #           'IBO',
+        #           'IAOIBO',
+        #           'IAOBOYS'
+        #           'NEWBOYS'
+        #           'AHFB'),
+        type=str,
         description="""
         Name of the localization method
         """,
-    ) # Extend from molpro
+    )
 
     n_max_iterations = Quantity(
         type=np.int32,
@@ -159,6 +160,13 @@ class LocMet(NumericalSettings):
         description="""
         Specifies the convergence tolerance.
         """,
+    )
+
+    orbital_window = Quantity(
+        shape=['*'],
+        description="""
+        the Molecular orbital number of the orbitals to be localized.
+        """
     )
 
     # TODO : add more method-dependent quantities

@@ -24,7 +24,7 @@ from nomad_simulations.schema_packages.numerical_settings import SelfConsistency
 
 
 from nomad_parser_orca.schema_packages.schema_package import CoupledCluster
-from nomad_parser_orca.schema_packages.numerical_settings import PNOSettings
+from nomad_parser_orca.schema_packages.numerical_settings import PNOSettings, LocMet
 from nomad_parser_orca.schema_packages.outputs import CCOutputs
 
 
@@ -372,7 +372,7 @@ class OutParser(TextParser):
                             unit=ureg.hartree,
                         ),
                         ParsedQuantity(
-                            'max_n_iterations',
+                            'n_max_iterations',
                             rf'Maximum # iterations\s*MaxIter\s*\.+\s*({re_float})',
                             dtype=float,
                         ),
@@ -792,7 +792,7 @@ class OutParser(TextParser):
                 r'Localization creterion\s*\.+\s*(\S+)',
                 convert=False,
             ),
-            ParsedQuantity('max_n_iterations',
+            ParsedQuantity('n_max_iterations',
                 rf'Max. number of iterations\s*\.+\s*({re_float})',
                 dtype=float,
             ),
@@ -849,6 +849,14 @@ class OutParser(TextParser):
                 'loc',
                 r'\n *ORCA ORBITAL LOCALIZATION\s*\-+([\s\S]+?)\-{10}',
                 sub_parser=TextParser(quantities=localization_quantities),
+            ),
+            # FIX HERE
+            ParsedQuantity(
+                'cc',
+                r'ORCA\-MATRIX DRIVEN CI([\s\S]+?E\(CCSD\(T\)\).*)',
+                # optional regex: ECCSDT part is not a must to match
+                #r'ORCA\-MATRIX DRIVEN CI([\s\S]+?)(E\(CCSD\(T\)\).*)?',
+                sub_parser=TextParser(quantities=coupled_cluster_quantities),
             )
         ]
 
@@ -967,8 +975,42 @@ class ORCAParser(MatchingParser):
             logger.warning("No atoms information found or incorrect format.")
         return None
 
+    def parse_coupled_cluster(self, out_parser, logger):
+        cc_type = out_parser.get('single_point').get('cc').get('coupled_cluster_type')
+        if cc_type:
+            model_method = CoupledCluster(
+                type=cc_type,
+                reference_determinant=out_parser.get('single_point').get('cc').get('cc_reference_wavefunction')
+            )
+            #numerical_settings = PNOSettings(t_close_pair=out_parser.get('tCutPairs'))
+            output = CCOutputs(
+                largest_t2_amplitude=out_parser.get('single_point').get('cc').get('largest_t2_amplitudes'),
+                t1_norm=out_parser.get('single_point').get('cc').get('t1_diagnostic'),
+                reference_energy=out_parser.get('single_point').get('cc').get('reference_energy'),
+                corr_energy_strong=out_parser.get('single_point').get('cc').get('corr_energy_strong'),
+                corr_energy_weak=out_parser.get('single_point').get('cc').get('corr_energy_weak')
+            )
+            return model_method, output
+        logger.warning('No coupled cluster data found.')
+        return None, None
 
-    def parse(self, mainfile, archive: 'EntryArchive', logger: 'BoundLogger', child_archives=None):
+    def parse_localization(self, out_parser, logger):
+        #this part needs some more work
+
+        loc_type = out_parser.get('single_point').get('loc').get('type')
+        n_max_iterations = out_parser.get('single_point', {}).get('loc', {}).get('n_max_iterations')
+        threshold_change = out_parser.get('single_point', {}).get('loc', {}).get('energy_change_tolerance')
+
+        if loc_type:
+            localization = LocMet(type=loc_type,
+                                  n_max_iterations = n_max_iterations,
+                                  threshold_change=threshold_change)
+
+            return localization
+        return None
+
+    def parse(self, mainfile, archive: 'EntryArchive', logger: 'BoundLogger',
+              child_archives=None) -> None:
         self.out_parser.mainfile = mainfile
         self.out_parser.logger = logger
 
@@ -982,12 +1024,36 @@ class ORCAParser(MatchingParser):
         if model_system:
             simulation.model_system.append(model_system)
 
+        model_method, output = self.parse_coupled_cluster(self.out_parser, logger)
+
+        simulation.model_method.append(model_method)
+        simulation.outputs.append(output)
 
         scf_convergence = (
              self.out_parser.get('single_point', {})
             .get('self_consistent', {})
             .get('scf_settings', {})
         )
+
+        scf  = SelfConsistency(n_max_iterations = scf_convergence['n_max_iterations'],
+                               threshold_change = scf_convergence['energy_change_tolerance']
+        )
+        model_method.numerical_settings.append(scf)
+
+        # parse orbital localization information
+        # append to ModelMethod / NumericalSettings
+        #localization = self.parse_localization(self.out_parser, logger)
+        #model_method.numerical_settings.append(localization)
+
+
+
+
+
+
+
+
+
+
 
 
 
