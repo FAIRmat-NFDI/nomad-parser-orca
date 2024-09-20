@@ -960,10 +960,7 @@ class ORCAParser(MatchingParser):
             if len(symbols) == len(coordinates):
                 model_system = ModelSystem()
                 atomic_cell = AtomicCell()
-                #Set the number of atoms
-                atomic_cell.n_atoms = len(symbols)
-                #Create AtomsState instance and append them to atomic_cell
-                for symbol in symbols:
+                for symbol, coord in zip(symbols, coordinates):
                     try:
                         atom_state = AtomsState(chemical_symbol=symbol)
                         atomic_cell.atoms_state.append(atom_state)
