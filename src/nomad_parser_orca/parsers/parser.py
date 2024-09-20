@@ -1015,7 +1015,7 @@ class ORCAParser(MatchingParser):
         # Perform parsing
         self.out_parser.parse()
         simulation = Simulation()
-        simulation.program = Program(name='EBB2675', version=self.out_parser.get('program_version'))
+        simulation.program = Program(name='ORCA', version=self.out_parser.get('program_version'))
         archive.data = simulation
 
         model_system = self.parse_coordinates(self.out_parser, logger)
