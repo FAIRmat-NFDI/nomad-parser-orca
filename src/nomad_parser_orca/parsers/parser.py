@@ -947,6 +947,7 @@ def str_to_cartesian_coordinates(val_in):
     else:
         raise ValueError("Expected a list input for cartesian coordinates.")
 
+
 class ORCAParser(MatchingParser):
 
     def __init__(self, *args, **kwargs):
@@ -959,21 +960,19 @@ class ORCAParser(MatchingParser):
             symbols, coordinates = str_to_cartesian_coordinates(cartesian_coordinates)
             if len(symbols) == len(coordinates):
                 model_system = ModelSystem()
-                atomic_cell_data = {
-                    'atoms_state': [],
-                    'positions': coordinates,
-                    'n_atoms': len(symbols)
-                }
-                
-                for symbol in symbols:
+                atomic_cell = AtomicCell()
+                atomic_cell.n_atoms = len(symbols)  # Set the number of atoms
+                atomic_cell.equivalent_atoms = list(range(len(symbols)))  # Initialize equivalent atoms
+
+                for symbol, coord in zip(symbols, coordinates):
                     try:
                         atom_state = AtomsState(chemical_symbol=symbol)
-                        atomic_cell_data['atoms_state'].append(atom_state)
+                        atomic_cell.atoms_state.append(atom_state)
                     except Exception as e:
                         logger.warning(f'Error creating AtomsState: {e}')
-                
-                # You can now use atomic_cell_data for your purposes
-                return atomic_cell_data  # Return the dictionary instead of AtomicCell
+                atomic_cell.positions = coordinates
+                model_system.cell.append(atomic_cell)
+                return model_system
             else:
                 logger.error('Mismatch between number of symbols and coordinates.')
         else:
@@ -981,36 +980,31 @@ class ORCAParser(MatchingParser):
         return None
 
     def parse_coupled_cluster(self, out_parser, logger):
-        cc_type = out_parser.get('single_point').get('cc').get('coupled_cluster_type')
-        if cc_type:
+        cc_data = out_parser.get('single_point', {}).get('cc', {})
+        if cc_data:
             model_method = CoupledCluster(
-                type=cc_type,
-                reference_determinant=out_parser.get('single_point').get('cc').get('cc_reference_wavefunction')
+                type=cc_data.get('coupled_cluster_type'),
+                reference_determinant=cc_data.get('cc_reference_wavefunction')
             )
-            #numerical_settings = PNOSettings(t_close_pair=out_parser.get('tCutPairs'))
             output = CCOutputs(
-                largest_t2_amplitude=out_parser.get('single_point').get('cc').get('largest_t2_amplitudes'),
-                t1_norm=out_parser.get('single_point').get('cc').get('t1_diagnostic'),
-                reference_energy=out_parser.get('single_point').get('cc').get('reference_energy'),
-                corr_energy_strong=out_parser.get('single_point').get('cc').get('corr_energy_strong'),
-                corr_energy_weak=out_parser.get('single_point').get('cc').get('corr_energy_weak')
+                largest_t2_amplitude=cc_data.get('largest_t2_amplitudes'),
+                t1_norm=cc_data.get('t1_diagnostic'),
+                reference_energy=cc_data.get('reference_energy'),
+                corr_energy_strong=cc_data.get('corr_energy_strong'),
+                corr_energy_weak=cc_data.get('corr_energy_weak')
             )
             return model_method, output
         logger.warning('No coupled cluster data found.')
         return None, None
 
     def parse_localization(self, out_parser, logger):
-        #this part needs some more work
-
-        loc_type = out_parser.get('single_point').get('loc').get('type')
-        n_max_iterations = out_parser.get('single_point', {}).get('loc', {}).get('n_max_iterations')
-        threshold_change = out_parser.get('single_point', {}).get('loc', {}).get('energy_change_tolerance')
-
-        if loc_type:
-            localization = LocMet(type=loc_type,
-                                  n_max_iterations = n_max_iterations,
-                                  threshold_change=threshold_change)
-
+        loc_data = out_parser.get('single_point', {}).get('loc', {})
+        if loc_data:
+            localization = LocMet(
+                type=loc_data.get('type'),
+                n_max_iterations=loc_data.get('n_max_iterations'),
+                threshold_change=loc_data.get('energy_change_tolerance')
+            )
             return localization
         return None
 
@@ -1025,46 +1019,22 @@ class ORCAParser(MatchingParser):
         simulation.program = Program(name='EBB2675', version=self.out_parser.get('program_version'))
         archive.data = simulation
 
-        atomic_cell_data = self.parse_coordinates(self.out_parser, logger)
-        if atomic_cell_data:
-            # Convert atomic_cell_data to an AtomicCell or process as needed
-            atomic_cell = AtomicCell()
-            atomic_cell.atoms_state = atomic_cell_data['atoms_state']
-            atomic_cell.positions = atomic_cell_data['positions']
-            atomic_cell.n_atoms = atomic_cell_data['n_atoms']
-            simulation.model_system.append(atomic_cell)
+        model_system = self.parse_coordinates(self.out_parser, logger)
+        if model_system:
+            simulation.model_system.append(model_system)
 
         model_method, output = self.parse_coupled_cluster(self.out_parser, logger)
-        simulation.model_method.append(model_method)
-        simulation.outputs.append(output)
+        if model_method:
+            simulation.model_method.append(model_method)
+        if output:
+            simulation.outputs.append(output)
 
-        scf_convergence = (
-             self.out_parser.get('single_point', {})
-            .get('self_consistent', {})
-            .get('scf_settings', {})
-        )
-
-        scf = SelfConsistency(n_max_iterations=scf_convergence['n_max_iterations'],
-                              threshold_change=scf_convergence['energy_change_tolerance']
-        )
-        model_method.numerical_settings.append(scf)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        scf_convergence = self.out_parser.get('single_point', {}).get('self_consistent', {}).get('scf_settings', {})
+        if scf_convergence:
+            scf = SelfConsistency(
+                n_max_iterations=scf_convergence.get('n_max_iterations'),
+                threshold_change=scf_convergence.get('energy_change_tolerance')
+            )
+            model_method.numerical_settings.append(scf)
 
 
