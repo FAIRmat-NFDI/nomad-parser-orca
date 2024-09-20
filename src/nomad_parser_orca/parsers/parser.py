@@ -962,7 +962,6 @@ class ORCAParser(MatchingParser):
                 model_system = ModelSystem()
                 atomic_cell = AtomicCell()
                 atomic_cell.n_atoms = len(symbols)  # Set the number of atoms
-                atomic_cell.equivalent_atoms = list(range(len(symbols)))  # Initialize equivalent atoms
 
                 for symbol, coord in zip(symbols, coordinates):
                     try:
