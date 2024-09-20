@@ -971,6 +971,7 @@ class ORCAParser(MatchingParser):
                         logger.warning(f'Error creating AtomsState: {e}')
                 atomic_cell.positions = coordinates
                 model_system.cell.append(atomic_cell)
+                print(atomic_cell)
                 return model_system
             else:
                 logger.error('Mismatch between number of symbols and coordinates.')
