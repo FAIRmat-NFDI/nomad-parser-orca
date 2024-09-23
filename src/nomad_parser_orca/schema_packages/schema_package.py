@@ -39,11 +39,33 @@ configuration = config.get_plugin_entry_point(
 
 m_package = SchemaPackage()
 
+class PerturbationMethod(ModelMethodElectronic):
+    type = Quantity(
+        type=MEnum('MP', 'RS', 'BW'),
+        description="""
+        Perturbation approach. The abbreviations stand for:
+        | Abbreviation | Description |
+        | ------------ | ----------- |
+        | `'MP'`       | Moller-Plesset |
+        | `'RS'`       | Rayleigh-Schrödigner |
+        | `'BW'`       | Brillouin-Wigner |
+        """,
+        a_eln=ELNAnnotation(component='EnumEditQuantity'),
+    )  # TODO: check if the special symbols are supported
+
+    order = Quantity(
+        type=np.int32,
+        description="""
+        Order up to which the perturbation is expanded.
+        """,
+        a_eln=ELNAnnotation(component='NumberEditQuantity'),
+    )
 
 class CoupledCluster(ModelMethodElectronic):
-    order_map = {k: v for k, v in enumerate(('S', 'D', 'T', 'Q'))}
-    solver_map = {'QV': 'quasi-variational', 'B': 'Brueckner'}
-    map_solver = {v: k for k, v in solver_map.items()}
+    """
+    A base section used to define the parameters of a Coupled Cluster calculation.
+    A standard schema is defined, though the most common cases can be summarized in the `type` quantity.
+    """
 
     valid_base_methods = [
         'CC2', 'CC3', 'CC4', 'CCD', 'CCSD', 'CCSDT', 'CCSDTQ',
@@ -51,12 +73,11 @@ class CoupledCluster(ModelMethodElectronic):
         'MP2', 'MP3', 'MP4', 'MP5'
     ]
 
-    # Define valid perturbative corrections and correlation methods
     perturbative_corrections = ['(T)', '(T0)', '(T1)', '[T]', '[T0]',
                                 '(Q)', '(2)', '(fT)', '(dT)']
+    
     correlation_methods = ['-F12', '-R12']
 
-    # Solver prefixes
     solver_prefixes = ['QV', 'B', 'Q']
 
     type = Quantity(
@@ -65,7 +86,7 @@ class CoupledCluster(ModelMethodElectronic):
         Coupled Cluster flavor.
         """,
         a_eln=ELNAnnotation(component='StringEditQuantity'),
-    )  # TODO: add important stuff
+    )  
 
     excitation_order = Quantity(
         type=np.int32,
@@ -73,36 +94,28 @@ class CoupledCluster(ModelMethodElectronic):
         description="""
         Orders at which the excitation are used.
         1 = single, 2 = double, 3 = triple, 4 = quadruple, etc.
-
-        Note that coupled cluster typically start from doubles.
-        Singles excitations in a Koopman-compliant scheme only make sense as a response to a perturbation.
-        """,
+        """
     )
 
     reference_determinant = Quantity(
-        type=MEnum('UHF','RHF','ROHF'
+        type=MEnum('UHF','RHF','ROHF',
                    'UKS', 'RKS', 'ROKS'),
         description="""
         the type of reference determinant.
         """,
     )
-
-    perturbative_order = Quantity(
-        type=np.int32,
-        shape=['*'],
-        description="""
-        Excitation order at which the perturbative correction is used.
-        1 = single, 2 = double, 3 = triple, 4 = quadruple, etc.
-        """,
-    )
+    
+    perturbation_method = SubSection(sub_section=PerturbationMethod.m_def)
 
     perturbative_correction = Quantity(
-        type=MEnum('(T)', '[T]'),
+        type=MEnum('(T)', '[T]', 
+                   '(T0)', '[T0]',
+                   '(Q)'),
         description="""
-        The type of perturbative corrections
+        The type of perturbative corrections.
+        A perturbative correction is different than a perturbation method.
         """,
-    )
-
+    ) # TODO: add more perturbative correction
 
     explicit_correlation = Quantity(
         type=MEnum('F12', 'F12a', 'F12b', 'F12c',
@@ -179,38 +192,11 @@ class CoupledCluster(ModelMethodElectronic):
         if isinstance(self.perturbative_order, list):
             self.perturbative_order = np.sort(self.perturbative_order)
 
-        # Optionally log the parsed method components (this requires a logger passed into the function)
-        # logger.info(f"Parsed method: {method_name}, local_approximation: {self.local_approximation}, "
-        #             f"solver: {self.solver}, type: {self.type}, perturbative_correction: {perturbative_correction}, "
-        #             f"explicit_correlation: {self.explicit_correlation}")
-
-    def cc_to_type(self) -> None:
-        """Produce an educated guess based on the other parameters."""
-        name = 'CC'
-        # cover the basic cases
-        if 2 in self.excitation_order:
-            if 1 in self.excitation_order:
-                name += 'SD'
-            name += 'D'
-        
-        # cover extended excitations
-        for order, abbrev in {3: 'T', 4: 'Q'}.items():
-            if order in self.excitation_order:
-                name += abbrev
-            elif order in self.perturbative_order:
-                name += f'({abbrev})'
-        # cover explicit correlation
-        if self.explicit_correlation is not None:
-            name += self.explicit_correlation
-        # cover specific solver approaches
-        if self.solver in self.map_solver:
-            name = self.solver_map[self.solver] + name
 
     def validate_type(self, logger) -> bool:
         """
         Validate the Coupled Cluster type to ensure it's a valid combination.
         Logs a warning if the input doesn't match expected patterns.
-        This is from ndaelman
         """
         # Regular expression to match the input
         pattern = re.compile(
@@ -224,74 +210,6 @@ class CoupledCluster(ModelMethodElectronic):
         logger.info(f'Valid Coupled Cluster type: {self.type}')
         return True
 
-
-    def type_to_cc(self) -> None:
-        """Try to extract the excitation and perturbation orders from the type.
-        This is also from ndaelman.
-        """
-        match = re.match(
-            r'(QV|B)?CC(S)?(D)?(T|\(T\))?(Q|\(Q\))?(-F12|-R12)?', self.type
-        )
-        if match is None:
-            return
-
-        ptb_initialized, exc_initialized = False, False
-        for i in range(2, 6):
-            if abbrev := match.group(i):
-                order = i - 1
-                if abbrev[0] == '(':
-                    if not ptb_initialized:
-                        self.perturbative_order = []
-                        ptb_initialized = True
-                    self.perturbative_order = np.append(self.perturbative_order, order)
-                else:
-                    if not exc_initialized:
-                        self.excitation_order = []
-                        exc_initialized = True
-                    self.excitation_order = np.append(self.excitation_order, order)
-        if match.group(1) in self.solver_map:
-            self.solver = self.solver_map[match.group(1)]
-        if match.group(6):
-            self.explicit_correlation = match.group(6)[1:]  # remove the dash
         
-
-    def check_orders(self, logger) -> bool:
-        """Perform a sanity check on the excitation and perturbation order.
-        Raise a logging error if any inconsistency is found.
-        """
-        if self.excitation_order is None:
-            logger.warning('`CoupledCluster.excitation_order` is undefined.')
-            return False
-        if len(self.excitation_order) > 1:
-            if 2 not in self.excitation_order:
-                logger.error('Coupled Cluster typically starts from doubles.')
-                return False
-        for order in (3, 4):
-            if order in self.excitation_order and order in self.perturbative_order:
-                logger.error(
-                    f'Order {order} is defined as both excitation and perturbative.'
-                )
-                return False
-        return True
-
-    def normalize(self, archive, logger) -> None:
-        super().normalize(archive, logger)
-        if self.type is None:
-            if self.check_orders(logger):
-                self.cc_to_type()
-        else:
-            self.type_to_cc()
-        #if isinstance(self.excitation_order, list):
-        #    self.excitation_order = np.sort(self.excitation_order)
-        #if isinstance(self.perturbative_order, list):
-        #    self.perturbative_order = np.sort(self.perturbative_order)
-
-
-        # Sort excitation_order if it's a list and has elements
-        if isinstance(self.excitation_order, list) and len(self.excitation_order) > 0:
-            self.excitation_order = max(self.excitation_order)
-        # Sort perturbative_order if it's a list and has elements
-        if isinstance(self.perturbative_order, list) and len(self.perturbative_order) > 0:
-            self.perturbative_order = sorted(self.perturbative_order)
 
 m_package.__init_metainfo__()

@@ -148,20 +148,6 @@ class LocMet(SelfConsistency):
         """,
     )
 
-    n_max_iterations = Quantity(
-        type=np.int32,
-        description="""
-        Specifies the maximum number of iterations for the orbital localization.
-        """,
-    )
-
-    threshold_change = Quantity(
-        type=np.float64,
-        description="""
-        Specifies the convergence tolerance.
-        """,
-    )
-
     orbital_window = Quantity(
         shape=['*'],
         description="""
