@@ -62,9 +62,8 @@ class PerturbationMethod(ModelMethodElectronic):
     )
 
     density = Quantity(
-        type = MEnum(
-            'relaxed', 'unrelaxed'
-        )
+        type = MEnum('relaxed', 'unrelaxed'
+        ),
         description="""
         unrelaxed density: MP2 expectation value density
         relaxed density  : incorporates orbital relaxation

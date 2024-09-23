@@ -161,4 +161,39 @@ class Localization(SelfConsistency):
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
         super().normalize(archive, logger)
 
+class IntegrationGrid(SelfConsistency):
+    """Settings for radial and angular integration grids."""
+
+    type = Quantity(
+        type=str,
+        description= """ type of the grid """
+    )
+
+    angular_scheme = Quantity(
+        type=str,
+        description=""" 
+        the angular scheme
+        """
+    )
+
+    radial_scheme = Quantity(
+        type=str,
+        description=""" 
+        the radial scheme
+        """
+    )
+
+    atom_partitioning = Quantity(
+        type=str,
+        description=""" 
+        
+        """
+    )
+
+    pruning_method = Quantity(
+        type=str,
+        description=""" 
+        
+        """
+    )
 

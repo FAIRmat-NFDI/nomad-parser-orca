@@ -1049,16 +1049,14 @@ class ORCAParser(MatchingParser):
             )
             model_method.numerical_settings.append(scf)
 
-        #basis_set = self.out_parser.get('basis_set_name', {})
-        #if basis_set:
-        #    bs_settings = AtomCenteredBasisSet(name=basis_set.get('main_basis_set'))
-        #    simulation.model_method.append(bs_settings)
-        basis_set = self.out_parser.get('basis_set_name', {})
-        if basis_set:
-            main_basis_set = basis_set.get('main_basis_set')
-            if main_basis_set:
-                bs_settings = AtomCenteredBasisSet(name=main_basis_set)
-                model_method.numerical_settings.append(bs_settings) 
+        main_basis_set = self.out_parser.get('basis_set_name', {}).get('main_basis_set')
+        print(main_basis_set)
+        if main_basis_set:
+            bs_settings = AtomCenteredBasisSet(name=main_basis_set)
+            model_method.numerical_settings.append(bs_settings) 
+
+
+
         
 
 
