@@ -132,7 +132,7 @@ class PNOSettings(NumericalSettings):
         super().normalize(archive, logger)
 
 
-class LocMet(NumericalSettings):
+class LocMet(SelfConsistency):
     """ Numerical settings that control orbital localization."""
     type = Quantity(
         #type=MEnum('FB',

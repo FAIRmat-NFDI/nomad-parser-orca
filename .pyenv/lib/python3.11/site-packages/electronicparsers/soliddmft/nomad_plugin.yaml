@@ -1,0 +1,26 @@
+code_category: Atomistic code
+code_homepage: https://github.com/TRIQS/solid_dmft
+code_name: solid_dmft
+metadata:
+  codeCategory: Atomistic code
+  codeLabel: solid_dmft
+  codeLabelStyle: All in lowercase
+  codeName: solid_dmft
+  codeUrl: https://github.com/TRIQS/solid_dmft
+  codeVersion: ''
+  parserDirName: dependencies/parsers/electronic/electronicparsers/soliddmft/
+  parserGitUrl: https://github.com/nomad-coe/electronic-parsers.git
+  parserSpecific: ''
+  preamble: ''
+  status: production
+  tableOfFiles: '| Input Filename | Description |
+
+    | --- | --- |
+
+    | `*.h5` | **Mainfile:** h5 file containing all i/o parameters w/ arbitrary name |
+
+    '
+name: parsers/soliddmft
+parser_class_name: electronicparsers.soliddmft.parser.SolidDMFTParser
+python_package: electronicparsers.soliddmft
+plugin_source_code_url: https://github.com/nomad-coe/electronic-parsers/tree/develop/electronicparsers/soliddmft

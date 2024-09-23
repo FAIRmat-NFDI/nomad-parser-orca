@@ -1,0 +1,7 @@
+build
+demo
+dist
+docs
+palettable
+scripts
+test

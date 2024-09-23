@@ -1,0 +1,19 @@
+code_category: Database manager
+code_homepage: https://eelsdb.eu/
+code_name: EELSDB
+metadata:
+  codeCategory: Database manager
+  codeLabel: EELSDB
+  codeLabelStyle: All in capitals
+  codeName: eels
+  codeUrl: https://eelsdb.eu/
+  parserDirName: dependencies/parsers/eelsdb/
+  parserGitUrl: https://github.com/nomad-coe/nomad-parser-eelsdb.git
+  parserSpecific: ''
+  preamble: ''
+  status: production
+  tableOfFiles: ''
+name: parsers/eels
+parser_class_name: eelsdbparser.eelsdb_parser.EELSDBParser
+python_package: eelsdbparser
+plugin_source_code_url: https://github.com/nomad-coe/nomad-parser-eelsdb

@@ -1,0 +1,19 @@
+code_category: Database manager
+code_homepage: https://openkim.org/
+code_name: OpenKIM
+metadata:
+  codeCategory: Database manager
+  codeLabel: OpenKIM
+  codeLabelStyle: 'Capitals: O,K,I,M'
+  codeName: openkim
+  codeUrl: https://openkim.org/
+  parserDirName: dependencies/parsers/database/databaseparsers/openkim/
+  parserGitUrl: https://github.com/nomad-coe/database-parsers.git
+  parserSpecific: ''
+  preamble: ''
+  status: production
+  tableOfFiles: ''
+name: parsers/openkim
+parser_class_name: databaseparsers.openkim.parser.OpenKIMParser
+python_package: databaseparsers.openkim
+plugin_source_code_url: https://github.com/nomad-coe/electronic-parsers/tree/develop/databaseparsers/openkim

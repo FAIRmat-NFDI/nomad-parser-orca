@@ -1,0 +1,2 @@
+[console_scripts]
+nomad = nomad.cli:run_cli
