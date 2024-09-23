@@ -61,6 +61,16 @@ class PerturbationMethod(ModelMethodElectronic):
         a_eln=ELNAnnotation(component='NumberEditQuantity'),
     )
 
+    density = Quantity(
+        type = MEnum(
+            'relaxed', 'unrelaxed'
+        )
+        description="""
+        unrelaxed density: MP2 expectation value density
+        relaxed density  : incorporates orbital relaxation
+        """
+    )   
+
 class CoupledCluster(ModelMethodElectronic):
     """
     A base section used to define the parameters of a Coupled Cluster calculation.

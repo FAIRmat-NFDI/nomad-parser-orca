@@ -20,10 +20,11 @@ from nomad_simulations.schema_packages.general import Program, Simulation
 from nomad_simulations.schema_packages.model_method import ModelMethod
 from nomad_simulations.schema_packages.model_system import (AtomicCell,
                                                             ModelSystem)
+from nomad_simulations.schema_packages.basis_set import AtomCenteredBasisSet
 from nomad_simulations.schema_packages.numerical_settings import SelfConsistency
 
 from nomad_parser_orca.schema_packages.schema_package import CoupledCluster
-from nomad_parser_orca.schema_packages.numerical_settings import PNOSettings, LocMet
+from nomad_parser_orca.schema_packages.numerical_settings import PNOSettings, Localization
 from nomad_parser_orca.schema_packages.outputs import CCOutputs
 
 
@@ -1048,6 +1049,16 @@ class ORCAParser(MatchingParser):
             )
             model_method.numerical_settings.append(scf)
 
+        #basis_set = self.out_parser.get('basis_set_name', {})
+        #if basis_set:
+        #    bs_settings = AtomCenteredBasisSet(name=basis_set.get('main_basis_set'))
+        #    simulation.model_method.append(bs_settings)
         basis_set = self.out_parser.get('basis_set_name', {})
+        if basis_set:
+            main_basis_set = basis_set.get('main_basis_set')
+            if main_basis_set:
+                bs_settings = AtomCenteredBasisSet(name=main_basis_set)
+                model_method.numerical_settings.append(bs_settings) 
+        
 
 
