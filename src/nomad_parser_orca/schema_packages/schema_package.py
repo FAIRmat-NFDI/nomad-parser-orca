@@ -97,6 +97,15 @@ class CoupledCluster(ModelMethodElectronic):
         a_eln=ELNAnnotation(component='StringEditQuantity'),
     )  
 
+    excitation_order = Quantity(
+        type=np.int32,
+        shape=['*'],
+        description="""
+        Orders at which the excitation are used.
+        1 = single, 2 = double, 3 = triple, 4 = quadruple, etc.
+        """
+    )
+
     reference_determinant = Quantity(
         type=MEnum('UHF','RHF','ROHF',
                    'UKS', 'RKS', 'ROKS'),
