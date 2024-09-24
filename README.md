@@ -2,6 +2,16 @@
 
 An ORCA parser while extending the schema for coupled cluster
 
+## Usage
+
+Please use the coupled cluster branch in the nomad-simulations (along with the development version of nomad-lab)
+
+## Current limitations:
+
+Only the standard basis sets are supported. User defined basis sets are in progress.
+
+
+
 This `nomad` plugin was generated with `Cookiecutter` along with `@nomad`'s [`cookiecutter-nomad-plugin`](https://github.com/FAIRmat-NFDI/cookiecutter-nomad-plugin) template.
 
 
