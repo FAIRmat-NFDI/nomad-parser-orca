@@ -31,7 +31,6 @@ from nomad.metainfo import (
     SchemaPackage
 )
 
-
 class CCOutputs(Outputs):
     """
     This section contains the relevant output information from a Coupled-Cluster run.
@@ -84,50 +83,7 @@ class CCOutputs(Outputs):
         """,
     )
 
-    def t1_diagnostic(self, logger) -> None:
-        '''Perform a sanity check based on t1 norm.
-
-        Raise a logging error if its larger than 0.02.'''
-        
-        if self.t1_norm > 0.02:
-            logger.info(
-                f'T1 diagnostic warning: T1 norm ({self.t1_norm}) exceeds the 0.02 threshold.'
-            )
-        else:
-            logger.info(
-                f'T1 diagnostic passed: T1 norm ({self.t1_norm}) is within the acceptable range.'
-            )
-
-    def t2_diagnostic(self, logger) -> None:
-        '''Perform a sanity check based on the largest t2 amplitude.
-        Log a warning if it's larger than 0.02.
-        '''
-
-        max_amplitude = max(self.largest_t2_amplitude)
-
-        if not max_amplitude:
-            logger.warning('T2 diagnostic warning: The list of largest T2 amplitudes is empty.')
-            return
-        
-        if max_amplitude > 0.05:
-            logger.info(
-                f'T2 diagnostic warning: Largest T2 amplitude ({max_amplitude})'
-                f'exceeds the 0.05 threshold. This may indicate a multiconfigurational character!'
-            )
-        else:
-            logger.info(
-                f'T2 diagnostic passed: Largest T2 amplitude ({max_amplitude})'
-                f'is within the acceptable range.'
-            )
-
     def normalize(self, archive, logger) -> None:
-        '''Normalize the coupled-cluster output quantities and run diagnostic checks.
-
-        Log warnings if any diagnostic thresholds are exceeded.
+        '''Normalize the coupled-cluster output quantities
         '''
-        super().normalize(archive, logger)  # Call the parent's normalize method
-
-        # Run diagnostic checks
-        self.t1_diagnostic(logger)
-        self.t2_diagnostic(logger)
-
+        super().normalize(archive, logger)  

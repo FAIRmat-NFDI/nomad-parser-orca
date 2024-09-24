@@ -1,7 +1,7 @@
+.gitignore
 LICENSE
 MANIFEST.in
 README.md
-example.out
 mkdocs.yml
 move_template_files.sh
 parser.test.json
@@ -186,9 +186,7 @@ src/nomad_parser_orca/schema_packages/__pycache__/numerical_settings.cpython-311
 src/nomad_parser_orca/schema_packages/__pycache__/outputs.cpython-311.pyc
 src/nomad_parser_orca/schema_packages/__pycache__/schema_package.cpython-311.pyc
 tests/conftest.py
-tests/__pycache__/conftest.cpython-311-pytest-8.3.2.pyc
 tests/data/.gitkeep
-tests/data/.someCC.log.swp
 tests/data/example.out
 tests/data/methodCC.log
 tests/data/smaller.log

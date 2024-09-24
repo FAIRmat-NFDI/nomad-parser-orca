@@ -20,7 +20,7 @@ from nomad_simulations.schema_packages.general import Program, Simulation
 from nomad_simulations.schema_packages.model_method import ModelMethod
 from nomad_simulations.schema_packages.model_system import (AtomicCell,
                                                             ModelSystem)
-from nomad_simulations.schema_packages.basis_set import AtomCenteredBasisSet
+from nomad_simulations.schema_packages.basis_set import BasisSetComponent, AtomCenteredBasisSet
 from nomad_simulations.schema_packages.numerical_settings import SelfConsistency
 
 from nomad_parser_orca.schema_packages.schema_package import CoupledCluster
@@ -93,7 +93,11 @@ class OutParser(TextParser):
             ),
             ParsedQuantity(
                 'largest_t2_amplitudes',
-                r'\b\d+[ab]->\d+[ab]\b\s+\b\d+[ab]->\d+[ab]\b\s+([-+]?\d*\.\d+)\b',
+                #r'\b\d+[ab]->\d+[ab]\b\s+\b\d+[ab]->\d+[ab]\b\s+([-+]?\d*\.\d+)\b',
+                #r'\b\d+[ab]?->\d+[ab]?\s+\d+[ab]?->\d+[ab]?\s+([-+]?\d*\.\d+)', 
+                #r'(\d+[ab]?->\d+[ab]?)\s+(\d+[ab]?->\d+[ab]?)\s+([-+]?\d*\.\d+)',
+                r'\b\d+[ab]?->\d+[ab]?\s+\d+[ab]?->\d+[ab]?\s+([-+]?\d*\.\d+)', 
+                #r'\b(\d+[ab]?->\d+[ab]?)\s+(\d+[ab]?->\d+[ab]?)\s+([-+]?\d*\.\d+)\b',
                 repeats=True
             ),
             ParsedQuantity(
@@ -125,12 +129,23 @@ class OutParser(TextParser):
             ParsedQuantity('basis_set_contracted', r'(\w+)\s*pattern', repeats=True) ]
         
         basis_set_naming_quantities = [
-            ParsedQuantity('main_basis_set',
-                r'Your calculation utilizes the basis:\s*(.*)',
-                repeats=False, convert=False, flatten=False),
-            ParsedQuantity('aux_basis_set',
-                r'Your calculation utilizes the auxiliary basis:\s*(.*)',
-                repeats=True, convert=False, flatten=False)]
+            ParsedQuantity(
+                'main_basis_set',
+                #r'Your calculation utilizes the basis:\s*(.*)',
+                r'Your calculation utilizes the basis:\s*([^\s].*?)[\s]*\n',
+                repeats=False, convert=False, flatten=False
+            ),
+            ParsedQuantity(
+                'auxc_basis_set',
+                r'----- AuxC basis set information -----\s*Your calculation utilizes the auxiliary basis:\s*([^\s].*?)(?:\s*\n|$)',  # This matches the entire line
+                repeats=False, convert=False, flatten=False
+            ),
+            ParsedQuantity(
+                'auxj_basis_set',
+                r'----- AuxJ basis set information -----\s*Your calculation utilizes the auxiliary basis:\s*(.*)',  # Adjust for AuxJ as needed
+                repeats=False, convert=False, flatten=False
+            )
+        ]
 
         # Basis set statistics quantities
         basis_set_statistics_quantities = [
@@ -907,10 +922,10 @@ class OutParser(TextParser):
         self._quantities = [
             ParsedQuantity(
                 'program_version',
-                r'Program Version\s*([\w_.].*)',
-                #r'EBB2675 Version *([\d\.]+)',
-                #convert=False,
-                #flatten=False,
+                #r'Program Version\s*([\w_.].*)',
+                r'Program Version\s*([\d\.]+)',
+                convert=False,
+                flatten=False,
             ),
             ParsedQuantity(
                 'program_svn', r'\(SVN:\s*\$([^$]+)\$\)\s', convert=False, flatten=False
@@ -933,7 +948,8 @@ class OutParser(TextParser):
             ),
             ParsedQuantity(
                 'basis_set_name',
-                r'----- Orbital basis set information -----([\s\S]+?)\={10}',
+                #r'----- Orbital basis set information -----([\s\S]+?)\={10}',
+                r'----- Orbital basis set information -----([\s\S]+?)\={10}\s*',
                 sub_parser=TextParser(quantities=basis_set_naming_quantities),
             ),
             ParsedQuantity(
@@ -1050,9 +1066,12 @@ class ORCAParser(MatchingParser):
             model_method.numerical_settings.append(scf)
 
         main_basis_set = self.out_parser.get('basis_set_name', {}).get('main_basis_set')
-        print(main_basis_set)
+        auxc_basis_set = self.out_parser.get('basis_set_name', {}).get('auxc_basis_set')
+        auxj_basis_set = self.out_parser.get('basis_set_name', {}).get('auxj_basis_set')
+        print(auxc_basis_set)
         if main_basis_set:
-            bs_settings = AtomCenteredBasisSet(name=main_basis_set)
+            bs_settings = AtomCenteredBasisSet(main_basis_set=main_basis_set, aux_c_basis_set=auxc_basis_set)
+            
             model_method.numerical_settings.append(bs_settings) 
 
 
