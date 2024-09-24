@@ -4,7 +4,7 @@ An ORCA parser while extending the schema for coupled cluster
 
 ## Usage
 
-Please use the coupled cluster branch in the nomad-simulations (along with the development version of nomad-lab)
+Please use the coupled cluster branch in the `nomad-simulations` (along with the development version of `nomad-lab`)
 
 ## Current limitations:
 
