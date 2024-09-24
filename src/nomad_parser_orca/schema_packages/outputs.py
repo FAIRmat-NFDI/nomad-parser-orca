@@ -70,7 +70,6 @@ class CCOutputs(Outputs):
         type=np.float32,
         description="""
         The norm of T1 amplitudes.
-        Sanity check number 1.
         """,
     )
 
@@ -79,7 +78,6 @@ class CCOutputs(Outputs):
         shape=['*'],
         description="""
         The largest T2 amplitude.
-        Sanity check number 2.
         """,
     )
 

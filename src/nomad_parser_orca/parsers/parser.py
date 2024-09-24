@@ -120,6 +120,21 @@ class OutParser(TextParser):
                 r'TCutPairs\s*=\s*([-+]?\d*\.\d+([eE][-+]?\d+)?)',
                 repeats=False
             ),
+            ParsedQuantity(
+                'perturbative_triple_excitations_on_off',
+                r'Perturbative triple excitations\s*\.+\s*(\S+)',
+                convert=False,
+            ),
+            ParsedQuantity(
+                'f12_correction_on_off',
+                r'Calculation of F12 correction\s*\.+\s*(\S+)',
+                convert=False,
+            ),
+            ParsedQuantity(
+                'kc_formation',
+                r'K\(C\) Formation\s*\.+\s*(\S+)',
+                convert=False,
+            )
         ]
 
         # Basis set related quantities
@@ -136,15 +151,20 @@ class OutParser(TextParser):
                 repeats=False, convert=False, flatten=False
             ),
             ParsedQuantity(
-                'auxc_basis_set',
-                r'----- AuxC basis set information -----\s*Your calculation utilizes the auxiliary basis:\s*([^\s].*?)(?:\s*\n|$)',  # This matches the entire line
+                'auxj_basis_set',
+                r'----- AuxJ basis set information -----\s*Your calculation utilizes the auxiliary basis:\s*([^\s].*?)(?:\s*\n|$)', 
                 repeats=False, convert=False, flatten=False
             ),
             ParsedQuantity(
-                'auxj_basis_set',
-                r'----- AuxJ basis set information -----\s*Your calculation utilizes the auxiliary basis:\s*(.*)',  # Adjust for AuxJ as needed
+                'auxjk_basis_set',
+                r'----- AuxJK basis set information -----\s*Your calculation utilizes the auxiliary basis:\s*([^\s].*?)(?:\s*\n|$)', 
                 repeats=False, convert=False, flatten=False
-            )
+            ),
+            ParsedQuantity(
+                'auxc_basis_set',
+                r'----- AuxC basis set information -----\s*Your calculation utilizes the auxiliary basis:\s*([^\s].*?)(?:\s*\n|$)',
+                repeats=False, convert=False, flatten=False
+            ),
         ]
 
         # Basis set statistics quantities
@@ -1014,6 +1034,23 @@ class ORCAParser(MatchingParser):
                 type=cc_data.get('coupled_cluster_type'),
                 reference_determinant=cc_data.get('cc_reference_wavefunction')
             )
+
+            # perturbative triples
+            perturbative_triple_status = cc_data.get('perturbative_triple_excitations_on_off')
+            # Check if perturbative triple excitations is 'ON'
+            if perturbative_triple_status == 'ON':
+                # there is only (T) type present in ORCA
+                model_method.perturbative_correction = '(T)'
+
+            # explicit correlation status
+            explicit_correlation_status = cc_data.get('f12_correction_on_off')
+            if explicit_correlation_status == 'ON':
+                model_method.explicit_correlation = 'F12'
+
+            local_approximation = cc_data.get('kc_formation')
+            if local_approximation:
+                model_method.local_approximation = local_approximation
+
             output = CCOutputs(
                 largest_t2_amplitude=cc_data.get('largest_t2_amplitudes'),
                 t1_norm=cc_data.get('t1_diagnostic'),
@@ -1028,7 +1065,7 @@ class ORCAParser(MatchingParser):
     def parse_localization(self, out_parser, logger):
         loc_data = out_parser.get('single_point', {}).get('loc', {})
         if loc_data:
-            localization = LocMet(
+            localization = Localization(
                 type=loc_data.get('type'),
                 n_max_iterations=loc_data.get('n_max_iterations'),
                 threshold_change=loc_data.get('energy_change_tolerance')
@@ -1068,9 +1105,12 @@ class ORCAParser(MatchingParser):
         main_basis_set = self.out_parser.get('basis_set_name', {}).get('main_basis_set')
         auxc_basis_set = self.out_parser.get('basis_set_name', {}).get('auxc_basis_set')
         auxj_basis_set = self.out_parser.get('basis_set_name', {}).get('auxj_basis_set')
+        auxjk_basis_set = self.out_parser.get('basis_set_name', {}).get('auxjk_basis_set')
         print(auxc_basis_set)
         if main_basis_set:
-            bs_settings = AtomCenteredBasisSet(main_basis_set=main_basis_set, aux_c_basis_set=auxc_basis_set)
+            bs_settings = AtomCenteredBasisSet(main_basis_set=main_basis_set, aux_c_basis_set=auxc_basis_set,
+                                               aux_j_basis_set=auxj_basis_set,
+                                               aux_jk_basis_set= auxjk_basis_set)
             
             model_method.numerical_settings.append(bs_settings) 
 

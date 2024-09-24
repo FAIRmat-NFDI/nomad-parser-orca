@@ -97,15 +97,6 @@ class CoupledCluster(ModelMethodElectronic):
         a_eln=ELNAnnotation(component='StringEditQuantity'),
     )  
 
-    excitation_order = Quantity(
-        type=np.int32,
-        shape=['*'],
-        description="""
-        Orders at which the excitation are used.
-        1 = single, 2 = double, 3 = triple, 4 = quadruple, etc.
-        """
-    )
-
     reference_determinant = Quantity(
         type=MEnum('UHF','RHF','ROHF',
                    'UKS', 'RKS', 'ROKS'),
@@ -154,7 +145,8 @@ class CoupledCluster(ModelMethodElectronic):
     )  
 
     local_approximation = Quantity(
-        type=MEnum('LPNO', 'DLPNO', ''),
+        #type=MEnum('LPNO', 'DLPNO', ''),
+        type=str,
         description="""
         Is there a local approximation with pair natural orbitals
         or domain-based pair natural orbitals etc.
