@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     )
 
 import numpy as np
+import re
 from nomad.config import config
 from nomad.datamodel.metainfo.workflow import Workflow
 from nomad.parsing.file_parser import Quantity,  TextParser
@@ -19,7 +20,7 @@ from nomad_simulations.schema_packages.general import Program, Simulation
 from nomad_simulations.schema_packages.model_method import ModelMethod
 from nomad_simulations.schema_packages.model_system import (AtomicCell,
                                                             ModelSystem)
-from nomad_simulations.schema_packages.basis_set import AtomCenteredBasisSet
+from nomad_simulations.schema_packages.basis_set import AtomCenteredBasisSet, AtomCenteredFunction
 from nomad_simulations.schema_packages.numerical_settings import SelfConsistency
 from nomad_simulations.schema_packages.outputs import Outputs
 
@@ -92,12 +93,12 @@ class OutParser(TextParser):
             Quantity(
                 'largest_t2_amplitudes',
                 #r'\b\d+[ab]->\d+[ab]\b\s+\b\d+[ab]->\d+[ab]\b\s+([-+]?\d*\.\d+)\b',
-                #r'\b\d+[ab]?->\d+[ab]?\s+\d+[ab]?->\d+[ab]?\s+([-+]?\d*\.\d+)', 
-                #r'(\d+[ab]?->\d+[ab]?)\s+(\d+[ab]?->\d+[ab]?)\s+([-+]?\d*\.\d+)',
                 r'\b\d+[ab]?->\d+[ab]?\s+\d+[ab]?->\d+[ab]?\s+([-+]?\d*\.\d+)', 
+                #r'(\d+[ab]?->\d+[ab]?)\s+(\d+[ab]?->\d+[ab]?)\s+([-+]?\d*\.\d+)',
+                #r'\b\d+[ab]?->\d+[ab]?\s+\d+[ab]?->\d+[ab]?\s+([-+]?\d*\.\d+)', 
                 #r'\b(\d+[ab]?->\d+[ab]?)\s+(\d+[ab]?->\d+[ab]?)\s+([-+]?\d*\.\d+)\b',
                 repeats=True
-            ),
+            ), # TODO: find regex that is suitable for all 4 types
             Quantity(
                 'reference_energy',
                 r'E\(0\)\s*\.\.\.\s*(-?[\d\.]+)',
@@ -952,12 +953,13 @@ class OutParser(TextParser):
             Quantity(
                 'input_file',
                 r'INPUT FILE\s*\=+([\s\S]+?)END OF INPUT',
-                sub_parser=TextParser(
-                    quantities=[
-                        Quantity('xc_functional', r'\d+>\s*!\s*(\S+)'),
-                        Quantity('tier', r'(\w+SCF)'),
-                    ]
-                ),
+                #r'INPUT FILE\s*\=+\s*([\s\S]*?)(?:(?:\|\s*\d+\s*>)[\s\S]*)*END OF INPUT',
+                #sub_parser=TextParser(
+                #    quantities=[
+                #        Quantity('xc_functional', r'\d+>\s*!\s*(\S+)'),
+                #        Quantity('tier', r'(\w+SCF)'),
+                #    ]
+                #),
             ),
             Quantity(
                 'basis_set_name',
@@ -1020,6 +1022,7 @@ class ORCAParser(MatchingParser):
             logger.warning("No atoms information found or incorrect format.")
         return None
 
+
     def parse_basis_set(self, out_parser, logger):
         # Extract basis set information
         main_basis_set = out_parser.get('basis_set_name', {}).get('main_basis_set')
@@ -1033,12 +1036,118 @@ class ORCAParser(MatchingParser):
                 main_basis_set=main_basis_set, 
                 aux_c_basis_set=auxc_basis_set,
                 aux_j_basis_set=auxj_basis_set,
-                aux_jk_basis_set= auxjk_basis_set
+                aux_jk_basis_set=auxjk_basis_set
             )
+            
+            # Extract GTO and AuxGTO data from the output parser
+            gto_data, auxgto_data = self._extract_basis_data(out_parser)
+
+            # If GTO data is available, parse it and add to the basis set settings
+            if gto_data:
+                self._parse_basis_functions(gto_data, bs_settings, 'GTO', logger)
+
+            # If AuxGTO data is available, parse it and add to the basis set settings
+            if auxgto_data:
+                self._parse_basis_functions(auxgto_data, bs_settings, 'AuxGTO', logger)
+
             return bs_settings
         else:
             logger.warning("No basis set information found.")
         return None
+
+    def _extract_basis_data(self, out_parser):
+        """
+        Extract GTO and AuxGTO data from the basis section of the output parser.
+
+        Args:
+            out_parser (dict): The parsed output dictionary.
+
+        Returns:
+            tuple: GTO data and AuxGTO data.
+        """
+        data = out_parser.get('input_file')  # Assume this key contains the relevant data snippet
+        gto_data = []
+        auxgto_data = []
+        is_gto_section = False
+        is_auxgto_section = False
+
+        for item in data:
+            # Filter out items that are '|', contain '>', or are empty strings
+            if isinstance(item, str) and ('|' in item or '>' in item or item.strip() == ''):
+                continue
+            
+            if item == 'AddGTO':
+                is_gto_section = True
+                continue
+            elif item == 'end' and is_gto_section:
+                is_gto_section = False
+                continue
+            elif item == 'AddAuxCGTO':
+                is_auxgto_section = True
+                continue
+            elif item == 'end' and is_auxgto_section:
+                is_auxgto_section = False
+                continue
+
+            if is_gto_section:
+                gto_data.append(item)
+            elif is_auxgto_section:
+                auxgto_data.append(item)
+
+        return gto_data, auxgto_data
+
+    def _parse_basis_functions(self, basis_data, basis_set, function_type, logger):
+        """
+        Parse basis functions from the provided data and add them to the basis set.
+
+        Args:
+            basis_data (list): The data list containing basis functions.
+            basis_set (AtomCenteredBasisSet): The basis set object to update.
+            function_type (str): The type of function (GTO or AuxGTO).
+        """
+        i = 0
+        while i < len(basis_data):
+            # Ensure enough data is present
+            if isinstance(basis_data[i:], list) and len(basis_data[i:]) >= 5:
+                atom_number = basis_data[i]        # Atom number
+
+                
+                atom_state = basis_set.m_create(AtomsState)
+                atom_state.atomic_number = atom_number
+                atom_state.chemical_symbol = atom_state.resolve_chemical_symbol()
+
+
+                # Resolve chemical symbol based on atomic number
+                atom_state.chemical_symbol = atom_state.resolve_chemical_symbol(logger=logger)
+
+                # Function type (e.g., S, P, D, etc.)
+                function_type = basis_data[i + 1]
+
+                # Number of primitives
+                n_primitive = basis_data[i + 2]
+
+                # Extract exponents and contraction coefficients
+                exponents = basis_data[i + 3:i + 3 + n_primitive]
+                contraction_coefficients = basis_data[i + 3 + n_primitive:i + 3 + 2 * n_primitive]
+
+                # Create AtomCenteredFunction and add it to the basis set
+                function = AtomCenteredFunction(
+                    atom_state=atom_state,
+                    function_type=function_type,
+                    n_primitive=n_primitive,
+                    exponents=exponents,
+                    contraction_coefficients=contraction_coefficients
+                )
+                basis_set.functional_composition.append(function)
+
+                # Move index forward by the size of the current function data
+                i += 3 + 2 * n_primitive
+            else:
+                break  # If there's not enough data, exit the loop
+
+
+
+
 
     def parse_scf(self, out_parser, logger):
         # Extract SCF convergence information
@@ -1046,6 +1155,7 @@ class ORCAParser(MatchingParser):
 
         if scf_convergence:
             scf = SelfConsistency(
+                
                 threshold_change=scf_convergence.get('energy_change_tolerance')
             )
             return scf
@@ -1097,6 +1207,7 @@ class ORCAParser(MatchingParser):
             )
             return localization
         return None
+    
     def parse(self, mainfile, archive: 'EntryArchive', logger: 'BoundLogger', child_archives=None) -> None:
         self.out_parser.mainfile = mainfile
         self.out_parser.logger = logger
@@ -1117,6 +1228,7 @@ class ORCAParser(MatchingParser):
 
         # Parse basis set and append if exists
         basis_set = self.parse_basis_set(self.out_parser, logger)
+        print(basis_set)
         if basis_set:
             model_method.numerical_settings.append(basis_set)
 

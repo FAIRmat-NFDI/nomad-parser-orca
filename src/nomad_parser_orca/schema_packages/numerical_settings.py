@@ -161,7 +161,7 @@ class Localization(SelfConsistency):
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
         super().normalize(archive, logger)
 
-class IntegrationGrid(SelfConsistency):
+class IntegrationGrid(NumericalSettings):
     """Settings for radial and angular integration grids."""
 
     type = Quantity(
