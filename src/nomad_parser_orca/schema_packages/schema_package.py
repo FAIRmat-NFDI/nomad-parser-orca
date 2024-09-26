@@ -123,7 +123,7 @@ class CoupledCluster(ModelMethodElectronic):
         description="""
         The type of perturbative corrections.
         A perturbative correction is different than a perturbation method.
-        """,
+        """
     ) # TODO: add more perturbative correction
 
     explicit_correlation = Quantity(
@@ -137,14 +137,6 @@ class CoupledCluster(ModelMethodElectronic):
         It can be added linearly (R12) or exponentially (F12).
         """,
     )
-
-    ri_approximation = Quantity(
-        type=str,
-        description="""
-        Flavor of RI approximation.
-        In MOLPRO, it is denoted as density fitting!
-        """,
-    ) 
 
     is_frozencore = Quantity(
         type=bool,
@@ -165,6 +157,7 @@ class CoupledCluster(ModelMethodElectronic):
     def dissect_cc_method(self, method_name):
         """
         Parses the Coupled Cluster method string and updates the corresponding attributes of the class.
+        This is relevant for some program packages.
         """
 
         # regex to account for explicit correlation variants and perturbative corrections
@@ -220,6 +213,9 @@ class CoupledCluster(ModelMethodElectronic):
         logger.info(f'Valid Coupled Cluster type: {self.type}')
         return True
 
+
+    def normalize(self, archive, logger) -> None:
+        super().normalize(archive, logger)
         
 
 m_package.__init_metainfo__()

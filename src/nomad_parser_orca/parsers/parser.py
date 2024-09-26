@@ -78,46 +78,47 @@ class OutParser(TextParser):
             Quantity(
                 'coupled_cluster_type',
                 r'Correlation treatment\s+\.\.\.\s+([A-Z]+)',
-                repeats=False
+                repeats=False,
             ),
             Quantity(
                 'cc_reference_wavefunction',
                 r'Reference Wavefunction\s+\.\.\.\s+([A-Z]+)',
-                repeats=False
+                repeats=False,
             ),
             Quantity(
                 't1_diagnostic',
                 r'T1 diagnostic\s+\.\.\.\s+([\d\.]+)',
-                repeats=False
+                repeats=False,
             ),
             Quantity(
                 'largest_t2_amplitudes',
                 #r'\b\d+[ab]->\d+[ab]\b\s+\b\d+[ab]->\d+[ab]\b\s+([-+]?\d*\.\d+)\b',
-                r'\b\d+[ab]?->\d+[ab]?\s+\d+[ab]?->\d+[ab]?\s+([-+]?\d*\.\d+)', 
+                #r'\b\d+[ab]?->\d+[ab]?\s+\d+[ab]?->\d+[ab]?\s+([-+]?\d*\.\d+)', 
                 #r'(\d+[ab]?->\d+[ab]?)\s+(\d+[ab]?->\d+[ab]?)\s+([-+]?\d*\.\d+)',
                 #r'\b\d+[ab]?->\d+[ab]?\s+\d+[ab]?->\d+[ab]?\s+([-+]?\d*\.\d+)', 
                 #r'\b(\d+[ab]?->\d+[ab]?)\s+(\d+[ab]?->\d+[ab]?)\s+([-+]?\d*\.\d+)\b',
+                r'\b\d+[ab]?\s*->\s*\d+[ab]?\s+\d+[ab]?\s*->\s*\d+[ab]?\s+([-+]?\d*\.\d+)', 
                 repeats=True
             ), # TODO: find regex that is suitable for all 4 types
             Quantity(
                 'reference_energy',
                 r'E\(0\)\s*\.\.\.\s*(-?[\d\.]+)',
-                repeats=False
+                repeats=False,
             ),
             Quantity(
                 'corr_energy_strong',
                 r'E\(CORR\)\(strong-pairs\)\s*\.\.\.\s*(-?[\d\.]+)',
-                repeats=False
+                repeats=False,
             ),
             Quantity(
                 'corr_energy_weak',
                 r'E\(CORR\)\(weak-pairs\)\s*\.\.\.\s*(-?[\d\.]+)',
-                repeats=False
+                repeats=False,
             ),
             Quantity(
                 'tCutPairs',
                 r'TCutPairs\s*=\s*([-+]?\d*\.\d+([eE][-+]?\d+)?)',
-                repeats=False
+                repeats=False,
             ),
             Quantity(
                 'perturbative_triple_excitations_on_off',
@@ -341,6 +342,11 @@ class OutParser(TextParser):
                 r'SCF SETTINGS\s*\-+([\s\S]+?)\-{12}',
                 sub_parser=TextParser(
                     quantities=[
+                        Quantity(
+                            'n_max_iterations',
+                            rf'Maximum # iterations\s*MaxIter\s*\.+\s*({re_float})',
+                            dtype=float,
+                        ),
                         Quantity(
                             'XC_functional_type',
                             r'Ab initio Hamiltonian\s*Method\s*\.+\s*(\S+)',
@@ -844,8 +850,10 @@ class OutParser(TextParser):
         calculation_quantities = [
             Quantity(
                 'cartesian_coordinates',
+                #rf'CARTESIAN COORDINATES \(ANGSTROEM\)\s*\-+\s*([\s\S]+?)(?=\-+\s*{re_n}CARTESIAN COORDINATES \(A\.U\.\))',
                 rf'CARTESIAN COORDINATES \(ANGSTROEM\)\s*\-+\s*([\s\S]+?){re_n}{re_n}',
                 #str_operation=str_to_cartesian_coordinates,
+                repeats=False,
             ),
             Quantity(
                 'basis_set',
@@ -1023,20 +1031,23 @@ class ORCAParser(MatchingParser):
         return None
 
 
-    def parse_basis_set(self, out_parser, logger):
+    def parse_basis_set(self, out_parser, model_system, logger):
         # Extract basis set information
         main_basis_set = out_parser.get('basis_set_name', {}).get('main_basis_set')
         auxc_basis_set = out_parser.get('basis_set_name', {}).get('auxc_basis_set')
         auxj_basis_set = out_parser.get('basis_set_name', {}).get('auxj_basis_set')
         auxjk_basis_set = out_parser.get('basis_set_name', {}).get('auxjk_basis_set')
 
-        # Check if main basis set exists and append to the numerical settings
+        # Check if main basis set exists and append to the numerical settings?
+        # Im sure its not the right place.
         if main_basis_set:
+            atoms_ref = model_system.cell[0].atoms_state
             bs_settings = AtomCenteredBasisSet(
                 main_basis_set=main_basis_set, 
                 aux_c_basis_set=auxc_basis_set,
                 aux_j_basis_set=auxj_basis_set,
-                aux_jk_basis_set=auxjk_basis_set
+                aux_jk_basis_set=auxjk_basis_set,
+                atoms_ref = atoms_ref
             )
             return bs_settings
         else:
@@ -1049,7 +1060,7 @@ class ORCAParser(MatchingParser):
 
         if scf_convergence:
             scf = SelfConsistency(
-                
+                n_max_iterations=scf_convergence.get('n_max_iterations'),
                 threshold_change=scf_convergence.get('energy_change_tolerance')
             )
             return scf
@@ -1058,12 +1069,15 @@ class ORCAParser(MatchingParser):
         return None
 
 
-    def parse_coupled_cluster(self, out_parser, model_method, logger):
+    def parse_coupled_cluster(self, out_parser, logger):
         cc_data = out_parser.get('single_point', {}).get('cc', {})
 
         if cc_data:
-            model_method.type = cc_data.get('coupled_cluster_type')
-            model_method.reference_determinant = cc_data.get('cc_reference_wavefunction')
+            model_method = CoupledCluster(
+                type= cc_data.get('coupled_cluster_type'),
+                reference_determinant=cc_data.get('cc_reference_wavefunction'))
+            #model_method.type = cc_data.get('coupled_cluster_type')
+            #model_method.reference_determinant = cc_data.get('cc_reference_wavefunction')
 
             # Perturbative triples
             perturbative_triple_status = cc_data.get('perturbative_triple_excitations_on_off')
@@ -1086,10 +1100,10 @@ class ORCAParser(MatchingParser):
                 corr_energy_strong=cc_data.get('corr_energy_strong'),
                 corr_energy_weak=cc_data.get('corr_energy_weak')
             )
-            return output
+            return model_method, output
         else:
-            logger.warning('No coupled cluster data found.')
-            return None
+            return None, None
+
 
     def parse_localization(self, out_parser, logger):
         loc_data = out_parser.get('single_point', {}).get('loc', {})
@@ -1100,7 +1114,6 @@ class ORCAParser(MatchingParser):
                 threshold_change=loc_data.get('energy_change_tolerance')
             )
             return localization
-        return None
     
     def parse(self, mainfile, archive: 'EntryArchive', logger: 'BoundLogger', child_archives=None) -> None:
         self.out_parser.mainfile = mainfile
@@ -1118,25 +1131,32 @@ class ORCAParser(MatchingParser):
 
         # Initialize model_method 
         model_method = ModelMethod()
-        #outputs = Outputs()
 
-        # Parse basis set and append if exists
-        basis_set = self.parse_basis_set(self.out_parser, logger)
-        print(basis_set)
+        # Parse basis set 
+        basis_set = self.parse_basis_set(self.out_parser, model_system, logger)
+        #print(basis_set, basis_set.atoms_ref, basis_set.atoms_ref[0])
         if basis_set:
             model_method.numerical_settings.append(basis_set)
 
-        # Parse SCF and append if exists
+        # Parse SCF 
         scf = self.parse_scf(self.out_parser, logger)
         if scf:
             model_method.numerical_settings.append(scf)
 
+        # Parse Integration Grid 
+
+
         # Parse coupled cluster data and append if exists
-        output = self.parse_coupled_cluster(self.out_parser, model_method, logger)
-        if model_method:
-            simulation.model_method.append(model_method)
+        cc_method, output = self.parse_coupled_cluster(self.out_parser, logger)
+        if cc_method:
+            simulation.model_method.append(cc_method)
         if output:
             simulation.outputs.append(output)
+
+        # Parse Integration Grid 
+
+
+        simulation.model_method.append(model_method)
 
 
 
