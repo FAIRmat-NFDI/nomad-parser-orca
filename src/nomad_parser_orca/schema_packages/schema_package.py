@@ -68,7 +68,9 @@ class PerturbationMethod(ModelMethodElectronic):
         unrelaxed density: MP2 expectation value density
         relaxed density  : incorporates orbital relaxation
         """
-    )   
+    )
+
+    #connect Hartree fock here as a subsection to get the HFType   
 
 class CoupledCluster(ModelMethodElectronic):
     """

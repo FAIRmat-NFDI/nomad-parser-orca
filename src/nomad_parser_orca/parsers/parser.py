@@ -24,7 +24,7 @@ from nomad_simulations.schema_packages.basis_set import AtomCenteredBasisSet, At
 from nomad_simulations.schema_packages.numerical_settings import SelfConsistency
 from nomad_simulations.schema_packages.outputs import Outputs
 
-from nomad_parser_orca.schema_packages.schema_package import CoupledCluster
+from nomad_parser_orca.schema_packages.schema_package import CoupledCluster, PerturbationMethod
 from nomad_parser_orca.schema_packages.numerical_settings import PNOSettings, Localization
 from nomad_parser_orca.schema_packages.outputs import CCOutputs
 
@@ -907,7 +907,8 @@ class OutParser(TextParser):
             ),
             Quantity(
                 'mp2',
-                r'ORCA MP2 CALCULATION([\s\S]+?MP2 TOTAL ENERGY:.+)',
+                #r'ORCA MP2 CALCULATION([\s\S]+?MP2 TOTAL ENERGY:.+)',
+                r'(ORCA MP2 CALCULATION|-{78}\s+ORCA\s+MP2\s+-{78})([\s\S]+?MP2 TOTAL ENERGY:.+)',
                 sub_parser=TextParser(quantities=mp2_quantities),
             ),
             Quantity(
@@ -1165,6 +1166,18 @@ class ORCAParser(MatchingParser):
                 threshold_change=loc_data.get('energy_change_tolerance')
             )
             return localization
+        
+    def parse_mp2(self, out_parser, logger):
+        mp2_data = out_parser.get('single_point', {}).get('mp2', {})
+
+        if mp2_data:
+            mp2 = PerturbationMethod(
+                type='MP',
+                order=2,
+                density='unrelaxed'
+            )
+
+        return mp2
     
     def parse(self, mainfile, archive: 'EntryArchive', logger: 'BoundLogger', child_archives=None) -> None:
         self.out_parser.mainfile = mainfile
@@ -1196,8 +1209,11 @@ class ORCAParser(MatchingParser):
 
         if dft:
             simulation.model_method.append(dft)
-        # Parse Integration Grid
-
+        
+        # Parse MP2
+        mp2 = self.parse_mp2(self.out_parser, logger)
+        if mp2:
+            simulation.model_method.append(mp2)
 
         # Parse coupled cluster data and append if exists
         cc_method, output = self.parse_coupled_cluster(self.out_parser, logger)
