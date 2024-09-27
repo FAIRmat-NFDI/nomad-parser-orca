@@ -17,7 +17,7 @@ from nomad.parsing.parser import MatchingParser
 from nomad.units import ureg
 from nomad_simulations.schema_packages.atoms_state import AtomsState
 from nomad_simulations.schema_packages.general import Program, Simulation
-from nomad_simulations.schema_packages.model_method import ModelMethod
+from nomad_simulations.schema_packages.model_method import ModelMethod, DFT, XCFunctional
 from nomad_simulations.schema_packages.model_system import (AtomicCell,
                                                             ModelSystem)
 from nomad_simulations.schema_packages.basis_set import AtomCenteredBasisSet, AtomCenteredFunction
@@ -343,6 +343,18 @@ class OutParser(TextParser):
                 sub_parser=TextParser(
                     quantities=[
                         Quantity(
+                            'exchange_functional',
+                            #r'Exchange Functional\s*Exchange\s*\.+\s*(\S+)',
+                            #r'Exchange Functional\s*Exchange\s*\.+\s*(\w+)',
+                            r'Exchange Functional\s+Exchange\s*\.+\s+(\w+)',
+                            convert=False,
+                        ),
+                        Quantity(
+                            'correlation_functional',
+                            r'Correlation Functional\s*Correlation\s*\.+\s+(\w+)',
+                            convert=False,
+                        ),
+                        Quantity(
                             'n_max_iterations',
                             rf'Maximum # iterations\s*MaxIter\s*\.+\s*({re_float})',
                             dtype=float,
@@ -355,11 +367,6 @@ class OutParser(TextParser):
                         Quantity(
                             'XC_functional_type',
                             r'Density Functional\s*Method\s*\.+\s*(\S+)',
-                            convert=False,
-                        ),
-                        Quantity(
-                            'exchange_functional',
-                            r'Exchange Functional\s*Exchange\s*\.+\s*(\S+)',
                             convert=False,
                         ),
                         Quantity(
@@ -381,6 +388,24 @@ class OutParser(TextParser):
                             'lda_part_of_gga_corr',
                             r'LDA part of GGA corr\.\s*LDAOpt\s*\.+\s*(\S+)',
                             convert=False,
+                        ),
+                        Quantity(
+                            'fraction_hf_exchange',
+                            #r'Fraction HF Exchange\s*ScalHFX\s*\.+\s*({re_float})',
+                            r'Fraction HF Exchange\s*ScalHFX\s*\.+\s*([\d\.]+)',
+                            #r'Fraction HF Exchange\s+ScalHFX\s*\.+\s*({re_float})',
+                            #r'Fraction HF Exchange\s+ScalHFX\s*\.+\s*({re_float})',
+                            dtype=float,
+                        ),
+                        Quantity(
+                            'scaling_exchange',
+                            r'Scaling of DF-GGA-X\s*ScalDFX\s*\.+\s*([\d\.]+)',
+                            dtype=float,
+                        ),
+                        Quantity(
+                            'scaling_correlation',
+                            r'Scaling of DF-GGA-C\s*ScalDFC\s*\.+\s*([\d\.]+)',
+                            dtype=float,
                         ),
                         Quantity(
                             'scalar_relativistic_method',
@@ -1050,25 +1075,53 @@ class ORCAParser(MatchingParser):
                 atoms_ref = atoms_ref
             )
             return bs_settings
-        else:
-            logger.warning("No basis set information found.")
-        return None
+
 
     def parse_scf(self, out_parser, logger):
         # Extract SCF convergence information
         scf_convergence = out_parser.get('single_point', {}).get('self_consistent', {}).get('scf_settings', {})
 
+        # Initialize SCF object only if scf_convergence has required data
         if scf_convergence:
             scf = SelfConsistency(
-                n_max_iterations=scf_convergence.get('n_max_iterations'),
-                threshold_change=scf_convergence.get('energy_change_tolerance')
+                n_max_iterations=scf_convergence.get('n_max_iterations', 0),  # Default to 0
+                threshold_change=scf_convergence.get('energy_change_tolerance', 1e-8)  # Default value
             )
-            return scf
         else:
-            logger.warning("No SCF convergence information found.")
-        return None
+            scf = None  # Handle missing SCF data appropriately
 
+        xc_functionals = []
+        
+        # Handle exchange functional
 
+        if scf_convergence.get('exchange_functional'):
+            exchange_functional = XCFunctional(
+                libxc_name=scf_convergence.get('exchange_functional'),
+                name='exchange',
+                weight=scf_convergence.get('scaling_exchange')
+            )
+            xc_functionals.append(exchange_functional)
+
+        # Handle correlation functional
+        if scf_convergence.get('correlation_functional'):
+            correlation_functional = XCFunctional(
+                libxc_name=scf_convergence.get('correlation_functional'),
+                name='correlation',
+                weight=scf_convergence.get('scaling_correlation')
+            )
+            xc_functionals.append(correlation_functional)
+
+        # Create DFT object only if there are functionals
+        dft = None
+        if xc_functionals:
+            dft = DFT(
+                jacobs_ladder='metaGGA',
+                xc_functionals=xc_functionals,
+                exact_exchange_mixing_factor=scf_convergence.get('fraction_hf_exchange')  
+            )
+
+        return scf, dft
+    
     def parse_coupled_cluster(self, out_parser, logger):
         cc_data = out_parser.get('single_point', {}).get('cc', {})
 
@@ -1076,8 +1129,6 @@ class ORCAParser(MatchingParser):
             model_method = CoupledCluster(
                 type= cc_data.get('coupled_cluster_type'),
                 reference_determinant=cc_data.get('cc_reference_wavefunction'))
-            #model_method.type = cc_data.get('coupled_cluster_type')
-            #model_method.reference_determinant = cc_data.get('cc_reference_wavefunction')
 
             # Perturbative triples
             perturbative_triple_status = cc_data.get('perturbative_triple_excitations_on_off')
@@ -1139,11 +1190,13 @@ class ORCAParser(MatchingParser):
             model_method.numerical_settings.append(basis_set)
 
         # Parse SCF 
-        scf = self.parse_scf(self.out_parser, logger)
+        scf, dft = self.parse_scf(self.out_parser, logger)
         if scf:
             model_method.numerical_settings.append(scf)
 
-        # Parse Integration Grid 
+        if dft:
+            simulation.model_method.append(dft)
+        # Parse Integration Grid
 
 
         # Parse coupled cluster data and append if exists
@@ -1152,8 +1205,6 @@ class ORCAParser(MatchingParser):
             simulation.model_method.append(cc_method)
         if output:
             simulation.outputs.append(output)
-
-        # Parse Integration Grid 
 
 
         simulation.model_method.append(model_method)

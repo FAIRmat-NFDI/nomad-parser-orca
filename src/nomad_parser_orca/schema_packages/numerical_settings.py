@@ -162,12 +162,12 @@ class Localization(SelfConsistency):
         super().normalize(archive, logger)
 
 class IntegrationGrid(NumericalSettings):
-    """Settings for radial and angular integration grids."""
+    """Settings for integration grids."""
 
     type = Quantity(
         type=str,
         description= """ type of the grid """
-    )
+    ) # TODO: an MEnum for COSX or XC grids?
 
     angular_scheme = Quantity(
         type=str,
