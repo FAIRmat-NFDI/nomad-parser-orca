@@ -1082,7 +1082,6 @@ class ORCAParser(MatchingParser):
         # Extract SCF convergence information
         scf_convergence = out_parser.get('single_point', {}).get('self_consistent', {}).get('scf_settings', {})
 
-        # Initialize SCF object only if scf_convergence has required data
         if scf_convergence:
             scf = SelfConsistency(
                 n_max_iterations=scf_convergence.get('n_max_iterations', 0),  # Default to 0
@@ -1202,7 +1201,8 @@ class ORCAParser(MatchingParser):
         if basis_set:
             model_method.numerical_settings.append(basis_set)
 
-        # Parse SCF 
+        # Parse SCF and DFT sections
+        # TODO: add integration grids here
         scf, dft = self.parse_scf(self.out_parser, logger)
         if scf:
             model_method.numerical_settings.append(scf)
