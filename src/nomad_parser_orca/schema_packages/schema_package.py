@@ -126,7 +126,7 @@ class CoupledCluster(ModelMethodElectronic):
         The type of perturbative corrections.
         A perturbative correction is different than a perturbation method.
         """
-    ) # TODO: add more perturbative correction
+    ) # TODO: add more perturbative corrections
 
     explicit_correlation = Quantity(
         type=MEnum('F12', 'F12a', 'F12b', 'F12c',
@@ -145,7 +145,7 @@ class CoupledCluster(ModelMethodElectronic):
         description="""
         frozen core approximation
         """,
-    )  
+    )  # TODO: frozen core settings should be added to NumericalSettings
 
     local_approximation = Quantity(
         #type=MEnum('LPNO', 'DLPNO', ''),

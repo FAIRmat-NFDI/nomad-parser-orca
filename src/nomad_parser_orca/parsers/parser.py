@@ -1176,7 +1176,7 @@ class ORCAParser(MatchingParser):
                 density='unrelaxed'
             )
 
-        return mp2
+            return mp2
     
     def parse(self, mainfile, archive: 'EntryArchive', logger: 'BoundLogger', child_archives=None) -> None:
         self.out_parser.mainfile = mainfile
