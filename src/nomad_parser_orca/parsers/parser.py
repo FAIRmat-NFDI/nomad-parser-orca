@@ -1056,24 +1056,31 @@ class ORCAParser(MatchingParser):
             logger.warning("No atoms information found or incorrect format.")
         return None
 
-
     def parse_basis_set(self, out_parser, model_system, logger):
-        # Extract basis set information
-        main_basis_set = out_parser.get('basis_set_name', {}).get('main_basis_set')
-        auxc_basis_set = out_parser.get('basis_set_name', {}).get('auxc_basis_set')
-        auxj_basis_set = out_parser.get('basis_set_name', {}).get('auxj_basis_set')
-        auxjk_basis_set = out_parser.get('basis_set_name', {}).get('auxjk_basis_set')
+        # Extract all basis set data from out_parser
+        basis_set_data = {
+            "main_basis_set": {
+                "name": out_parser.get('basis_set_name', {}).get('main_basis_set'),
+                "atoms_ref_ids": [f"{atom.chemical_symbol}_{i}" for i, atom in enumerate(model_system.cell[0].atoms_state)]
+            },
+            "aux_c_basis_set": {
+                "name": out_parser.get('basis_set_name', {}).get('auxc_basis_set'),
+                "atoms_ref_ids": [f"{atom.chemical_symbol}_{i}" for i, atom in enumerate(model_system.cell[0].atoms_state)]
+            },
+            "aux_j_basis_set": {
+                "name": out_parser.get('basis_set_name', {}).get('auxj_basis_set'),
+                "atoms_ref_ids": [f"{atom.chemical_symbol}_{i}" for i, atom in enumerate(model_system.cell[0].atoms_state)]
+            },
+            "aux_jk_basis_set": {
+                "name": out_parser.get('basis_set_name', {}).get('auxjk_basis_set'),
+                "atoms_ref_ids": [f"{atom.chemical_symbol}_{i}" for i, atom in enumerate(model_system.cell[0].atoms_state)]
+            }
+        }
 
-        # Check if main basis set exists and append to the numerical settings?
-        # Im sure its not the right place.
-        if main_basis_set:
-            atoms_ref = model_system.cell[0].atoms_state
+        if basis_set_data:
+            # Create the AtomCenteredBasisSet object with the JSON structure
             bs_settings = AtomCenteredBasisSet(
-                main_basis_set=main_basis_set, 
-                aux_c_basis_set=auxc_basis_set,
-                aux_j_basis_set=auxj_basis_set,
-                aux_jk_basis_set=auxjk_basis_set,
-                atoms_ref = atoms_ref
+                basis_set_data=basis_set_data
             )
             return bs_settings
 
