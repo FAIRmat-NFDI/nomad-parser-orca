@@ -1,10 +1,10 @@
 # nomad-parser-orca
 
-An ORCA parser while extending the schema for coupled cluster
+An ORCA parser while extending the schema for coupled cluster and more. 
 
 ## Usage
 
-Please use the coupled cluster branch in the `nomad-simulations` (along with the development version of `nomad-lab`)
+Please use the atom centered basis set branch in the `nomad-simulations` (along with the development version of `nomad-lab`)
 
 ## Current limitations:
 
