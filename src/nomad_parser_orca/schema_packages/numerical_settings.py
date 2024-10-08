@@ -4,7 +4,7 @@ import nomad_simulations.schema_packages
 from nomad_simulations.schema_packages.model_method import \
     ModelMethodElectronic
 from nomad_simulations.schema_packages.numerical_settings import \
-    NumericalSettings, SelfConsistency
+    NumericalSettings, SelfConsistency, Mesh
 from nomad_simulations.schema_packages.outputs import Outputs
 
 if TYPE_CHECKING:
@@ -161,39 +161,44 @@ class Localization(SelfConsistency):
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
         super().normalize(archive, logger)
 
-class IntegrationGrid(NumericalSettings):
-    """Settings for integration grids."""
+class IntegrationGrid(Mesh):
+    """Settings for integration grids.
+    The integration grids can be different for different atoms!
+    """
 
     type = Quantity(
         type=str,
-        description= """ type of the grid """
+        description= """ type of the grid """,
     ) # TODO: an MEnum for COSX or XC grids?
 
     angular_scheme = Quantity(
-        type=str,
+        type=str,  
         description=""" 
-        the angular scheme
-        """
+        the angular quadrature scheme.
+        Most popular is Lebedev: A. D. Becke, J. Chem. Phys. 88, 2547 (1988), which provides angular grids of octahedral symmetry.
+
+        Gauss-Legendre: y C. W. Murray, N. C. Handy and G. J. Laming, Mol. Phys. 78, 997 (1993)
+        """,
     )
 
     radial_scheme = Quantity(
         type=str,
         description=""" 
-        the radial scheme
-        """
+        the radial quadrature scheme.
+        """,
     )
 
     atom_partitioning = Quantity(
         type=str,
         description=""" 
-        
-        """
+        Weight generation scheme, also known as Voronoi scheme, typically Becke.
+        """,
     )
 
     pruning_method = Quantity(
         type=str,
         description=""" 
-        
-        """
+        Angular grid pruning method
+        """,
     )
 
