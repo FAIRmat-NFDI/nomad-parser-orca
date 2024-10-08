@@ -1077,7 +1077,7 @@ class ORCAParser(MatchingParser):
 
         if aux_c_basis_set_name:
             aux_c_basis_set = AtomCenteredBasisSet(
-                name=aux_c_basis_set_name, 
+                basis_set=aux_c_basis_set_name, 
                 type='GTO',
                 role='auxiliary_post_hf',
                 )
@@ -1085,7 +1085,7 @@ class ORCAParser(MatchingParser):
 
         if aux_j_basis_set_name:
             aux_j_basis_set = AtomCenteredBasisSet(
-                name=aux_j_basis_set_name, 
+                basis_set=aux_j_basis_set_name, 
                 type='GTO',
                 role='auxiliary_scf'
                 )
@@ -1093,7 +1093,7 @@ class ORCAParser(MatchingParser):
 
         if aux_jk_basis_set_name:
             aux_jk_basis_set = AtomCenteredBasisSet(
-                name=aux_jk_basis_set_name, 
+                basis_set=aux_jk_basis_set_name, 
                 type='GTO',
                 role='auxiliary_scf'
                 )
