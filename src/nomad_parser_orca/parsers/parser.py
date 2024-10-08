@@ -1068,22 +1068,37 @@ class ORCAParser(MatchingParser):
 
         # Set the name property directly
         if main_basis_set_name:
-            main_basis_set = AtomCenteredBasisSet(basis_set=main_basis_set_name, type='main')
+            main_basis_set = AtomCenteredBasisSet(
+                basis_set=main_basis_set_name, 
+                type='GTO',
+                role='orbital',
+                )
             basis_sets.append(main_basis_set)
 
         if aux_c_basis_set_name:
-            aux_c_basis_set = AtomCenteredBasisSet(name=aux_c_basis_set_name, type='AuxC')
+            aux_c_basis_set = AtomCenteredBasisSet(
+                name=aux_c_basis_set_name, 
+                type='GTO',
+                role='auxiliary_post_hf',
+                )
             basis_sets.append(aux_c_basis_set)
 
         if aux_j_basis_set_name:
-            aux_j_basis_set = AtomCenteredBasisSet(name=aux_j_basis_set_name, type='AuxJ')
+            aux_j_basis_set = AtomCenteredBasisSet(
+                name=aux_j_basis_set_name, 
+                type='GTO',
+                role='auxiliary_scf'
+                )
             basis_sets.append(aux_j_basis_set)
 
         if aux_jk_basis_set_name:
-            aux_jk_basis_set = AtomCenteredBasisSet(name=aux_jk_basis_set_name, type='AuxJK')
+            aux_jk_basis_set = AtomCenteredBasisSet(
+                name=aux_jk_basis_set_name, 
+                type='GTO',
+                role='auxiliary_scf'
+                )
             basis_sets.append(aux_jk_basis_set)
 
-        #return main_basis_set, aux_c_basis_set
         return basis_sets
  
 
@@ -1205,8 +1220,10 @@ class ORCAParser(MatchingParser):
         # Initialize model_method 
         model_method = ModelMethod()
 
+        input_file = self.out_parser.get('input_file')
+        #print(input_file)
+
         # Parse basis set 
-        #main_basis_set, aux_c_basis_set = self.parse_basis_set(self.out_parser, model_system, logger)
         basis_set = self.parse_basis_set(self.out_parser, model_system, logger)
 
         #print(basis_set, basis_set.atoms_ref, basis_set.atoms_ref[0])
