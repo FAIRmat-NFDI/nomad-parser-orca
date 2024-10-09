@@ -992,7 +992,8 @@ class OutParser(TextParser):
             ),
             Quantity(
                 'input_file',
-                r'INPUT FILE\s*\=+([\s\S]+?)END OF INPUT',
+                #r'INPUT FILE\s*\=+([\s\S]+?)END OF INPUT',
+                r'INPUT FILE\s*=\s*([\s\S]+?)(?:(?:^=+$|END OF INPUT))',
                 #r'INPUT FILE\s*\=+\s*([\s\S]*?)(?:(?:\|\s*\d+\s*>)[\s\S]*)*END OF INPUT',
                 #sub_parser=TextParser(
                 #    quantities=[
@@ -1076,6 +1077,23 @@ class ORCAParser(MatchingParser):
 
     def parse_basis_set(self, out_parser, model_system, logger):
 
+        
+        # Parse input file from the output
+        input_file = self.out_parser.get('input_file')
+
+        # Check whether there is custom basis set:
+        # AddGTO AddAuxCGTO AddAuxJGTO AddAuxJKGTO AddCabsGTO
+        # NewGTO NewAuxCGTO NewAuxJGTO NewAuxJKGTO NewCabsGTO
+        #
+        # NewGTO Element "def2-svp" end (BUNLARI YAZINCA ZATEN ORADA CIKIYO MU DIYE CHECK ET)
+        # NewGTO AtomNumber "def2-svp" end (BUNLARI YAZINCA ZATEN ORADA CIKIYO MU DIYE CHECK ET)
+        # NewGTO Element "6-31G" function_type n_primitive [exponents contraction_coefficients] end
+        # NewGTO completely defines the basis set
+
+        # AddGTO adds basis functions to it.
+        # AddGTO doesnt have to be in the %basis block!!!!
+        # AddGTO Element function_type n_primitive [exponents contraction_coefficients] end
+
         main_basis_set_name = out_parser.get('basis_set_name', {}).get('main_basis_set', None)
         aux_c_basis_set_name = out_parser.get('basis_set_name', {}).get('auxc_basis_set', None)
         aux_j_basis_set_name = out_parser.get('basis_set_name', {}).get('auxj_basis_set', None)
@@ -1084,7 +1102,6 @@ class ORCAParser(MatchingParser):
 
         basis_sets = []
 
-        # Set the name property directly
         if main_basis_set_name:
             main_basis_set = AtomCenteredBasisSet(
                 basis_set=main_basis_set_name, 
@@ -1118,8 +1135,7 @@ class ORCAParser(MatchingParser):
             basis_sets.append(aux_jk_basis_set)
 
         if capped_ecp_name:
-            for ecp in capped_ecp_name:
-                element, basis_set = ecp 
+            for element, basis_set  in capped_ecp_name:
                 ecp_basis_set = AtomCenteredBasisSet(
                     basis_set=basis_set,
                     type='cECP',
@@ -1129,8 +1145,6 @@ class ORCAParser(MatchingParser):
 
         return basis_sets
  
-
-
     def parse_scf(self, out_parser, logger):
         # Extract SCF convergence information
         scf_convergence = out_parser.get('single_point', {}).get('self_consistent', {}).get('scf_settings', {})
@@ -1249,7 +1263,7 @@ class ORCAParser(MatchingParser):
         model_method = ModelMethod()
 
         input_file = self.out_parser.get('input_file')
-        #print(input_file)
+        print(input_file)
 
         # Parse basis set 
         basis_set = self.parse_basis_set(self.out_parser, model_system, logger)
