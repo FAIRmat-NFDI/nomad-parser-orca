@@ -148,22 +148,27 @@ class OutParser(TextParser):
                 'main_basis_set',
                 #r'Your calculation utilizes the basis:\s*(.*)',
                 r'Your calculation utilizes the basis:\s*([^\s].*?)[\s]*\n',
-                repeats=False, convert=False, flatten=False
+                repeats=False, convert=False, flatten=False,
             ),
             Quantity(
                 'auxj_basis_set',
                 r'----- AuxJ basis set information -----\s*Your calculation utilizes the auxiliary basis:\s*([^\s].*?)(?:\s*\n|$)', 
-                repeats=False, convert=False, flatten=False
+                repeats=False, convert=False, flatten=False,
             ),
             Quantity(
                 'auxjk_basis_set',
                 r'----- AuxJK basis set information -----\s*Your calculation utilizes the auxiliary basis:\s*([^\s].*?)(?:\s*\n|$)', 
-                repeats=False, convert=False, flatten=False
+                repeats=False, convert=False, flatten=False,
             ),
             Quantity(
                 'auxc_basis_set',
                 r'----- AuxC basis set information -----\s*Your calculation utilizes the auxiliary basis:\s*([^\s].*?)(?:\s*\n|$)',
-                repeats=False, convert=False, flatten=False
+                repeats=False, convert=False, flatten=False,
+            ),
+            Quantity(
+                'capped_ecp',
+                r'Group\s*\d+,\s*Type\s*([A-Z][a-z]*)\s*ECP\s*([A-Z]+\(\d+,[A-Z]+\))',
+                repeats=True, convert=False, flatten=False,
             ),
         ]
 
@@ -1014,12 +1019,18 @@ class OutParser(TextParser):
         ]
 
 def str_to_cartesian_coordinates(val_in):
-    if isinstance(val_in, list):
+    val_in_cleaned = [val.replace('>', '') if isinstance(val, str) else val for val in val_in if val != '>']
+
+    if isinstance(val_in_cleaned, list):
         symbols = []
         coordinates = []
-        for i in range(0, len(val_in), 4):
-            symbols.append(val_in[i])
-            coordinates.append(val_in[i+1:i+4])
+        for i in range(0, len(val_in_cleaned), 4):
+            symbol = val_in_cleaned[i]
+            if isinstance(symbol, str):
+                symbol = symbol.replace('>', '')
+            symbols.append(symbol)
+            coordinates.append(val_in_cleaned[i+1:i+4])
+            #print(coordinates)
         coordinates = np.array(coordinates, dtype=float)
         return symbols, coordinates
     else:
@@ -1063,6 +1074,9 @@ class ORCAParser(MatchingParser):
         aux_c_basis_set_name = out_parser.get('basis_set_name', {}).get('auxc_basis_set', None)
         aux_j_basis_set_name = out_parser.get('basis_set_name', {}).get('auxj_basis_set', None)
         aux_jk_basis_set_name = out_parser.get('basis_set_name', {}).get('auxjk_basis_set', None)
+        #capped_ecp_name = out_parser.get('basis_set_name', {}).get('capped_ecp', None)
+
+        #print(capped_ecp_name)
 
         basis_sets = []
 
