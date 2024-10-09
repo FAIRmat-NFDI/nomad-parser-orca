@@ -167,8 +167,9 @@ class OutParser(TextParser):
             ),
             Quantity(
                 'capped_ecp',
-                r'Group\s*\d+,\s*Type\s*([A-Z][a-z]*)\s*ECP\s*([A-Z]+\(\d+,[A-Z]+\))',
-                repeats=True, convert=False, flatten=False,
+                #r'Group\s*\d+,\s*Type\s*([A-Z][a-z]*)\s*ECP\s*([A-Z]+\(\d+,[A-Z]+\))',
+                r'Group \d+, Type (\w+)\s+ECP\s+(\w+\(\d+,[A-Z]+\))',
+                repeats=True, convert=False, 
             ),
         ]
 
@@ -1007,6 +1008,11 @@ class OutParser(TextParser):
                 sub_parser=TextParser(quantities=basis_set_naming_quantities),
             ),
             Quantity(
+                'ecp_basis_set_name',
+                r'ECP PARAMETER INFORMATION\s*\-+\s*([\s\S]+?)Atom\s*',
+                sub_parser=TextParser(quantities=basis_set_naming_quantities),
+            ),
+            Quantity(
                 'single_point',
                 r'\* Single Point Calculation \*\s*\*+([\s\S]+?(?:FINAL SINGLE POINT ENERGY.*|\Z))',
                 sub_parser=TextParser(quantities=calculation_quantities),
@@ -1074,9 +1080,7 @@ class ORCAParser(MatchingParser):
         aux_c_basis_set_name = out_parser.get('basis_set_name', {}).get('auxc_basis_set', None)
         aux_j_basis_set_name = out_parser.get('basis_set_name', {}).get('auxj_basis_set', None)
         aux_jk_basis_set_name = out_parser.get('basis_set_name', {}).get('auxjk_basis_set', None)
-        #capped_ecp_name = out_parser.get('basis_set_name', {}).get('capped_ecp', None)
-
-        #print(capped_ecp_name)
+        capped_ecp_name = out_parser.get('ecp_basis_set_name', {}).get('capped_ecp', [])
 
         basis_sets = []
 
@@ -1112,6 +1116,16 @@ class ORCAParser(MatchingParser):
                 role='auxiliary_scf'
                 )
             basis_sets.append(aux_jk_basis_set)
+
+        if capped_ecp_name:
+            for ecp in capped_ecp_name:
+                element, basis_set = ecp 
+                ecp_basis_set = AtomCenteredBasisSet(
+                    basis_set=basis_set,
+                    type='cECP',
+                    species_scope=[element]
+                )
+                basis_sets.append(ecp_basis_set)
 
         return basis_sets
  
