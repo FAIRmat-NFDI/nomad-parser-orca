@@ -161,44 +161,125 @@ class Localization(SelfConsistency):
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
         super().normalize(archive, logger)
 
-class IntegrationGrid(Mesh):
-    """Settings for integration grids.
-    The integration grids can be different for different atoms!
+
+class Mesh(NumericalSettings):
+    """
+    A base section used to define the mesh or space partitioning over which a discrete numerical integration is performed.
     """
 
-    type = Quantity(
-        type=str,
-        description= """ type of the grid """,
-    ) # TODO: an MEnum for COSX or XC grids?
-
-    angular_scheme = Quantity(
-        type=str,  
-        description=""" 
-        the angular quadrature scheme.
-        Most popular is Lebedev: A. D. Becke, J. Chem. Phys. 88, 2547 (1988), which provides angular grids of octahedral symmetry.
-
-        Gauss-Legendre: y C. W. Murray, N. C. Handy and G. J. Laming, Mol. Phys. 78, 997 (1993)
+    dimensionality = Quantity(
+        type=np.int32,
+        default=3,
+        description="""
+        Dimensionality of the mesh: 1, 2, or 3. Defaults to 3.
         """,
     )
 
-    radial_scheme = Quantity(
-        type=str,
-        description=""" 
-        the radial quadrature scheme.
+    kind = Quantity(
+        type=MEnum('equidistant', 'logarithmic', 'tan'),
+        shape=['dimensionality'],
+        description="""
+        Kind of mesh identifying the spacing in each of the dimensions specified by `dimensionality`. It can take the values:
+
+        | Name      | Description                      |
+        | --------- | -------------------------------- |
+        | `'equidistant'`  | Equidistant grid (also known as 'Newton-Cotes') |
+        | `'logarithmic'`  | log distance grid |
+        | `'Tan'`  | Non-uniform tan mesh for grids. More dense at low abs values of the points, while less dense for higher values |
         """,
     )
 
-    atom_partitioning = Quantity(
-        type=str,
-        description=""" 
-        Weight generation scheme, also known as Voronoi scheme, typically Becke.
+    grid = Quantity(
+        type=np.int32,
+        shape=['dimensionality'],
+        description="""
+        Amount of mesh point sampling along each axis.
+        """,
+    ) 
+
+    n_points = Quantity(
+        type=np.int32,
+        description="""
+        Number of points in the mesh.
         """,
     )
 
-    pruning_method = Quantity(
-        type=str,
-        description=""" 
-        Angular grid pruning method
+    points = Quantity(
+        type=np.complex128,
+        shape=['n_points', 'dimensionality'],
+        description="""
+        List of all the points in the mesh.
         """,
     )
 
+    multiplicities = Quantity(
+        type=np.float64,
+        shape=['n_points'],
+        description="""
+        The amount of times the same point reappears. A value larger than 1, typically indicates
+        a symmetry operation that was applied to the `Mesh`.
+        """,
+    )
+
+    pruning = Quantity(
+        type=str,
+        description="""
+        Pruning method applied for reducing the amount of points in the Mesh. This is typically
+        used for numerical integration near the core levels in atoms, and it takes the value
+        `adaptive`.
+        """
+    )
+
+    def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
+        super().normalize(archive, logger)
+
+        if self.dimensionality not in [1, 2, 3]:
+            logger.error('`dimensionality` meshes different than 1, 2, or 3 are not supported.')
+
+
+class NumericalIntegration(NumericalSettings):
+    """
+    Numerical integration settings used to resolve the following type of integrals by discrete
+    numerical integration:
+    
+    ```math
+    \int_{\vec{r}_a}^{\vec{r}_b} d^3 \vec{r} F(\vec{r}) \approx \sum_{n=a}^{b} w(\vec{r}_n) F(\vec{r}_n)   
+    ```
+
+    Here, $F$ can be any type of function which would define the type of rules that can be applied
+    to solve such integral (e.g., 1D Gaussian quadrature rule or multi-dimensional `angular` rules like the 
+    Lebedev quadrature rule).
+    
+    These multidimensional integral has a `Mesh` defined over which the integration is performed, i.e., the 
+    $\vec{r}_n$ points. 
+    """
+
+    coordinate = Quantity(
+        type=MEnum('all', 'radial', 'angular'),
+        description="""
+        Coordinate over which the integration is performed. `all` means the integration is performed in 
+        all the space. `radial` and `angular` describe cases where the integration is performed for
+        functions which can be splitted into radial and angular distributions (e.g., orbital wavefunctions). 
+        """,
+    )
+
+    integration_rule = Quantity(
+        type=str,  # ? extend to MEnum?
+        description="""
+        Integration rule used. This can be any 1D Gaussian quadrature rule or multi-dimensional `angular` rules, 
+        e.g., Lebedev quadrature rule (see e.g., Becke, Chem. Phys. 88, 2547 (1988)).
+        """
+    )
+
+    weight_partitioning = Quantity(
+        type=str,
+        description="""
+        Approximation applied to the weight when doing the numerical integration. See e.g., C. W. Murray, N. C. Handy 
+        and G. J. Laming, Mol. Phys. 78, 997 (1993).
+        """
+    )
+
+    mesh = SubSection(sub_section=Mesh.m_def)
+
+    def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
+        super().normalize(archive, logger)

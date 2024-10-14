@@ -21,11 +21,14 @@ from nomad_simulations.schema_packages.model_method import ModelMethod, DFT, XCF
 from nomad_simulations.schema_packages.model_system import (AtomicCell,
                                                             ModelSystem)
 from nomad_simulations.schema_packages.basis_set import AtomCenteredBasisSet, BasisSetContainer
-from nomad_simulations.schema_packages.numerical_settings import SelfConsistency
 from nomad_simulations.schema_packages.outputs import Outputs
 
 from nomad_parser_orca.schema_packages.schema_package import CoupledCluster, PerturbationMethod
-from nomad_parser_orca.schema_packages.numerical_settings import PNOSettings, Localization
+from nomad_parser_orca.schema_packages.numerical_settings import(SelfConsistency, 
+                                                                 PNOSettings, 
+                                                                 Localization, 
+                                                                 Mesh, 
+                                                                 NumericalIntegration)
 from nomad_parser_orca.schema_packages.outputs import CCOutputs
 
 
