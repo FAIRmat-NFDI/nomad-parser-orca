@@ -17,7 +17,10 @@ from nomad.parsing.parser import MatchingParser
 from nomad.units import ureg
 from nomad_simulations.schema_packages.atoms_state import AtomsState
 from nomad_simulations.schema_packages.general import Program, Simulation
-from nomad_simulations.schema_packages.model_method import ModelMethod, DFT, XCFunctional
+from nomad_simulations.schema_packages.model_method import (ModelMethod, 
+                                                            DFT, 
+                                                            XCFunctional,
+                                                            GTOIntegralDecomposition)
 from nomad_simulations.schema_packages.model_system import (AtomicCell,
                                                             ModelSystem)
 from nomad_simulations.schema_packages.basis_set import AtomCenteredBasisSet, BasisSetContainer
@@ -1265,8 +1268,8 @@ class ORCAParser(MatchingParser):
         # Initialize model_method 
         model_method = ModelMethod()
 
-        input_file = self.out_parser.get('input_file')
-        print(input_file)
+        #input_file = self.out_parser.get('input_file')
+        #print(input_file)
 
         # Parse basis set 
         basis_set = self.parse_basis_set(self.out_parser, model_system, logger)
@@ -1284,6 +1287,20 @@ class ORCAParser(MatchingParser):
         if dft:
             simulation.model_method.append(dft)
         
+
+        # Parse RI approximation if there's any
+
+        ri_contribution = GTOIntegralDecomposition(
+            approximation_type = "RIJ",
+        )
+
+        cosx_contribution = GTOIntegralDecomposition(
+            approximation_type = "COSX",
+        )
+
+        model_method.contributions.append(ri_contribution)
+        model_method.contributions.append(cosx_contribution)
+
         # Parse MP2
         mp2 = self.parse_mp2(self.out_parser, logger)
         if mp2:
