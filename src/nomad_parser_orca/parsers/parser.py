@@ -147,7 +147,7 @@ class OutParser(TextParser):
         basis_set_quantities = [
             Quantity('basis_set_atom_labels', r'Type\s*(\w+)', repeats=True),
             Quantity('basis_set', r':\s*(\w+)\s*contracted\s*to', repeats=True),
-            Quantity('basis_set_contracted', r'(\w+)\s*pattern', repeats=True) ]
+            Quantity('basis_set_contracted', r'(\w+)\s*pattern', repeats=True), ]
         
         basis_set_naming_quantities = [
             Quantity(
@@ -356,8 +356,6 @@ class OutParser(TextParser):
                     quantities=[
                         Quantity(
                             'exchange_functional',
-                            #r'Exchange Functional\s*Exchange\s*\.+\s*(\S+)',
-                            #r'Exchange Functional\s*Exchange\s*\.+\s*(\w+)',
                             r'Exchange Functional\s+Exchange\s*\.+\s+(\w+)',
                             convert=False,
                         ),
@@ -403,10 +401,7 @@ class OutParser(TextParser):
                         ),
                         Quantity(
                             'fraction_hf_exchange',
-                            #r'Fraction HF Exchange\s*ScalHFX\s*\.+\s*({re_float})',
                             r'Fraction HF Exchange\s*ScalHFX\s*\.+\s*([\d\.]+)',
-                            #r'Fraction HF Exchange\s+ScalHFX\s*\.+\s*({re_float})',
-                            #r'Fraction HF Exchange\s+ScalHFX\s*\.+\s*({re_float})',
                             dtype=float,
                         ),
                         Quantity(
@@ -471,6 +466,15 @@ class OutParser(TextParser):
                             rf'1\-El\. energy change\s*\.+\s*({re_float})',
                             dtype=float,
                         ),
+                        Quantity('rij', 
+                                r'RI-approximation to the Coulomb term is turned (\w+)',
+                                 convert=False), 
+                        Quantity('cosx', 
+                                 r'RIJ-COSX \(HFX calculated with COS-X\)\)\s*\.\.\.\.\s*(\w+)',
+                                 convert=False),
+                        Quantity('rijk', 
+                                 r'RI-JK \(J\+K treated both via RI\)\s+\.\.\.\.\s+(\w+)', 
+                                 convert=False),
                     ]
                 ),
             ),
@@ -479,6 +483,7 @@ class OutParser(TextParser):
                 r'DFT GRID GENERATION\s*\-+([\s\S]+?\-{10})',
                 sub_parser=TextParser(quantities=grid_quantities),
             ),
+            
             Quantity(
                 'scf_iterations',
                 r'SCF ITERATIONS\s*\-+([\s\S]+?)\*{10}',
@@ -1080,14 +1085,18 @@ class ORCAParser(MatchingParser):
             logger.warning("No atoms information found or incorrect format.")
         return None
 
+    def create_basis_set(self, role, basis_set_name, species_scope=None, 
+                         gto_integral_decomposition_ref=None):
+        return AtomCenteredBasisSet(
+            basis_set=basis_set_name,
+            type='GTO',
+            role=role,
+            species_scope=species_scope,
+            gto_integral_decomposition_ref=gto_integral_decomposition_ref,
+        )
 
     def parse_basis_set(self, out_parser, model_system, logger):
 
-        
-        # Parse input file from the output
-        input_file = self.out_parser.get('input_file')
-
-        # Check whether there is custom basis set:
         # AddGTO AddAuxCGTO AddAuxJGTO AddAuxJKGTO AddCabsGTO
         # NewGTO NewAuxCGTO NewAuxJGTO NewAuxJKGTO NewCabsGTO
         #
@@ -1100,54 +1109,33 @@ class ORCAParser(MatchingParser):
         # AddGTO doesnt have to be in the %basis block!!!!
         # AddGTO Element function_type n_primitive [exponents contraction_coefficients] end
 
-        main_basis_set_name = out_parser.get('basis_set_name', {}).get('main_basis_set', None)
-        aux_c_basis_set_name = out_parser.get('basis_set_name', {}).get('auxc_basis_set', None)
-        aux_j_basis_set_name = out_parser.get('basis_set_name', {}).get('auxj_basis_set', None)
-        aux_jk_basis_set_name = out_parser.get('basis_set_name', {}).get('auxjk_basis_set', None)
-        capped_ecp_name = out_parser.get('ecp_basis_set_name', {}).get('capped_ecp', [])
+        rij_coulomb   = out_parser.get('single_point', {}).get('self_consistent', {}).get('scf_settings', {}).get('rij')
+        cosx_exchange = out_parser.get('single_point', {}).get('self_consistent', {}).get('scf_settings', {}).get('cosx')
+        rijk_both = out_parser.get('single_point', {}).get('self_consistent', {}).get('scf_settings', {}).get('rijk')
 
         basis_sets = []
+        basis_set_names = {
+            'main_basis_set': out_parser.get('basis_set_name', {}).get('main_basis_set'),
+            'aux_c_basis_set': out_parser.get('basis_set_name', {}).get('auxc_basis_set'),
+            'aux_j_basis_set': out_parser.get('basis_set_name', {}).get('auxj_basis_set'),
+            'aux_jk_basis_set': out_parser.get('basis_set_name', {}).get('auxjk_basis_set'),
+            'capped_ecp': out_parser.get('ecp_basis_set_name', {}).get('capped_ecp', [])
+        }
 
-        if main_basis_set_name:
-            main_basis_set = AtomCenteredBasisSet(
-                basis_set=main_basis_set_name, 
-                type='GTO',
-                role='orbital',
-                )
-            basis_sets.append(main_basis_set)
+        # Collect different types of basis sets
+        if basis_set_names['main_basis_set']:
+            basis_sets.append(self.create_basis_set('orbital', basis_set_names['main_basis_set']))
+        if basis_set_names['aux_c_basis_set']:
+            basis_sets.append(self.create_basis_set('auxiliary_post_hf', basis_set_names['aux_c_basis_set']))
+        if basis_set_names['aux_j_basis_set']:
+            basis_sets.append(self.create_basis_set('auxiliary_scf', basis_set_names['aux_j_basis_set']))
+        if basis_set_names['aux_jk_basis_set']:
+            basis_sets.append(self.create_basis_set('auxiliary_scf', basis_set_names['aux_jk_basis_set']))
 
-        if aux_c_basis_set_name:
-            aux_c_basis_set = AtomCenteredBasisSet(
-                basis_set=aux_c_basis_set_name, 
-                type='GTO',
-                role='auxiliary_post_hf',
-                )
-            basis_sets.append(aux_c_basis_set)
-
-        if aux_j_basis_set_name:
-            aux_j_basis_set = AtomCenteredBasisSet(
-                basis_set=aux_j_basis_set_name, 
-                type='GTO',
-                role='auxiliary_scf'
-                )
-            basis_sets.append(aux_j_basis_set)
-
-        if aux_jk_basis_set_name:
-            aux_jk_basis_set = AtomCenteredBasisSet(
-                basis_set=aux_jk_basis_set_name, 
-                type='GTO',
-                role='auxiliary_scf'
-                )
-            basis_sets.append(aux_jk_basis_set)
-
-        if capped_ecp_name:
-            for element, basis_set  in capped_ecp_name:
-                ecp_basis_set = AtomCenteredBasisSet(
-                    basis_set=basis_set,
-                    type='cECP',
-                    species_scope=[element]
-                )
-                basis_sets.append(ecp_basis_set)
+        # Handle capped ECPs if available
+        if basis_set_names['capped_ecp']:
+            for element, basis_set in basis_set_names['capped_ecp']:
+                basis_sets.append(self.create_basis_set('cECP', basis_set, species_scope=[element]))
 
         return basis_sets
  
@@ -1161,12 +1149,11 @@ class ORCAParser(MatchingParser):
                 threshold_change=scf_convergence.get('energy_change_tolerance', 1e-8)  # Default value
             )
         else:
-            scf = None  # Handle missing SCF data appropriately
+            scf = None 
 
         xc_functionals = []
         
         # Handle exchange functional
-
         if scf_convergence.get('exchange_functional'):
             exchange_functional = XCFunctional(
                 libxc_name=scf_convergence.get('exchange_functional'),
@@ -1286,20 +1273,6 @@ class ORCAParser(MatchingParser):
 
         if dft:
             simulation.model_method.append(dft)
-        
-
-        # Parse RI approximation if there's any
-
-        ri_contribution = GTOIntegralDecomposition(
-            approximation_type = "RIJ",
-        )
-
-        cosx_contribution = GTOIntegralDecomposition(
-            approximation_type = "COSX",
-        )
-
-        model_method.contributions.append(ri_contribution)
-        model_method.contributions.append(cosx_contribution)
 
         # Parse MP2
         mp2 = self.parse_mp2(self.out_parser, logger)
