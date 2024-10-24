@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 
 import nomad_simulations.schema_packages
 from nomad_simulations.schema_packages.model_method import \
-    ModelMethodElectronic
+    ModelMethodElectronic, BaseModelMethod
 from nomad_simulations.schema_packages.numerical_settings import \
     NumericalSettings
 from nomad_simulations.schema_packages.outputs import Outputs
@@ -38,6 +38,18 @@ configuration = config.get_plugin_entry_point(
 
 
 m_package = SchemaPackage()
+
+
+class MolecularHamiltonianSubTerms(BaseModelMethod):
+    type=Quantity(
+        type=MEnum('coulomb', 'exchange'),
+        description="""
+        something something
+        """,
+    )
+
+    def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
+        super().normalize(archive, logger)
 
 class PerturbationMethod(ModelMethodElectronic):
     type = Quantity(

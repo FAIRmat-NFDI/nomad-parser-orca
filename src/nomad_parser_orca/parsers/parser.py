@@ -17,16 +17,18 @@ from nomad.parsing.parser import MatchingParser
 from nomad.units import ureg
 from nomad_simulations.schema_packages.atoms_state import AtomsState
 from nomad_simulations.schema_packages.general import Program, Simulation
-from nomad_simulations.schema_packages.model_method import (ModelMethod, 
+from nomad_simulations.schema_packages.model_method import (BaseModelMethod, 
+                                                            ModelMethod, 
                                                             DFT, 
-                                                            XCFunctional,
-                                                            GTOIntegralDecomposition)
+                                                            XCFunctional)
 from nomad_simulations.schema_packages.model_system import (AtomicCell,
                                                             ModelSystem)
 from nomad_simulations.schema_packages.basis_set import AtomCenteredBasisSet, BasisSetContainer
 from nomad_simulations.schema_packages.outputs import Outputs
 
-from nomad_parser_orca.schema_packages.schema_package import CoupledCluster, PerturbationMethod
+from nomad_parser_orca.schema_packages.schema_package import (CoupledCluster, 
+                                                              PerturbationMethod,
+                                                              MolecularHamiltonianSubTerms)
 from nomad_parser_orca.schema_packages.numerical_settings import(SelfConsistency, 
                                                                  PNOSettings, 
                                                                  Localization, 
@@ -1092,8 +1094,25 @@ class ORCAParser(MatchingParser):
             type='GTO',
             role=role,
             species_scope=species_scope,
-            gto_integral_decomposition_ref=gto_integral_decomposition_ref,
         )
+    
+    def create_sub_terms(self, out_parser, logger):
+        """
+        Create coulomb and exchange parts of the Hamiltonian as a contribution
+        if there are integral decomposition techniques
+        """
+        rij_coulomb   = out_parser.get('single_point', {}).get('self_consistent', {}).get('scf_settings', {}).get('rij')
+        cosx_exchange = out_parser.get('single_point', {}).get('self_consistent', {}).get('scf_settings', {}).get('cosx')
+        rijk_both = out_parser.get('single_point', {}).get('self_consistent', {}).get('scf_settings', {}).get('rijk')
+
+        #at some point there should be an RI flag.
+
+        if rij_coulomb == 'on':
+            coulomb_term  = MolecularHamiltonianSubTerms(type="coulomb")
+            exchange_term = MolecularHamiltonianSubTerms(type="exchange")
+
+            return coulomb_term, exchange_term
+
 
     def parse_basis_set(self, out_parser, model_system, logger):
 
@@ -1108,10 +1127,6 @@ class ORCAParser(MatchingParser):
         # AddGTO adds basis functions to it.
         # AddGTO doesnt have to be in the %basis block!!!!
         # AddGTO Element function_type n_primitive [exponents contraction_coefficients] end
-
-        rij_coulomb   = out_parser.get('single_point', {}).get('self_consistent', {}).get('scf_settings', {}).get('rij')
-        cosx_exchange = out_parser.get('single_point', {}).get('self_consistent', {}).get('scf_settings', {}).get('cosx')
-        rijk_both = out_parser.get('single_point', {}).get('self_consistent', {}).get('scf_settings', {}).get('rijk')
 
         basis_sets = []
         basis_set_names = {
@@ -1185,7 +1200,7 @@ class ORCAParser(MatchingParser):
     def parse_coupled_cluster(self, out_parser, logger):
         cc_data = out_parser.get('single_point', {}).get('cc', {})
 
-        if cc_data:
+        if cc_data: 
             model_method = CoupledCluster(
                 type= cc_data.get('coupled_cluster_type'),
                 reference_determinant=cc_data.get('cc_reference_wavefunction'))
@@ -1254,6 +1269,9 @@ class ORCAParser(MatchingParser):
 
         # Initialize model_method 
         model_method = ModelMethod()
+
+        coulomb_term, exchange_term = self.create_sub_terms(self.out_parser, logger)
+        print(coulomb_term)
 
         #input_file = self.out_parser.get('input_file')
         #print(input_file)
