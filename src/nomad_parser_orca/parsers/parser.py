@@ -1271,7 +1271,8 @@ class ORCAParser(MatchingParser):
         model_method = ModelMethod()
 
         coulomb_term, exchange_term = self.create_sub_terms(self.out_parser, logger)
-        print(coulomb_term)
+        if coulomb_term:
+            model_method.contributions.append(coulomb_term)
 
         #input_file = self.out_parser.get('input_file')
         #print(input_file)

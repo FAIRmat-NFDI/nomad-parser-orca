@@ -1,0 +1,1855 @@
+{
+  "data": {
+    "m_def": "nomad_simulations.schema_packages.general.Simulation",
+    "program": {
+      "name": "ORCA",
+      "version": "5.0.3"
+    },
+    "model_system": [
+      {
+        "datetime": "2024-10-24T16:40:59.957558+00:00",
+        "branch_depth": 0,
+        "cell": [
+          {
+            "m_def": "nomad_simulations.schema_packages.model_system.AtomicCell",
+            "name": "AtomicCell",
+            "length_vector_a": 0.0,
+            "length_vector_b": 0.0,
+            "length_vector_c": 0.0,
+            "angle_vectors_b_c": 1.5707963267948966,
+            "angle_vectors_a_c": 1.5707963267948966,
+            "angle_vectors_a_b": 1.5707963267948966,
+            "volume": 0.0,
+            "positions": [
+              [
+                22.722016,
+                9.933524,
+                10.669693
+              ],
+              [
+                23.468385,
+                11.803013,
+                10.216448
+              ],
+              [
+                20.960491,
+                11.023937,
+                10.579787
+              ],
+              [
+                22.549836,
+                12.633596,
+                9.962841
+              ],
+              [
+                21.160741,
+                12.205259,
+                10.171116
+              ],
+              [
+                20.116062,
+                13.131834,
+                9.911247
+              ],
+              [
+                20.407646,
+                14.389492,
+                9.463703
+              ],
+              [
+                21.749216,
+                14.802121,
+                9.259522
+              ],
+              [
+                22.793326,
+                13.95526,
+                9.501559
+              ],
+              [
+                22.497871,
+                9.235236,
+                8.727516
+              ],
+              [
+                21.920161,
+                8.067846,
+                11.035953
+              ],
+              [
+                21.956723,
+                8.091554,
+                8.693855
+              ],
+              [
+                21.628369,
+                7.449221,
+                9.972726
+              ],
+              [
+                21.01513,
+                6.16751,
+                9.954081
+              ],
+              [
+                20.747196,
+                5.549734,
+                8.765558
+              ],
+              [
+                21.071341,
+                6.166778,
+                7.530302
+              ],
+              [
+                21.660702,
+                7.398882,
+                7.489045
+              ],
+              [
+                23.119003,
+                10.274302,
+                12.773676
+              ],
+              [
+                24.275128,
+                9.808607,
+                13.244399
+              ],
+              [
+                24.606241,
+                9.940923,
+                14.587367
+              ],
+              [
+                23.714825,
+                10.566337,
+                15.44178
+              ],
+              [
+                22.518583,
+                11.044013,
+                14.937215
+              ],
+              [
+                22.262705,
+                10.87299,
+                13.586954
+              ],
+              [
+                24.695176,
+                9.092708,
+                11.006673
+              ],
+              [
+                25.160974,
+                9.153516,
+                12.2533
+              ],
+              [
+                26.404713,
+                8.626455,
+                12.579519
+              ],
+              [
+                27.163359,
+                8.029385,
+                11.587704
+              ],
+              [
+                26.666408,
+                7.976759,
+                10.297691
+              ],
+              [
+                25.418998,
+                8.526674,
+                10.05345
+              ],
+              [
+                19.093386,
+                12.810114,
+                10.060396
+              ],
+              [
+                19.606369,
+                15.086499,
+                9.255591
+              ],
+              [
+                21.941945,
+                15.805432,
+                8.90229
+              ],
+              [
+                23.818598,
+                14.264927,
+                9.344792
+              ],
+              [
+                20.768526,
+                5.701637,
+                10.89948
+              ],
+              [
+                20.27822,
+                4.574346,
+                8.758948
+              ],
+              [
+                20.841945,
+                5.64891,
+                6.608054
+              ],
+              [
+                21.901788,
+                7.876447,
+                6.547972
+              ],
+              [
+                25.541201,
+                9.562862,
+                14.973499
+              ],
+              [
+                23.955237,
+                10.676551,
+                16.490575
+              ],
+              [
+                21.794532,
+                11.537386,
+                15.569166
+              ],
+              [
+                21.340341,
+                11.22138,
+                13.141552
+              ],
+              [
+                26.786254,
+                8.675993,
+                13.588427
+              ],
+              [
+                28.132662,
+                7.611417,
+                11.82395
+              ],
+              [
+                27.226164,
+                7.520735,
+                9.494086
+              ],
+              [
+                24.985747,
+                8.517083,
+                9.062113
+              ]
+            ],
+            "periodic_boundary_conditions": [
+              false,
+              false,
+              false
+            ],
+            "n_atoms": 45,
+            "atoms_state": [
+              {
+                "datetime": "2024-10-24T16:40:59.949451+00:00",
+                "chemical_symbol": "Co",
+                "atomic_number": 27
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.949699+00:00",
+                "chemical_symbol": "O",
+                "atomic_number": 8
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.949868+00:00",
+                "chemical_symbol": "O",
+                "atomic_number": 8
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.950012+00:00",
+                "chemical_symbol": "C",
+                "atomic_number": 6
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.950163+00:00",
+                "chemical_symbol": "C",
+                "atomic_number": 6
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.950309+00:00",
+                "chemical_symbol": "C",
+                "atomic_number": 6
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.950456+00:00",
+                "chemical_symbol": "C",
+                "atomic_number": 6
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.950605+00:00",
+                "chemical_symbol": "C",
+                "atomic_number": 6
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.950752+00:00",
+                "chemical_symbol": "C",
+                "atomic_number": 6
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.950904+00:00",
+                "chemical_symbol": "O",
+                "atomic_number": 8
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.951048+00:00",
+                "chemical_symbol": "O",
+                "atomic_number": 8
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.951188+00:00",
+                "chemical_symbol": "C",
+                "atomic_number": 6
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.951326+00:00",
+                "chemical_symbol": "C",
+                "atomic_number": 6
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.951467+00:00",
+                "chemical_symbol": "C",
+                "atomic_number": 6
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.951604+00:00",
+                "chemical_symbol": "C",
+                "atomic_number": 6
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.951746+00:00",
+                "chemical_symbol": "C",
+                "atomic_number": 6
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.951892+00:00",
+                "chemical_symbol": "C",
+                "atomic_number": 6
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.952036+00:00",
+                "chemical_symbol": "N",
+                "atomic_number": 7
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.952179+00:00",
+                "chemical_symbol": "C",
+                "atomic_number": 6
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.952328+00:00",
+                "chemical_symbol": "C",
+                "atomic_number": 6
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.952476+00:00",
+                "chemical_symbol": "C",
+                "atomic_number": 6
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.952621+00:00",
+                "chemical_symbol": "C",
+                "atomic_number": 6
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.952763+00:00",
+                "chemical_symbol": "C",
+                "atomic_number": 6
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.952916+00:00",
+                "chemical_symbol": "N",
+                "atomic_number": 7
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.953067+00:00",
+                "chemical_symbol": "C",
+                "atomic_number": 6
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.953219+00:00",
+                "chemical_symbol": "C",
+                "atomic_number": 6
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.953371+00:00",
+                "chemical_symbol": "C",
+                "atomic_number": 6
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.953525+00:00",
+                "chemical_symbol": "C",
+                "atomic_number": 6
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.953679+00:00",
+                "chemical_symbol": "C",
+                "atomic_number": 6
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.953836+00:00",
+                "chemical_symbol": "H",
+                "atomic_number": 1
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.953974+00:00",
+                "chemical_symbol": "H",
+                "atomic_number": 1
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.954112+00:00",
+                "chemical_symbol": "H",
+                "atomic_number": 1
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.954251+00:00",
+                "chemical_symbol": "H",
+                "atomic_number": 1
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.954391+00:00",
+                "chemical_symbol": "H",
+                "atomic_number": 1
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.954532+00:00",
+                "chemical_symbol": "H",
+                "atomic_number": 1
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.954672+00:00",
+                "chemical_symbol": "H",
+                "atomic_number": 1
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.954816+00:00",
+                "chemical_symbol": "H",
+                "atomic_number": 1
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.954958+00:00",
+                "chemical_symbol": "H",
+                "atomic_number": 1
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.955100+00:00",
+                "chemical_symbol": "H",
+                "atomic_number": 1
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.955241+00:00",
+                "chemical_symbol": "H",
+                "atomic_number": 1
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.955382+00:00",
+                "chemical_symbol": "H",
+                "atomic_number": 1
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.955524+00:00",
+                "chemical_symbol": "H",
+                "atomic_number": 1
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.955665+00:00",
+                "chemical_symbol": "H",
+                "atomic_number": 1
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.955810+00:00",
+                "chemical_symbol": "H",
+                "atomic_number": 1
+              },
+              {
+                "datetime": "2024-10-24T16:40:59.955958+00:00",
+                "chemical_symbol": "H",
+                "atomic_number": 1
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "model_method": [
+      {
+        "m_def": "nomad_simulations.schema_packages.model_method.DFT",
+        "jacobs_ladder": "metaGGA",
+        "exact_exchange_mixing_factor": 0.1,
+        "xc_functionals": [
+          {
+            "libxc_name": "0.9*TPSS",
+            "name": "exchange",
+            "weight": 0.9
+          },
+          {
+            "libxc_name": "1.0*TPSS",
+            "name": "correlation",
+            "weight": 1.0
+          }
+        ]
+      },
+      {
+        "numerical_settings": [
+          {
+            "m_def": "nomad_simulations.schema_packages.basis_set.AtomCenteredBasisSet",
+            "name": "AtomCenteredBasisSet",
+            "basis_set": "ZORA-def2-TZVPP",
+            "type": "GTO",
+            "role": "orbital"
+          },
+          {
+            "m_def": "nomad_simulations.schema_packages.basis_set.AtomCenteredBasisSet",
+            "name": "AtomCenteredBasisSet",
+            "basis_set": "SARC/J",
+            "type": "GTO",
+            "role": "auxiliary_scf"
+          },
+          {
+            "m_def": "nomad_simulations.schema_packages.numerical_settings.SelfConsistency",
+            "name": "SelfConsistency",
+            "n_max_iterations": 900,
+            "threshold_change": 1e-08
+          }
+        ],
+        "contributions": [
+          {
+            "m_def": "nomad_parser_orca.schema_packages.schema_package.MolecularHamiltonianSubTerms",
+            "type": "coulomb"
+          }
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "entry_name": "single-point-dft.out",
+    "mainfile": "/home/ebb/ORCA/nomad-parser-orca/tests/data/single-point-dft.out",
+    "text_search_contents": [
+      "GTO",
+      "coulomb",
+      "exchange",
+      "auxiliary_scf",
+      "SARC/J",
+      "H",
+      "ZORA-def2-TZVPP",
+      "5.0.3",
+      "O",
+      "0.9*TPSS",
+      "1.0*TPSS",
+      "N",
+      "orbital",
+      "SelfConsistency",
+      "AtomicCell",
+      "metaGGA",
+      "ORCA",
+      "C",
+      "correlation",
+      "AtomCenteredBasisSet",
+      "Co"
+    ],
+    "domain": "dft",
+    "n_quantities": 235,
+    "quantities": [
+      "",
+      "data",
+      "data.model_method",
+      "data.model_method.contributions",
+      "data.model_method.contributions.type",
+      "data.model_method.exact_exchange_mixing_factor",
+      "data.model_method.jacobs_ladder",
+      "data.model_method.numerical_settings",
+      "data.model_method.numerical_settings.basis_set",
+      "data.model_method.numerical_settings.n_max_iterations",
+      "data.model_method.numerical_settings.name",
+      "data.model_method.numerical_settings.role",
+      "data.model_method.numerical_settings.threshold_change",
+      "data.model_method.numerical_settings.type",
+      "data.model_method.xc_functionals",
+      "data.model_method.xc_functionals.libxc_name",
+      "data.model_method.xc_functionals.name",
+      "data.model_method.xc_functionals.weight",
+      "data.model_system",
+      "data.model_system.branch_depth",
+      "data.model_system.cell",
+      "data.model_system.cell.angle_vectors_a_b",
+      "data.model_system.cell.angle_vectors_a_c",
+      "data.model_system.cell.angle_vectors_b_c",
+      "data.model_system.cell.atoms_state",
+      "data.model_system.cell.atoms_state.atomic_number",
+      "data.model_system.cell.atoms_state.chemical_symbol",
+      "data.model_system.cell.atoms_state.datetime",
+      "data.model_system.cell.length_vector_a",
+      "data.model_system.cell.length_vector_b",
+      "data.model_system.cell.length_vector_c",
+      "data.model_system.cell.n_atoms",
+      "data.model_system.cell.name",
+      "data.model_system.cell.periodic_boundary_conditions",
+      "data.model_system.cell.positions",
+      "data.model_system.cell.volume",
+      "data.model_system.datetime",
+      "data.program",
+      "data.program.name",
+      "data.program.version",
+      "metadata",
+      "metadata.domain",
+      "metadata.entry_name",
+      "metadata.mainfile",
+      "metadata.quantities",
+      "metadata.section_defs",
+      "metadata.section_defs.definition_id",
+      "metadata.section_defs.definition_qualified_name",
+      "metadata.section_defs.used_directly",
+      "metadata.sections",
+      "results",
+      "results.eln",
+      "results.eln.sections",
+      "results.properties"
+    ],
+    "sections": [
+      "nomad.datamodel.datamodel.EntryArchive",
+      "nomad.datamodel.datamodel.EntryMetadata",
+      "nomad.datamodel.results.ELN",
+      "nomad.datamodel.results.Properties",
+      "nomad.datamodel.results.Results",
+      "nomad_parser_orca.schema_packages.schema_package.MolecularHamiltonianSubTerms",
+      "nomad_simulations.schema_packages.atoms_state.AtomsState",
+      "nomad_simulations.schema_packages.basis_set.AtomCenteredBasisSet",
+      "nomad_simulations.schema_packages.general.Program",
+      "nomad_simulations.schema_packages.general.Simulation",
+      "nomad_simulations.schema_packages.model_method.DFT",
+      "nomad_simulations.schema_packages.model_method.ModelMethod",
+      "nomad_simulations.schema_packages.model_method.XCFunctional",
+      "nomad_simulations.schema_packages.model_system.AtomicCell",
+      "nomad_simulations.schema_packages.model_system.ModelSystem",
+      "nomad_simulations.schema_packages.numerical_settings.SelfConsistency"
+    ],
+    "section_defs": [
+      {
+        "definition_qualified_name": "nomad.datamodel.data.ArchiveSection",
+        "definition_id": "7047cbff9980abff17cce4b1b6b0d1c783505b7f",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.data.EntryData",
+        "definition_id": "538f52fd8d52b29372066f878319c6aeb03b74d2",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.datamodel.EntryArchive",
+        "definition_id": "a5926a50801a097f5ff6a0fd3c585bb0e70e7ed1",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.datamodel.EntryMetadata",
+        "definition_id": "6edfa503af63b84d6a6021c227d00137b4c1cc9c",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.metainfo.basesections.Activity",
+        "definition_id": "bd0abbd05794fb9a22acf98127f53b6c621a2649",
+        "used_directly": false
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.metainfo.basesections.BaseSection",
+        "definition_id": "106bafb5140238b4afe8128b8c341b5b3e927838",
+        "used_directly": false
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.metainfo.basesections.Entity",
+        "definition_id": "8d478d6cfa9d129aeafe2e6f77d6fe3da6c000a0",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.metainfo.basesections.System",
+        "definition_id": "f503f05cfcac001f55d56db641463a38a301f4a5",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.results.ELN",
+        "definition_id": "eeed330bd18d40f3a2a00cc35ba6f58808d0c543",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.results.Properties",
+        "definition_id": "3d0188853e1806435f95f9a876b83ed98ad38713",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.results.Results",
+        "definition_id": "1caea35fada02e0b6861ceec2dd928595fc824db",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad_parser_orca.schema_packages.schema_package.MolecularHamiltonianSubTerms",
+        "definition_id": "e114f371c7680a1510ce722437bef632ebd89825",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad_simulations.schema_packages.atoms_state.AtomsState",
+        "definition_id": "9157f338611ceb4c69ec30cb280310011b563735",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad_simulations.schema_packages.basis_set.AtomCenteredBasisSet",
+        "definition_id": "338fbdffde248a618a2e444509aa9437c9c11d74",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad_simulations.schema_packages.basis_set.BasisSetComponent",
+        "definition_id": "7dc2eef1dee90a728b86442ac882a7ddc59ec729",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad_simulations.schema_packages.general.BaseSimulation",
+        "definition_id": "89eb90c47522313c6eaa8f0bd430b6e44d02f624",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad_simulations.schema_packages.general.Program",
+        "definition_id": "f5313c253f8da21c9cc7d0179376bd65468d1a34",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad_simulations.schema_packages.general.Simulation",
+        "definition_id": "232ace3c6dbfa836572b8263afb9dd11effc7e35",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad_simulations.schema_packages.model_method.BaseModelMethod",
+        "definition_id": "47ab2389d4920fe287b42cd083d9ac1976d8abbc",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad_simulations.schema_packages.model_method.DFT",
+        "definition_id": "e41a5ecb081ca5ee5c494b06ca58ad844c29a4b8",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad_simulations.schema_packages.model_method.GTOIntegralDecomposition",
+        "definition_id": "51d3c9f4d49a1357710363c3223d05378e694078",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad_simulations.schema_packages.model_method.ModelMethod",
+        "definition_id": "67b9630f49daa9855b169467d6c78aef9efd2b42",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad_simulations.schema_packages.model_method.ModelMethodElectronic",
+        "definition_id": "45c7cb7ecbd35842a6e332c2581e24502682ff8f",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad_simulations.schema_packages.model_method.XCFunctional",
+        "definition_id": "60bed96384aa1fe38645d6a10477a47c2a40549c",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad_simulations.schema_packages.model_system.AtomicCell",
+        "definition_id": "aa5697756a3a7fb25d4d818a1b1b35f274fa35b7",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad_simulations.schema_packages.model_system.Cell",
+        "definition_id": "2a964b6bdbfee04100ea3dfc7ef10e6f2ee99df8",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad_simulations.schema_packages.model_system.GeometricSpace",
+        "definition_id": "3252d726570906b5822e19eb4e1f4269b5c654a5",
+        "used_directly": false
+      },
+      {
+        "definition_qualified_name": "nomad_simulations.schema_packages.model_system.ModelSystem",
+        "definition_id": "02fa1076784ca566032c44a07e42cbd95058acfe",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad_simulations.schema_packages.numerical_settings.NumericalSettings",
+        "definition_id": "0fa805d16e6e61f97103409e5f5ea6130d47de4b",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad_simulations.schema_packages.numerical_settings.SelfConsistency",
+        "definition_id": "1d00db9c5adfe6170d6bd826ad009abab21ddc3f",
+        "used_directly": true
+      }
+    ],
+    "search_quantities": [
+      {
+        "id": "data.program.name#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.general.Program.name",
+        "path_archive": "data.program.name",
+        "str_value": "ORCA"
+      },
+      {
+        "id": "data.program.version#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.general.Program.version",
+        "path_archive": "data.program.version",
+        "str_value": "5.0.3"
+      },
+      {
+        "id": "data.model_system.cell.name#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.model_system.Cell.name",
+        "path_archive": "data.model_system.0.cell.0.name",
+        "str_value": "AtomicCell"
+      },
+      {
+        "id": "data.model_system.cell.n_atoms#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.model_system.AtomicCell.n_atoms",
+        "path_archive": "data.model_system.0.cell.0.n_atoms",
+        "int_value": 45
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.0.chemical_symbol",
+        "str_value": "Co"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.0.datetime",
+        "datetime_value": "2024-10-24T16:40:59.949451+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.0.atomic_number",
+        "int_value": 27
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.1.chemical_symbol",
+        "str_value": "O"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.1.datetime",
+        "datetime_value": "2024-10-24T16:40:59.949699+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.1.atomic_number",
+        "int_value": 8
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.2.chemical_symbol",
+        "str_value": "O"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.2.datetime",
+        "datetime_value": "2024-10-24T16:40:59.949868+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.2.atomic_number",
+        "int_value": 8
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.3.chemical_symbol",
+        "str_value": "C"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.3.datetime",
+        "datetime_value": "2024-10-24T16:40:59.950012+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.3.atomic_number",
+        "int_value": 6
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.4.chemical_symbol",
+        "str_value": "C"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.4.datetime",
+        "datetime_value": "2024-10-24T16:40:59.950163+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.4.atomic_number",
+        "int_value": 6
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.5.chemical_symbol",
+        "str_value": "C"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.5.datetime",
+        "datetime_value": "2024-10-24T16:40:59.950309+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.5.atomic_number",
+        "int_value": 6
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.6.chemical_symbol",
+        "str_value": "C"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.6.datetime",
+        "datetime_value": "2024-10-24T16:40:59.950456+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.6.atomic_number",
+        "int_value": 6
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.7.chemical_symbol",
+        "str_value": "C"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.7.datetime",
+        "datetime_value": "2024-10-24T16:40:59.950605+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.7.atomic_number",
+        "int_value": 6
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.8.chemical_symbol",
+        "str_value": "C"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.8.datetime",
+        "datetime_value": "2024-10-24T16:40:59.950752+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.8.atomic_number",
+        "int_value": 6
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.9.chemical_symbol",
+        "str_value": "O"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.9.datetime",
+        "datetime_value": "2024-10-24T16:40:59.950904+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.9.atomic_number",
+        "int_value": 8
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.10.chemical_symbol",
+        "str_value": "O"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.10.datetime",
+        "datetime_value": "2024-10-24T16:40:59.951048+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.10.atomic_number",
+        "int_value": 8
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.11.chemical_symbol",
+        "str_value": "C"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.11.datetime",
+        "datetime_value": "2024-10-24T16:40:59.951188+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.11.atomic_number",
+        "int_value": 6
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.12.chemical_symbol",
+        "str_value": "C"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.12.datetime",
+        "datetime_value": "2024-10-24T16:40:59.951326+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.12.atomic_number",
+        "int_value": 6
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.13.chemical_symbol",
+        "str_value": "C"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.13.datetime",
+        "datetime_value": "2024-10-24T16:40:59.951467+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.13.atomic_number",
+        "int_value": 6
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.14.chemical_symbol",
+        "str_value": "C"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.14.datetime",
+        "datetime_value": "2024-10-24T16:40:59.951604+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.14.atomic_number",
+        "int_value": 6
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.15.chemical_symbol",
+        "str_value": "C"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.15.datetime",
+        "datetime_value": "2024-10-24T16:40:59.951746+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.15.atomic_number",
+        "int_value": 6
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.16.chemical_symbol",
+        "str_value": "C"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.16.datetime",
+        "datetime_value": "2024-10-24T16:40:59.951892+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.16.atomic_number",
+        "int_value": 6
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.17.chemical_symbol",
+        "str_value": "N"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.17.datetime",
+        "datetime_value": "2024-10-24T16:40:59.952036+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.17.atomic_number",
+        "int_value": 7
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.18.chemical_symbol",
+        "str_value": "C"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.18.datetime",
+        "datetime_value": "2024-10-24T16:40:59.952179+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.18.atomic_number",
+        "int_value": 6
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.19.chemical_symbol",
+        "str_value": "C"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.19.datetime",
+        "datetime_value": "2024-10-24T16:40:59.952328+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.19.atomic_number",
+        "int_value": 6
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.20.chemical_symbol",
+        "str_value": "C"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.20.datetime",
+        "datetime_value": "2024-10-24T16:40:59.952476+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.20.atomic_number",
+        "int_value": 6
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.21.chemical_symbol",
+        "str_value": "C"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.21.datetime",
+        "datetime_value": "2024-10-24T16:40:59.952621+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.21.atomic_number",
+        "int_value": 6
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.22.chemical_symbol",
+        "str_value": "C"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.22.datetime",
+        "datetime_value": "2024-10-24T16:40:59.952763+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.22.atomic_number",
+        "int_value": 6
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.23.chemical_symbol",
+        "str_value": "N"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.23.datetime",
+        "datetime_value": "2024-10-24T16:40:59.952916+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.23.atomic_number",
+        "int_value": 7
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.24.chemical_symbol",
+        "str_value": "C"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.24.datetime",
+        "datetime_value": "2024-10-24T16:40:59.953067+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.24.atomic_number",
+        "int_value": 6
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.25.chemical_symbol",
+        "str_value": "C"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.25.datetime",
+        "datetime_value": "2024-10-24T16:40:59.953219+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.25.atomic_number",
+        "int_value": 6
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.26.chemical_symbol",
+        "str_value": "C"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.26.datetime",
+        "datetime_value": "2024-10-24T16:40:59.953371+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.26.atomic_number",
+        "int_value": 6
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.27.chemical_symbol",
+        "str_value": "C"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.27.datetime",
+        "datetime_value": "2024-10-24T16:40:59.953525+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.27.atomic_number",
+        "int_value": 6
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.28.chemical_symbol",
+        "str_value": "C"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.28.datetime",
+        "datetime_value": "2024-10-24T16:40:59.953679+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.28.atomic_number",
+        "int_value": 6
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.29.chemical_symbol",
+        "str_value": "H"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.29.datetime",
+        "datetime_value": "2024-10-24T16:40:59.953836+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.29.atomic_number",
+        "int_value": 1
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.30.chemical_symbol",
+        "str_value": "H"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.30.datetime",
+        "datetime_value": "2024-10-24T16:40:59.953974+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.30.atomic_number",
+        "int_value": 1
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.31.chemical_symbol",
+        "str_value": "H"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.31.datetime",
+        "datetime_value": "2024-10-24T16:40:59.954112+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.31.atomic_number",
+        "int_value": 1
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.32.chemical_symbol",
+        "str_value": "H"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.32.datetime",
+        "datetime_value": "2024-10-24T16:40:59.954251+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.32.atomic_number",
+        "int_value": 1
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.33.chemical_symbol",
+        "str_value": "H"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.33.datetime",
+        "datetime_value": "2024-10-24T16:40:59.954391+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.33.atomic_number",
+        "int_value": 1
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.34.chemical_symbol",
+        "str_value": "H"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.34.datetime",
+        "datetime_value": "2024-10-24T16:40:59.954532+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.34.atomic_number",
+        "int_value": 1
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.35.chemical_symbol",
+        "str_value": "H"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.35.datetime",
+        "datetime_value": "2024-10-24T16:40:59.954672+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.35.atomic_number",
+        "int_value": 1
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.36.chemical_symbol",
+        "str_value": "H"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.36.datetime",
+        "datetime_value": "2024-10-24T16:40:59.954816+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.36.atomic_number",
+        "int_value": 1
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.37.chemical_symbol",
+        "str_value": "H"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.37.datetime",
+        "datetime_value": "2024-10-24T16:40:59.954958+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.37.atomic_number",
+        "int_value": 1
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.38.chemical_symbol",
+        "str_value": "H"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.38.datetime",
+        "datetime_value": "2024-10-24T16:40:59.955100+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.38.atomic_number",
+        "int_value": 1
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.39.chemical_symbol",
+        "str_value": "H"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.39.datetime",
+        "datetime_value": "2024-10-24T16:40:59.955241+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.39.atomic_number",
+        "int_value": 1
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.40.chemical_symbol",
+        "str_value": "H"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.40.datetime",
+        "datetime_value": "2024-10-24T16:40:59.955382+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.40.atomic_number",
+        "int_value": 1
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.41.chemical_symbol",
+        "str_value": "H"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.41.datetime",
+        "datetime_value": "2024-10-24T16:40:59.955524+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.41.atomic_number",
+        "int_value": 1
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.42.chemical_symbol",
+        "str_value": "H"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.42.datetime",
+        "datetime_value": "2024-10-24T16:40:59.955665+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.42.atomic_number",
+        "int_value": 1
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.43.chemical_symbol",
+        "str_value": "H"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.43.datetime",
+        "datetime_value": "2024-10-24T16:40:59.955810+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.43.atomic_number",
+        "int_value": 1
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.chemical_symbol#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.chemical_symbol",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.44.chemical_symbol",
+        "str_value": "H"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.44.datetime",
+        "datetime_value": "2024-10-24T16:40:59.955958+00:00"
+      },
+      {
+        "id": "data.model_system.cell.atoms_state.atomic_number#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.atoms_state.AtomsState.atomic_number",
+        "path_archive": "data.model_system.0.cell.0.atoms_state.44.atomic_number",
+        "int_value": 1
+      },
+      {
+        "id": "data.model_system.cell.length_vector_a#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.model_system.GeometricSpace.length_vector_a",
+        "path_archive": "data.model_system.0.cell.0.length_vector_a",
+        "float_value": 0.0
+      },
+      {
+        "id": "data.model_system.cell.length_vector_b#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.model_system.GeometricSpace.length_vector_b",
+        "path_archive": "data.model_system.0.cell.0.length_vector_b",
+        "float_value": 0.0
+      },
+      {
+        "id": "data.model_system.cell.length_vector_c#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.model_system.GeometricSpace.length_vector_c",
+        "path_archive": "data.model_system.0.cell.0.length_vector_c",
+        "float_value": 0.0
+      },
+      {
+        "id": "data.model_system.cell.angle_vectors_b_c#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.model_system.GeometricSpace.angle_vectors_b_c",
+        "path_archive": "data.model_system.0.cell.0.angle_vectors_b_c",
+        "float_value": 1.5707963267948966
+      },
+      {
+        "id": "data.model_system.cell.angle_vectors_a_c#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.model_system.GeometricSpace.angle_vectors_a_c",
+        "path_archive": "data.model_system.0.cell.0.angle_vectors_a_c",
+        "float_value": 1.5707963267948966
+      },
+      {
+        "id": "data.model_system.cell.angle_vectors_a_b#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.model_system.GeometricSpace.angle_vectors_a_b",
+        "path_archive": "data.model_system.0.cell.0.angle_vectors_a_b",
+        "float_value": 1.5707963267948966
+      },
+      {
+        "id": "data.model_system.cell.volume#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.model_system.GeometricSpace.volume",
+        "path_archive": "data.model_system.0.cell.0.volume",
+        "float_value": 0.0
+      },
+      {
+        "id": "data.model_system.datetime#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad.datamodel.metainfo.basesections.BaseSection.datetime",
+        "path_archive": "data.model_system.0.datetime",
+        "datetime_value": "2024-10-24T16:40:59.957558+00:00"
+      },
+      {
+        "id": "data.model_system.branch_depth#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.model_system.ModelSystem.branch_depth",
+        "path_archive": "data.model_system.0.branch_depth",
+        "int_value": 0
+      },
+      {
+        "id": "data.model_method.jacobs_ladder#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.model_method.DFT.jacobs_ladder",
+        "path_archive": "data.model_method.0.jacobs_ladder",
+        "str_value": "metaGGA"
+      },
+      {
+        "id": "data.model_method.xc_functionals.libxc_name#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.model_method.XCFunctional.libxc_name",
+        "path_archive": "data.model_method.0.xc_functionals.0.libxc_name",
+        "str_value": "0.9*TPSS"
+      },
+      {
+        "id": "data.model_method.xc_functionals.name#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.model_method.XCFunctional.name",
+        "path_archive": "data.model_method.0.xc_functionals.0.name",
+        "str_value": "exchange"
+      },
+      {
+        "id": "data.model_method.xc_functionals.weight#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.model_method.XCFunctional.weight",
+        "path_archive": "data.model_method.0.xc_functionals.0.weight",
+        "float_value": 0.9
+      },
+      {
+        "id": "data.model_method.xc_functionals.libxc_name#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.model_method.XCFunctional.libxc_name",
+        "path_archive": "data.model_method.0.xc_functionals.1.libxc_name",
+        "str_value": "1.0*TPSS"
+      },
+      {
+        "id": "data.model_method.xc_functionals.name#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.model_method.XCFunctional.name",
+        "path_archive": "data.model_method.0.xc_functionals.1.name",
+        "str_value": "correlation"
+      },
+      {
+        "id": "data.model_method.xc_functionals.weight#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.model_method.XCFunctional.weight",
+        "path_archive": "data.model_method.0.xc_functionals.1.weight",
+        "float_value": 1.0
+      },
+      {
+        "id": "data.model_method.exact_exchange_mixing_factor#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.model_method.DFT.exact_exchange_mixing_factor",
+        "path_archive": "data.model_method.0.exact_exchange_mixing_factor",
+        "float_value": 0.1
+      },
+      {
+        "id": "data.model_method.contributions.type#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_parser_orca.schema_packages.schema_package.MolecularHamiltonianSubTerms.type",
+        "path_archive": "data.model_method.1.contributions.0.type",
+        "str_value": "coulomb"
+      },
+      {
+        "id": "data.model_method.numerical_settings.basis_set#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.basis_set.AtomCenteredBasisSet.basis_set",
+        "path_archive": "data.model_method.1.numerical_settings.0.basis_set",
+        "str_value": "ZORA-def2-TZVPP"
+      },
+      {
+        "id": "data.model_method.numerical_settings.type#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.basis_set.AtomCenteredBasisSet.type",
+        "path_archive": "data.model_method.1.numerical_settings.0.type",
+        "str_value": "GTO"
+      },
+      {
+        "id": "data.model_method.numerical_settings.role#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.basis_set.AtomCenteredBasisSet.role",
+        "path_archive": "data.model_method.1.numerical_settings.0.role",
+        "str_value": "orbital"
+      },
+      {
+        "id": "data.model_method.numerical_settings.name#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.basis_set.BasisSetComponent.name",
+        "path_archive": "data.model_method.1.numerical_settings.0.name",
+        "str_value": "AtomCenteredBasisSet"
+      },
+      {
+        "id": "data.model_method.numerical_settings.basis_set#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.basis_set.AtomCenteredBasisSet.basis_set",
+        "path_archive": "data.model_method.1.numerical_settings.1.basis_set",
+        "str_value": "SARC/J"
+      },
+      {
+        "id": "data.model_method.numerical_settings.type#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.basis_set.AtomCenteredBasisSet.type",
+        "path_archive": "data.model_method.1.numerical_settings.1.type",
+        "str_value": "GTO"
+      },
+      {
+        "id": "data.model_method.numerical_settings.role#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.basis_set.AtomCenteredBasisSet.role",
+        "path_archive": "data.model_method.1.numerical_settings.1.role",
+        "str_value": "auxiliary_scf"
+      },
+      {
+        "id": "data.model_method.numerical_settings.name#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.basis_set.BasisSetComponent.name",
+        "path_archive": "data.model_method.1.numerical_settings.1.name",
+        "str_value": "AtomCenteredBasisSet"
+      },
+      {
+        "id": "data.model_method.numerical_settings.n_max_iterations#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.numerical_settings.SelfConsistency.n_max_iterations",
+        "path_archive": "data.model_method.1.numerical_settings.2.n_max_iterations",
+        "int_value": 900
+      },
+      {
+        "id": "data.model_method.numerical_settings.threshold_change#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.numerical_settings.SelfConsistency.threshold_change",
+        "path_archive": "data.model_method.1.numerical_settings.2.threshold_change",
+        "float_value": 1e-08
+      },
+      {
+        "id": "data.model_method.numerical_settings.name#nomad_simulations.schema_packages.general.Simulation",
+        "definition": "nomad_simulations.schema_packages.numerical_settings.NumericalSettings.name",
+        "path_archive": "data.model_method.1.numerical_settings.2.name",
+        "str_value": "SelfConsistency"
+      }
+    ]
+  },
+  "results": {
+    "properties": {},
+    "eln": {
+      "sections": [
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "AtomsState",
+        "ModelSystem"
+      ]
+    }
+  }
+}
