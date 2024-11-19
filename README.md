@@ -1,6 +1,6 @@
 # nomad-parser-orca
 
-An ORCA parser while extending the schema for coupled cluster and more. 
+An ORCA parser while extending the schema for quantum chemistry
 
 ## Usage
 
@@ -19,7 +19,7 @@ This `nomad` plugin was generated with `Cookiecutter` along with `@nomad`'s [`co
 
 If you want to develop locally this plugin, clone the project and in the plugin folder, create a virtual environment (you can use Python 3.9, 3.10, or 3.11):
 ```sh
-git clone https://github.com/EBB2675/nomad-parser-orca.git
+git clone https://github.com/FAIRmat-NFDI/nomad-parser-orca.git
 cd nomad-parser-orca
 python3.11 -m venv .pyenv
 . .pyenv/bin/activate
