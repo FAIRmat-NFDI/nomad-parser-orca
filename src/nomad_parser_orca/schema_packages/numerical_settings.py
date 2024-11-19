@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     )
 
 from nomad.config import config
-from nomad.datamodel.data import Schema
+from nomad.datamodel.data import Schema, ArchiveSection
 from nomad.datamodel.metainfo.annotations import ELNAnnotation, ELNComponentEnum
 
 import nomad_simulations
@@ -162,7 +162,7 @@ class Localization(SelfConsistency):
         super().normalize(archive, logger)
 
 
-class Mesh(NumericalSettings):
+class Mesh(ArchiveSection):
     """
     A base section used to define the mesh or space partitioning over which a discrete numerical integration is performed.
     """
@@ -222,11 +222,13 @@ class Mesh(NumericalSettings):
     )
 
     pruning = Quantity(
-        type=str,
+        type=MEnum('fixed', 'adaptive'),
         description="""
         Pruning method applied for reducing the amount of points in the Mesh. This is typically
-        used for numerical integration near the core levels in atoms, and it takes the value
-        `adaptive`.
+        used for numerical integration near the core levels in atoms. 
+        In the fixed grid methods, the number of angular grid points is predetermined for
+        ranges of radial grid points, while in the adaptive methods, the angular grid is adjusted 
+        on-the-fly for each radial point according to some accuracy criterion.
         """
     )
 

@@ -20,20 +20,19 @@ from nomad_simulations.schema_packages.general import Program, Simulation
 from nomad_simulations.schema_packages.model_method import (BaseModelMethod, 
                                                             ModelMethod, 
                                                             DFT, 
-                                                            XCFunctional)
+                                                            XCFunctional,
+                                                            MolecularHamiltonianSubTerms)
+from nomad_simulations.schema_packages.numerical_settings import NumericalIntegration
 from nomad_simulations.schema_packages.model_system import (AtomicCell,
                                                             ModelSystem)
 from nomad_simulations.schema_packages.basis_set import AtomCenteredBasisSet, BasisSetContainer
 from nomad_simulations.schema_packages.outputs import Outputs
 
 from nomad_parser_orca.schema_packages.schema_package import (CoupledCluster, 
-                                                              PerturbationMethod,
-                                                              MolecularHamiltonianSubTerms)
+                                                              PerturbationMethod)
 from nomad_parser_orca.schema_packages.numerical_settings import(SelfConsistency, 
                                                                  PNOSettings, 
-                                                                 Localization, 
-                                                                 Mesh, 
-                                                                 NumericalIntegration)
+                                                                 Localization)
 from nomad_parser_orca.schema_packages.outputs import CCOutputs
 
 

@@ -40,17 +40,6 @@ configuration = config.get_plugin_entry_point(
 m_package = SchemaPackage()
 
 
-class MolecularHamiltonianSubTerms(BaseModelMethod):
-    type=Quantity(
-        type=MEnum('coulomb', 'exchange'),
-        description="""
-        something something
-        """,
-    )
-
-    def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
-        super().normalize(archive, logger)
-
 class PerturbationMethod(ModelMethodElectronic):
     type = Quantity(
         type=MEnum('MP', 'RS', 'BW'),
