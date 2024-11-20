@@ -1111,6 +1111,8 @@ class ORCAParser(MatchingParser):
             exchange_term = MolecularHamiltonianSubTerms(type="exchange")
 
             return coulomb_term, exchange_term
+        
+        return None, None
 
 
     def parse_basis_set(self, out_parser, model_system, logger):
@@ -1272,6 +1274,8 @@ class ORCAParser(MatchingParser):
         coulomb_term, exchange_term = self.create_sub_terms(self.out_parser, logger)
         if coulomb_term:
             model_method.contributions.append(coulomb_term)
+        if exchange_term:
+            model_method.contributions.append(exchange_term)
 
         #input_file = self.out_parser.get('input_file')
         #print(input_file)
