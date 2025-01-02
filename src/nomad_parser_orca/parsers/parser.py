@@ -20,8 +20,7 @@ from nomad_simulations.schema_packages.general import Program, Simulation
 from nomad_simulations.schema_packages.model_method import (BaseModelMethod, 
                                                             ModelMethod, 
                                                             DFT, 
-                                                            XCFunctional,
-                                                            MolecularHamiltonianSubTerms)
+                                                            XCFunctional)
 from nomad_simulations.schema_packages.numerical_settings import NumericalIntegration
 from nomad_simulations.schema_packages.model_system import (AtomicCell,
                                                             ModelSystem)
@@ -1095,24 +1094,24 @@ class ORCAParser(MatchingParser):
             species_scope=species_scope,
         )
     
-    def create_sub_terms(self, out_parser, logger):
-        """
-        Create coulomb and exchange parts of the Hamiltonian as a contribution
-        if there are integral decomposition techniques
-        """
-        rij_coulomb   = out_parser.get('single_point', {}).get('self_consistent', {}).get('scf_settings', {}).get('rij')
-        cosx_exchange = out_parser.get('single_point', {}).get('self_consistent', {}).get('scf_settings', {}).get('cosx')
-        rijk_both = out_parser.get('single_point', {}).get('self_consistent', {}).get('scf_settings', {}).get('rijk')
+    # def create_sub_terms(self, out_parser, logger):
+    #     """
+    #     Create coulomb and exchange parts of the Hamiltonian as a contribution
+    #     if there are integral decomposition techniques
+    #     """
+    #     rij_coulomb   = out_parser.get('single_point', {}).get('self_consistent', {}).get('scf_settings', {}).get('rij')
+    #     cosx_exchange = out_parser.get('single_point', {}).get('self_consistent', {}).get('scf_settings', {}).get('cosx')
+    #     rijk_both = out_parser.get('single_point', {}).get('self_consistent', {}).get('scf_settings', {}).get('rijk')
 
-        #at some point there should be an RI flag.
+    #     #at some point there should be an RI flag.
 
-        if rij_coulomb == 'on':
-            coulomb_term  = MolecularHamiltonianSubTerms(type="coulomb")
-            exchange_term = MolecularHamiltonianSubTerms(type="exchange")
+    #     if rij_coulomb == 'on':
+    #         coulomb_term  = MolecularHamiltonianSubTerms(type="coulomb")
+    #         exchange_term = MolecularHamiltonianSubTerms(type="exchange")
 
-            return coulomb_term, exchange_term
+    #         return coulomb_term, exchange_term
         
-        return None, None
+    #     return None, None
 
 
     def parse_basis_set(self, out_parser, model_system, logger):
@@ -1271,21 +1270,21 @@ class ORCAParser(MatchingParser):
         # Initialize model_method 
         model_method = ModelMethod()
 
-        coulomb_term, exchange_term = self.create_sub_terms(self.out_parser, logger)
-        if coulomb_term:
-            model_method.contributions.append(coulomb_term)
-        if exchange_term:
-            model_method.contributions.append(exchange_term)
+        # coulomb_term, exchange_term = self.create_sub_terms(self.out_parser, logger)
+        # if coulomb_term:
+        #     model_method.contributions.append(coulomb_term)
+        # if exchange_term:
+        #     model_method.contributions.append(exchange_term)
 
         #input_file = self.out_parser.get('input_file')
         #print(input_file)
 
         # Parse basis set 
-        basis_set = self.parse_basis_set(self.out_parser, model_system, logger)
+        #basis_set = self.parse_basis_set(self.out_parser, model_system, logger)
 
         #print(basis_set, basis_set.atoms_ref, basis_set.atoms_ref[0])
-        for component in basis_set:
-            model_method.numerical_settings.append(component)
+        #for component in basis_set:
+        #    model_method.numerical_settings.append(component)
         
         # Parse SCF and DFT sections
         # TODO: add integration grids here
