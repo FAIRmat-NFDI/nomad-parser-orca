@@ -27,8 +27,6 @@ from nomad_simulations.schema_packages.model_system import (AtomicCell,
 from nomad_simulations.schema_packages.basis_set import AtomCenteredBasisSet, BasisSetContainer
 from nomad_simulations.schema_packages.outputs import Outputs
 
-from nomad_parser_orca.schema_packages.schema_package import (CoupledCluster, 
-                                                              PerturbationMethod)
 from nomad_parser_orca.schema_packages.numerical_settings import(SelfConsistency, 
                                                                  PNOSettings, 
                                                                  Localization)
@@ -1094,26 +1092,6 @@ class ORCAParser(MatchingParser):
             species_scope=species_scope,
         )
     
-    # def create_sub_terms(self, out_parser, logger):
-    #     """
-    #     Create coulomb and exchange parts of the Hamiltonian as a contribution
-    #     if there are integral decomposition techniques
-    #     """
-    #     rij_coulomb   = out_parser.get('single_point', {}).get('self_consistent', {}).get('scf_settings', {}).get('rij')
-    #     cosx_exchange = out_parser.get('single_point', {}).get('self_consistent', {}).get('scf_settings', {}).get('cosx')
-    #     rijk_both = out_parser.get('single_point', {}).get('self_consistent', {}).get('scf_settings', {}).get('rijk')
-
-    #     #at some point there should be an RI flag.
-
-    #     if rij_coulomb == 'on':
-    #         coulomb_term  = MolecularHamiltonianSubTerms(type="coulomb")
-    #         exchange_term = MolecularHamiltonianSubTerms(type="exchange")
-
-    #         return coulomb_term, exchange_term
-        
-    #     return None, None
-
-
     def parse_basis_set(self, out_parser, model_system, logger):
 
         # AddGTO AddAuxCGTO AddAuxJGTO AddAuxJKGTO AddCabsGTO
@@ -1197,38 +1175,38 @@ class ORCAParser(MatchingParser):
 
         return scf, dft
     
-    def parse_coupled_cluster(self, out_parser, logger):
-        cc_data = out_parser.get('single_point', {}).get('cc', {})
+    # def parse_coupled_cluster(self, out_parser, logger):
+    #     cc_data = out_parser.get('single_point', {}).get('cc', {})
 
-        if cc_data: 
-            model_method = CoupledCluster(
-                type= cc_data.get('coupled_cluster_type'),
-                reference_determinant=cc_data.get('cc_reference_wavefunction'))
+    #     if cc_data: 
+    #         model_method = CoupledCluster(
+    #             type= cc_data.get('coupled_cluster_type'),
+    #             reference_determinant=cc_data.get('cc_reference_wavefunction'))
 
-            # Perturbative triples
-            perturbative_triple_status = cc_data.get('perturbative_triple_excitations_on_off')
-            if perturbative_triple_status == 'ON':
-                model_method.perturbative_correction = '(T)'
+    #         # Perturbative triples
+    #         perturbative_triple_status = cc_data.get('perturbative_triple_excitations_on_off')
+    #         if perturbative_triple_status == 'ON':
+    #             model_method.perturbative_correction = '(T)'
 
-            # Explicit correlation status
-            explicit_correlation_status = cc_data.get('f12_correction_on_off')
-            if explicit_correlation_status == 'ON':
-                model_method.explicit_correlation = 'F12'
+    #         # Explicit correlation status
+    #         explicit_correlation_status = cc_data.get('f12_correction_on_off')
+    #         if explicit_correlation_status == 'ON':
+    #             model_method.explicit_correlation = 'F12'
 
-            local_approximation = cc_data.get('kc_formation')
-            if local_approximation:
-                model_method.local_approximation = local_approximation
+    #         local_approximation = cc_data.get('kc_formation')
+    #         if local_approximation:
+    #             model_method.local_approximation = local_approximation
 
-            output = CCOutputs(
-                largest_t2_amplitude=cc_data.get('largest_t2_amplitudes'),
-                t1_norm=cc_data.get('t1_diagnostic'),
-                reference_energy=cc_data.get('reference_energy'),
-                corr_energy_strong=cc_data.get('corr_energy_strong'),
-                corr_energy_weak=cc_data.get('corr_energy_weak')
-            )
-            return model_method, output
-        else:
-            return None, None
+    #         output = CCOutputs(
+    #             largest_t2_amplitude=cc_data.get('largest_t2_amplitudes'),
+    #             t1_norm=cc_data.get('t1_diagnostic'),
+    #             reference_energy=cc_data.get('reference_energy'),
+    #             corr_energy_strong=cc_data.get('corr_energy_strong'),
+    #             corr_energy_weak=cc_data.get('corr_energy_weak')
+    #         )
+    #         return model_method, output
+    #     else:
+    #         return None, None
 
 
     def parse_localization(self, out_parser, logger):
@@ -1241,17 +1219,6 @@ class ORCAParser(MatchingParser):
             )
             return localization
         
-    def parse_mp2(self, out_parser, logger):
-        mp2_data = out_parser.get('single_point', {}).get('mp2', {})
-
-        if mp2_data:
-            mp2 = PerturbationMethod(
-                type='MP',
-                order=2,
-                density='unrelaxed'
-            )
-
-            return mp2
     
     def parse(self, mainfile, archive: 'EntryArchive', logger: 'BoundLogger', child_archives=None) -> None:
         self.out_parser.mainfile = mainfile
@@ -1296,16 +1263,16 @@ class ORCAParser(MatchingParser):
             simulation.model_method.append(dft)
 
         # Parse MP2
-        mp2 = self.parse_mp2(self.out_parser, logger)
-        if mp2:
-            simulation.model_method.append(mp2)
+        #mp2 = self.parse_mp2(self.out_parser, logger)
+        #if mp2:
+        #    simulation.model_method.append(mp2)
 
         # Parse coupled cluster data and append if exists
-        cc_method, output = self.parse_coupled_cluster(self.out_parser, logger)
-        if cc_method:
-            simulation.model_method.append(cc_method)
-        if output:
-            simulation.outputs.append(output)
+        # cc_method, output = self.parse_coupled_cluster(self.out_parser, logger)
+        # if cc_method:
+        #     simulation.model_method.append(cc_method)
+        # if output:
+        #     simulation.outputs.append(output)
 
 
         simulation.model_method.append(model_method)
