@@ -20,16 +20,15 @@ from nomad_simulations.schema_packages.general import Program, Simulation
 from nomad_simulations.schema_packages.model_method import (BaseModelMethod, 
                                                             ModelMethod, 
                                                             DFT, 
-                                                            XCFunctional)
-from nomad_simulations.schema_packages.numerical_settings import NumericalIntegration
+                                                            XCFunctional,
+                                                            CoupledCluster)
 from nomad_simulations.schema_packages.model_system import (AtomicCell,
                                                             ModelSystem)
-from nomad_simulations.schema_packages.basis_set import AtomCenteredBasisSet, BasisSetContainer
 from nomad_simulations.schema_packages.outputs import Outputs
+from nomad_simulations.schema_packages.numerical_settings import(SelfConsistency, 
+                                                                 OrbitalLocalization)
+from nomad_simulations.schema_packages.basis_set import AtomCenteredBasisSet, BasisSetContainer
 
-from nomad_parser_orca.schema_packages.numerical_settings import(SelfConsistency, 
-                                                                 PNOSettings, 
-                                                                 Localization)
 from nomad_parser_orca.schema_packages.outputs import CCOutputs
 
 
@@ -1134,7 +1133,7 @@ class ORCAParser(MatchingParser):
         return basis_sets
 
 
-    def parse_model_method(self, out_parser, logger):
+    def parse_dft(self, out_parser, logger):
         # Extract SCF convergence information
         dft_data = out_parser.get('single_point', {}).get('self_consistent', {}).get('scf_settings', {})
 
@@ -1180,54 +1179,57 @@ class ORCAParser(MatchingParser):
 
         if scf_convergence:
             scf = SelfConsistency(
-                n_max_iterations=scf_convergence.get('n_max_iterations', 0),  # Default to 0
-                threshold_change=scf_convergence.get('energy_change_tolerance', 1e-8)  # Default value
+                n_max_iterations=scf_convergence.get('n_max_iterations', 0),  
+                threshold_change=scf_convergence.get('energy_change_tolerance', 1e-8)  
             )
 
         loc_data = out_parser.get('single_point', {}).get('loc', {})
         if loc_data:
-            localization = Localization(
-                type=loc_data.get('type'),
-                n_max_iterations=loc_data.get('n_max_iterations'),
-                threshold_change=loc_data.get('energy_change_tolerance')
-            )
+            print(loc_data)
+            # localization = OrbitalLocalization(
+            #     #localization_method=loc_data.get('type'),
+            #     localization_method='AHFB',
+            #     #n_max_iterations=loc_data.get('n_max_iterations', 0),
+            #     #threshold_change=loc_data.get('energy_change_tolerance', 1e-6)
+            # )
+        
 
         return scf, localization
     
-    # def parse_coupled_cluster(self, out_parser, logger):
-    #     cc_data = out_parser.get('single_point', {}).get('cc', {})
+    def parse_coupled_cluster(self, out_parser, logger):
+        cc_data = out_parser.get('single_point', {}).get('cc', {})
 
-    #     if cc_data: 
-    #         model_method = CoupledCluster(
-    #             type= cc_data.get('coupled_cluster_type'),
-    #             reference_determinant=cc_data.get('cc_reference_wavefunction'))
+        if cc_data: 
+            print(cc_data.get('coupled_cluster_type'))
 
-    #         # Perturbative triples
-    #         perturbative_triple_status = cc_data.get('perturbative_triple_excitations_on_off')
-    #         if perturbative_triple_status == 'ON':
-    #             model_method.perturbative_correction = '(T)'
+            model_method = CoupledCluster(
+                type= cc_data.get('coupled_cluster_type'),
+                reference_determinant=cc_data.get('cc_reference_wavefunction'))
 
-    #         # Explicit correlation status
-    #         explicit_correlation_status = cc_data.get('f12_correction_on_off')
-    #         if explicit_correlation_status == 'ON':
-    #             model_method.explicit_correlation = 'F12'
+            # Perturbative triples
+            perturbative_triple_status = cc_data.get('perturbative_triple_excitations_on_off')
+            if perturbative_triple_status == 'ON':
+                model_method.perturbative_correction = '(T)'
 
-    #         local_approximation = cc_data.get('kc_formation')
-    #         if local_approximation:
-    #             model_method.local_approximation = local_approximation
+            # Explicit correlation status
+            explicit_correlation_status = cc_data.get('f12_correction_on_off')
+            if explicit_correlation_status == 'ON':
+                model_method.explicit_correlation = 'F12'
 
-    #         output = CCOutputs(
-    #             largest_t2_amplitude=cc_data.get('largest_t2_amplitudes'),
-    #             t1_norm=cc_data.get('t1_diagnostic'),
-    #             reference_energy=cc_data.get('reference_energy'),
-    #             corr_energy_strong=cc_data.get('corr_energy_strong'),
-    #             corr_energy_weak=cc_data.get('corr_energy_weak')
-    #         )
-    #         return model_method, output
-    #     else:
-    #         return None, None
+            #local_approximation = cc_data.get('kc_formation')
+            #if local_approximation:
+            #    model_method.local_approximation = local_approximation
 
-        
+            output = CCOutputs(
+                largest_t2_amplitude=cc_data.get('largest_t2_amplitudes'),
+                t1_norm=cc_data.get('t1_diagnostic'),
+                reference_energy=cc_data.get('reference_energy'),
+                corr_energy_strong=cc_data.get('corr_energy_strong'),
+                corr_energy_weak=cc_data.get('corr_energy_weak')
+            )
+            return model_method, output
+        return None, None
+       
     
     def parse(self, mainfile, archive: 'EntryArchive', logger: 'BoundLogger', child_archives=None) -> None:
         self.out_parser.mainfile = mainfile
@@ -1246,7 +1248,12 @@ class ORCAParser(MatchingParser):
         model_method = ModelMethod()
 
         # Search for methods
-        dft = self.parse_model_method(self.out_parser, logger)
+        dft = self.parse_dft(self.out_parser, logger)
+        cc, cc_output = self.parse_coupled_cluster(self.out_parser, logger)
+        #self.parse_coupled_cluster(self.out_parser, logger)
+
+        if cc:
+            simulation.model_method.append(cc)
 
         if dft:
             simulation.model_method.append(dft)
@@ -1256,8 +1263,8 @@ class ORCAParser(MatchingParser):
 
         if scf:
             model_method.numerical_settings.append(scf)
-        if loc:
-            model_method.numerical_settings.append(loc)
+        # if loc:
+        #     model_method.numerical_settings.append(loc)
 
         #input_file = self.out_parser.get('input_file')
         #print(input_file)
