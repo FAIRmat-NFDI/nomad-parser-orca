@@ -1084,12 +1084,13 @@ class ORCAParser(MatchingParser):
         return None
 
     def create_basis_set(self, role, basis_set_name, species_scope=None, 
-                         gto_integral_decomposition_ref=None):
+                         hamiltonian_scope=None):
         return AtomCenteredBasisSet(
             basis_set=basis_set_name,
             type='GTO',
             role=role,
             species_scope=species_scope,
+            hamiltonian_scope=hamiltonian_scope,
         )
     
     def parse_basis_set(self, out_parser, model_system, logger):
@@ -1131,36 +1132,29 @@ class ORCAParser(MatchingParser):
                 basis_sets.append(self.create_basis_set('cECP', basis_set, species_scope=[element]))
 
         return basis_sets
- 
-    def parse_scf(self, out_parser, logger):
-        # Extract SCF convergence information
-        scf_convergence = out_parser.get('single_point', {}).get('self_consistent', {}).get('scf_settings', {})
 
-        if scf_convergence:
-            scf = SelfConsistency(
-                n_max_iterations=scf_convergence.get('n_max_iterations', 0),  # Default to 0
-                threshold_change=scf_convergence.get('energy_change_tolerance', 1e-8)  # Default value
-            )
-        else:
-            scf = None 
+
+    def parse_model_method(self, out_parser, logger):
+        # Extract SCF convergence information
+        dft_data = out_parser.get('single_point', {}).get('self_consistent', {}).get('scf_settings', {})
 
         xc_functionals = []
         
         # Handle exchange functional
-        if scf_convergence.get('exchange_functional'):
+        if dft_data.get('exchange_functional'):
             exchange_functional = XCFunctional(
-                libxc_name=scf_convergence.get('exchange_functional'),
+                libxc_name=dft_data.get('exchange_functional'),
                 name='exchange',
-                weight=scf_convergence.get('scaling_exchange')
+                weight=dft_data.get('scaling_exchange')
             )
             xc_functionals.append(exchange_functional)
 
         # Handle correlation functional
-        if scf_convergence.get('correlation_functional'):
+        if dft_data.get('correlation_functional'):
             correlation_functional = XCFunctional(
-                libxc_name=scf_convergence.get('correlation_functional'),
+                libxc_name=dft_data.get('correlation_functional'),
                 name='correlation',
-                weight=scf_convergence.get('scaling_correlation')
+                weight=dft_data.get('scaling_correlation')
             )
             xc_functionals.append(correlation_functional)
 
@@ -1170,10 +1164,35 @@ class ORCAParser(MatchingParser):
             dft = DFT(
                 jacobs_ladder='metaGGA',
                 xc_functionals=xc_functionals,
-                exact_exchange_mixing_factor=scf_convergence.get('fraction_hf_exchange')  
+                exact_exchange_mixing_factor=dft_data.get('fraction_hf_exchange')  
             )
 
-        return scf, dft
+        return dft
+
+
+    def parse_numerical_settings(self, out_parser, logger):        
+
+        scf = None
+        localization = None
+        
+        # Extract SCF convergence information
+        scf_convergence = out_parser.get('single_point', {}).get('self_consistent', {}).get('scf_settings', {})
+
+        if scf_convergence:
+            scf = SelfConsistency(
+                n_max_iterations=scf_convergence.get('n_max_iterations', 0),  # Default to 0
+                threshold_change=scf_convergence.get('energy_change_tolerance', 1e-8)  # Default value
+            )
+
+        loc_data = out_parser.get('single_point', {}).get('loc', {})
+        if loc_data:
+            localization = Localization(
+                type=loc_data.get('type'),
+                n_max_iterations=loc_data.get('n_max_iterations'),
+                threshold_change=loc_data.get('energy_change_tolerance')
+            )
+
+        return scf, localization
     
     # def parse_coupled_cluster(self, out_parser, logger):
     #     cc_data = out_parser.get('single_point', {}).get('cc', {})
@@ -1208,23 +1227,12 @@ class ORCAParser(MatchingParser):
     #     else:
     #         return None, None
 
-
-    def parse_localization(self, out_parser, logger):
-        loc_data = out_parser.get('single_point', {}).get('loc', {})
-        if loc_data:
-            localization = Localization(
-                type=loc_data.get('type'),
-                n_max_iterations=loc_data.get('n_max_iterations'),
-                threshold_change=loc_data.get('energy_change_tolerance')
-            )
-            return localization
         
     
     def parse(self, mainfile, archive: 'EntryArchive', logger: 'BoundLogger', child_archives=None) -> None:
         self.out_parser.mainfile = mainfile
         self.out_parser.logger = logger
 
-        # Perform parsing
         self.out_parser.parse()
         simulation = Simulation()
         simulation.program = Program(name='ORCA', version=self.out_parser.get('program_version'))
@@ -1237,31 +1245,31 @@ class ORCAParser(MatchingParser):
         # Initialize model_method 
         model_method = ModelMethod()
 
-        # coulomb_term, exchange_term = self.create_sub_terms(self.out_parser, logger)
-        # if coulomb_term:
-        #     model_method.contributions.append(coulomb_term)
-        # if exchange_term:
-        #     model_method.contributions.append(exchange_term)
-
-        #input_file = self.out_parser.get('input_file')
-        #print(input_file)
-
-        # Parse basis set 
-        #basis_set = self.parse_basis_set(self.out_parser, model_system, logger)
-
-        #print(basis_set, basis_set.atoms_ref, basis_set.atoms_ref[0])
-        #for component in basis_set:
-        #    model_method.numerical_settings.append(component)
-        
-        # Parse SCF and DFT sections
-        # TODO: add integration grids here
-        scf, dft = self.parse_scf(self.out_parser, logger)
-        if scf:
-            model_method.numerical_settings.append(scf)
+        # Search for methods
+        dft = self.parse_model_method(self.out_parser, logger)
 
         if dft:
             simulation.model_method.append(dft)
 
+        # Parse numerical settings, such as scf convergence or localization criteria
+        scf, loc = self.parse_numerical_settings(self.out_parser, logger)
+
+        if scf:
+            model_method.numerical_settings.append(scf)
+        if loc:
+            model_method.numerical_settings.append(loc)
+
+        #input_file = self.out_parser.get('input_file')
+        #print(input_file)
+        
+        # Parse basis set 
+        basis_set = self.parse_basis_set(self.out_parser, model_system, logger)
+        for bs in basis_set:
+            model_method.numerical_settings.append(bs)
+        #print(basis_set, basis_set.atoms_ref, basis_set.atoms_ref[0])
+        #for component in basis_set:
+        #    model_method.numerical_settings.append(component)
+        
         # Parse MP2
         #mp2 = self.parse_mp2(self.out_parser, logger)
         #if mp2:
