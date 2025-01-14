@@ -21,13 +21,14 @@ from nomad_simulations.schema_packages.model_method import (BaseModelMethod,
                                                             ModelMethod, 
                                                             DFT, 
                                                             XCFunctional,
+                                                            PerturbationMethod,
                                                             CoupledCluster)
 from nomad_simulations.schema_packages.model_system import (AtomicCell,
                                                             ModelSystem)
 from nomad_simulations.schema_packages.outputs import Outputs
 from nomad_simulations.schema_packages.numerical_settings import(SelfConsistency, 
                                                                  OrbitalLocalization)
-from nomad_simulations.schema_packages.basis_set import AtomCenteredBasisSet, BasisSetContainer
+from nomad_simulations.schema_packages.basis_set import AtomCenteredBasisSet, BasisSetContainer, AtomCenteredFunction
 
 from nomad_parser_orca.schema_packages.outputs import CCOutputs
 
@@ -213,6 +214,26 @@ class OutParser(TextParser):
                 r'Maximum contraction depth\s*\.+\s*(\d+)',
                 repeats=True,
                 dtype=int,
+            ),
+            Quantity(
+                'main_basis_set',
+                r'Number of basis functions\s*\.+\s*(\d+)',
+                repeats=False, dtype=int,
+            ),
+            Quantity(
+                'auxj_basis_set',
+                r'   # of basis functions in Aux-J\s*\.+\s*(\d+)',
+                repeats=False, dtype=int,
+            ),
+            Quantity(
+                'auxjk_basis_set',
+                r'   # of basis functions in Aux-JK\s*\.+\s*(\d+)',
+                repeats=False, dtype=int,
+            ),
+            Quantity(
+                'auxc_basis_set',
+                r'   # of basis functions in Aux-C\s*\.+\s*(\d+)',
+                repeats=False, dtype=int,
             ),
         ]
 
@@ -439,6 +460,11 @@ class OutParser(TextParser):
                         Quantity(
                             'nelectrons',
                             rf'Number of Electrons\s*NEL\s*\.+\s*({re_float})',
+                            dtype=float,
+                        ),
+                        Quantity(
+                            'basis_dimension',
+                            rf'Basis Dimension\s*Dim\s*\.+\s*({re_float})',
                             dtype=float,
                         ),
                         Quantity(
@@ -870,7 +896,7 @@ class OutParser(TextParser):
 
         localization_quantities = [
             Quantity('type',
-                r'Localization creterion\s*\.+\s*(\S+)',
+                r'Localization criterion\s*\.+\s*(\S+)',
                 convert=False,
             ),
             Quantity('n_max_iterations',
@@ -882,6 +908,12 @@ class OutParser(TextParser):
                 rf'Convergence tolerance\s*\.+\s*({re_float})',
                 dtype=float,
                 unit=ureg.hartree,
+            ),
+            Quantity('orbital_range',
+                #r'Orbital range for localization\s*\.+\s*(\S+)',
+                #r'Orbital range for localization\s*\.+\s*(\d+\s+to\s+\d+)',
+                r'Orbital range for localization\s*\.+\s*(\d+)\s+to\s+(\d+)',
+                convert=False,
             ),
         ]
 
@@ -1017,6 +1049,12 @@ class OutParser(TextParser):
                 sub_parser=TextParser(quantities=basis_set_naming_quantities),
             ),
             Quantity(
+                'basis_set_total',
+                #r'----- Orbital basis set information -----([\s\S]+?)\={10}',
+                r'ORCA GTO INTEGRAL CALCULATION([\s\S]+?)ORCA SCF',
+                sub_parser=TextParser(quantities=basis_set_statistics_quantities),
+            ),
+            Quantity(
                 'ecp_basis_set_name',
                 r'ECP PARAMETER INFORMATION\s*\-+\s*([\s\S]+?)Atom\s*',
                 sub_parser=TextParser(quantities=basis_set_naming_quantities),
@@ -1083,30 +1121,27 @@ class ORCAParser(MatchingParser):
         return None
 
     def create_basis_set(self, role, basis_set_name, species_scope=None, 
-                         hamiltonian_scope=None):
+                         hamiltonian_scope=None,
+                         total_number_of_basis_functions=0,
+                         functional_composition=None):
+        
         return AtomCenteredBasisSet(
             basis_set=basis_set_name,
             type='GTO',
             role=role,
             species_scope=species_scope,
             hamiltonian_scope=hamiltonian_scope,
+            total_number_of_basis_functions=total_number_of_basis_functions,
+            functional_composition=functional_composition
         )
     
     def parse_basis_set(self, out_parser, model_system, logger):
-
-        # AddGTO AddAuxCGTO AddAuxJGTO AddAuxJKGTO AddCabsGTO
-        # NewGTO NewAuxCGTO NewAuxJGTO NewAuxJKGTO NewCabsGTO
-        #
-        # NewGTO Element "def2-svp" end (BUNLARI YAZINCA ZATEN ORADA CIKIYO MU DIYE CHECK ET)
-        # NewGTO AtomNumber "def2-svp" end (BUNLARI YAZINCA ZATEN ORADA CIKIYO MU DIYE CHECK ET)
-        # NewGTO Element "6-31G" function_type n_primitive [exponents contraction_coefficients] end
-        # NewGTO completely defines the basis set
-
-        # AddGTO adds basis functions to it.
-        # AddGTO doesnt have to be in the %basis block!!!!
-        # AddGTO Element function_type n_primitive [exponents contraction_coefficients] end
-
+        """
+        Parses the basis sets from the input file and creates corresponding AtomCenteredFunction objects.
+        """
         basis_sets = []
+
+        # Retrieve basis set names and total number of basis functions from the parsed output
         basis_set_names = {
             'main_basis_set': out_parser.get('basis_set_name', {}).get('main_basis_set'),
             'aux_c_basis_set': out_parser.get('basis_set_name', {}).get('auxc_basis_set'),
@@ -1115,19 +1150,106 @@ class ORCAParser(MatchingParser):
             'capped_ecp': out_parser.get('ecp_basis_set_name', {}).get('capped_ecp', [])
         }
 
-        # Collect different types of basis sets
-        if basis_set_names['main_basis_set']:
-            basis_sets.append(self.create_basis_set('orbital', basis_set_names['main_basis_set']))
-        if basis_set_names['aux_c_basis_set']:
-            basis_sets.append(self.create_basis_set('auxiliary_post_hf', basis_set_names['aux_c_basis_set']))
-        if basis_set_names['aux_j_basis_set']:
-            basis_sets.append(self.create_basis_set('auxiliary_scf', basis_set_names['aux_j_basis_set']))
-        if basis_set_names['aux_jk_basis_set']:
-            basis_sets.append(self.create_basis_set('auxiliary_scf', basis_set_names['aux_jk_basis_set']))
+        total_basis_functions = {
+            'main_basis_set': out_parser.get('basis_set_total', {}).get('main_basis_set'),
+            'aux_c_basis_set': out_parser.get('basis_set_total', {}).get('auxc_basis_set'),
+            'aux_j_basis_set': out_parser.get('basis_set_total', {}).get('auxj_basis_set'),
+            'aux_jk_basis_set': out_parser.get('basis_set_total', {}).get('auxjk_basis_set')
+        }
 
-        # Handle capped ECPs if available
-        if basis_set_names['capped_ecp']:
-            for element, basis_set in basis_set_names['capped_ecp']:
+        # Initialize variables for parsing functional compositions
+        input_file = out_parser.get('input_file', [])
+        keyword = None
+        function_definitions = []
+        keyword_to_role = {
+            'AddGTO': 'orbital',
+            'AddAuxCGTO': 'auxiliary_post_hf',
+            'AddAuxJGTO': 'auxiliary_scf',
+            'AddAuxJKGTO': 'auxiliary_scf',
+            'AddCabsGTO': 'cabs',
+            'NewGTO': 'orbital',
+            'NewAuxCGTO': 'auxiliary_post_hf',
+            'NewAuxJGTO': 'auxiliary_scf',
+            'NewAuxJKGTO': 'auxiliary_scf',
+            'NewCabsGTO': 'cabs'
+        }
+
+        # Iterate over the input file tokens to identify and parse basis set definitions
+        for index, token in enumerate(input_file):
+            if token in keyword_to_role:
+                # If a new keyword is found, process the previous block if it exists
+                if keyword and function_definitions:
+                    role = keyword_to_role[keyword]
+                    basis_sets.append(self.create_basis_set(
+                        role=role,
+                        basis_set_name=keyword,
+                        total_number_of_basis_functions=len(function_definitions),
+                        functional_composition=function_definitions
+                    ))
+                    function_definitions = []  # Reset for the next block
+
+                # Update the current keyword
+                keyword = token
+
+            elif keyword:
+                # Parse function definitions associated with the current keyword
+                try:
+                    if (
+                        len(input_file) > index + 3
+                        and isinstance(input_file[index + 1], int)
+                        and isinstance(input_file[index + 2], (int, float))
+                        and isinstance(input_file[index + 3], (int, float))
+                    ):
+                        function_type = token  # e.g., D, F, G
+
+                        # Ensure the function type is a valid alphabetical character
+                        if not function_type.isalpha():
+                            continue
+
+                        n_primitive = int(input_file[index + 1])
+                        exponents = [float(input_file[index + 2])]
+                        contraction_coefficients = [float(input_file[index + 3])]
+
+                        # Append the parsed function to the list
+                        function_definitions.append(AtomCenteredFunction(
+                            harmonic_type='spherical',
+                            function_type=function_type,
+                            n_primitive=n_primitive,
+                            exponents=exponents,
+                            contraction_coefficients=contraction_coefficients
+                        ))
+                except Exception as e:
+                    logger.error(f"Failed to parse basis function starting at index {index}: {e}")
+
+        # Process the last block after exiting the loop
+        if keyword and function_definitions:
+            role = keyword_to_role[keyword]
+            basis_sets.append(self.create_basis_set(
+                role=role,
+                basis_set_name=keyword,
+                total_number_of_basis_functions=len(function_definitions),
+                functional_composition=function_definitions
+            ))
+
+        # Collect and append different types of basis sets
+        for key, role in [
+            ('main_basis_set', 'orbital'),
+            ('aux_c_basis_set', 'auxiliary_post_hf'),
+            ('aux_j_basis_set', 'auxiliary_scf'),
+            ('aux_jk_basis_set', 'auxiliary_scf')
+        ]:
+            if basis_set_names[key]:
+                basis_sets.append(self.create_basis_set(
+                    role=role,
+                    basis_set_name=basis_set_names[key],
+                    total_number_of_basis_functions=total_basis_functions.get(key, 0),
+                    functional_composition=function_definitions if key == 'main_basis_set' else []
+                ))
+
+        # Handle capped effective core potentials (ECPs) if available
+        capped_ecps = basis_set_names['capped_ecp']
+        if capped_ecps:
+            for element, basis_set in capped_ecps:
                 basis_sets.append(self.create_basis_set('cECP', basis_set, species_scope=[element]))
 
         return basis_sets
@@ -1184,14 +1306,15 @@ class ORCAParser(MatchingParser):
             )
 
         loc_data = out_parser.get('single_point', {}).get('loc', {})
+
         if loc_data:
-            print(loc_data)
-            # localization = OrbitalLocalization(
-            #     #localization_method=loc_data.get('type'),
-            #     localization_method='AHFB',
-            #     #n_max_iterations=loc_data.get('n_max_iterations', 0),
-            #     #threshold_change=loc_data.get('energy_change_tolerance', 1e-6)
-            # )
+            localization = OrbitalLocalization(
+                #localization_method=loc_data.get('type'),
+                localization_method='AHFB',
+                n_max_iterations=loc_data.get('n_max_iterations', 0),
+                threshold_change=loc_data.get('energy_change_tolerance', 1e-6),
+                orbital_window=loc_data.get('orbital_range'),
+            )
         
 
         return scf, localization
@@ -1200,11 +1323,16 @@ class ORCAParser(MatchingParser):
         cc_data = out_parser.get('single_point', {}).get('cc', {})
 
         if cc_data: 
-            print(cc_data.get('coupled_cluster_type'))
+             #print(cc_data.get('coupled_cluster_type'))
+            pt = PerturbationMethod(type='MP',
+                                    order=2)
+            
 
             model_method = CoupledCluster(
                 type= cc_data.get('coupled_cluster_type'),
-                reference_determinant=cc_data.get('cc_reference_wavefunction'))
+                reference_determinant=cc_data.get('cc_reference_wavefunction'),
+                perturbation_method=pt,
+                is_frozencore=True)
 
             # Perturbative triples
             perturbative_triple_status = cc_data.get('perturbative_triple_excitations_on_off')
@@ -1215,10 +1343,6 @@ class ORCAParser(MatchingParser):
             explicit_correlation_status = cc_data.get('f12_correction_on_off')
             if explicit_correlation_status == 'ON':
                 model_method.explicit_correlation = 'F12'
-
-            #local_approximation = cc_data.get('kc_formation')
-            #if local_approximation:
-            #    model_method.local_approximation = local_approximation
 
             output = CCOutputs(
                 largest_t2_amplitude=cc_data.get('largest_t2_amplitudes'),
@@ -1250,10 +1374,10 @@ class ORCAParser(MatchingParser):
         # Search for methods
         dft = self.parse_dft(self.out_parser, logger)
         cc, cc_output = self.parse_coupled_cluster(self.out_parser, logger)
-        #self.parse_coupled_cluster(self.out_parser, logger)
 
         if cc:
             simulation.model_method.append(cc)
+            simulation.outputs.append(cc_output)
 
         if dft:
             simulation.model_method.append(dft)
@@ -1263,12 +1387,10 @@ class ORCAParser(MatchingParser):
 
         if scf:
             model_method.numerical_settings.append(scf)
-        # if loc:
-        #     model_method.numerical_settings.append(loc)
+        if loc:
+            model_method.numerical_settings.append(loc)
 
-        #input_file = self.out_parser.get('input_file')
-        #print(input_file)
-        
+       
         # Parse basis set 
         basis_set = self.parse_basis_set(self.out_parser, model_system, logger)
         for bs in basis_set:
