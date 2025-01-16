@@ -27,7 +27,9 @@ from nomad_simulations.schema_packages.model_system import (AtomicCell,
                                                             ModelSystem)
 from nomad_simulations.schema_packages.outputs import Outputs
 from nomad_simulations.schema_packages.numerical_settings import(SelfConsistency, 
-                                                                 OrbitalLocalization)
+                                                                 OrbitalLocalization,
+                                                                 Mesh,
+                                                                 NumericalIntegration)
 from nomad_simulations.schema_packages.basis_set import AtomCenteredBasisSet, BasisSetContainer, AtomCenteredFunction
 
 from nomad_parser_orca.schema_packages.outputs import CCOutputs
@@ -503,7 +505,7 @@ class OutParser(TextParser):
             ),
             Quantity(
                 'dft_grid_generation',
-                r'DFT GRID GENERATION\s*\-+([\s\S]+?\-{10})',
+                r'COSX GRID GENERATION\s*\-+([\s\S]+?\-{10})',
                 sub_parser=TextParser(quantities=grid_quantities),
             ),
             
@@ -1103,7 +1105,7 @@ class ORCAParser(MatchingParser):
             if len(symbols) == len(coordinates):
                 model_system = ModelSystem()
                 atomic_cell = AtomicCell()
-                atomic_cell.n_atoms = len(symbols)  # Set the number of atoms
+                atomic_cell.n_atoms = len(symbols)  
 
                 for symbol, coord in zip(symbols, coordinates):
                     try:
@@ -1290,6 +1292,45 @@ class ORCAParser(MatchingParser):
 
         return dft
 
+    def parse_integrationgrids(self, out_parser, logger):
+        """
+        Parses numerical integration settings and related grid information from the output.
+        """
+        grid_data = out_parser.get('single_point', {}).get('self_consistent', {}).get('dft_grid_generation', {})
+        # Extracting grid-related quantities
+        gral_integ_accuracy = grid_data.get('gral_integ_accuracy')
+        radial_grid_type = grid_data.get('radial_grid_type')
+        angular_grid = grid_data.get('angular_grid')
+        grid_pruning_method = grid_data.get('grid_pruning_method')
+        weight_gener_scheme = grid_data.get('weight_gener_scheme')
+        basis_fn_cutoff = grid_data.get('basis_fn_cutoff')
+        integr_weight_cutoff = grid_data.get('integr_weight_cutoff')
+        total_nb_grid_pts = grid_data.get('total_nb_grid_pts')
+
+        # Populate the Mesh section
+        mesh = Mesh(
+            dimensionality=3,  # Assuming 3D mesh by default
+            #mesh_type=[radial_grid_type],
+            n_points=total_nb_grid_pts,
+            pruning='adaptive',
+        )
+
+        # Populate the NumericalIntegration section
+        numerical_integration = NumericalIntegration(
+            mesh=mesh,
+            coordinate='full',  # Assuming full-space integration
+            integration_thresh=basis_fn_cutoff,
+            weight_approximation=weight_gener_scheme,
+            weight_cutoff=integr_weight_cutoff,
+        )
+
+        if gral_integ_accuracy is not None:
+            numerical_integration.integration_rule = f'Accuracy: {gral_integ_accuracy}'
+
+        #if angular_grid:
+        #    mesh.grid = [angular_grid]
+
+        return numerical_integration
 
     def parse_numerical_settings(self, out_parser, logger):        
 
@@ -1385,10 +1426,15 @@ class ORCAParser(MatchingParser):
         # Parse numerical settings, such as scf convergence or localization criteria
         scf, loc = self.parse_numerical_settings(self.out_parser, logger)
 
+        grids = self.parse_integrationgrids(self.out_parser, logger)
+
         if scf:
             model_method.numerical_settings.append(scf)
         if loc:
             model_method.numerical_settings.append(loc)
+        if grids:
+            model_method.numerical_settings.append(grids)
+    
 
        
         # Parse basis set 
