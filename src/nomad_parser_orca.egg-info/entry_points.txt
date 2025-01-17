@@ -1,3 +1,0 @@
-[nomad.plugin]
-parser_entry_point = nomad_parser_orca.parsers:parser_entry_point
-schema_package_entry_point = nomad_parser_orca.schema_packages:schema_package_entry_point

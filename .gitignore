@@ -1,4 +1,5 @@
 .pyenv/
 .vscode/
 *.pyc
+*.egg-info/
 __pycache__/
