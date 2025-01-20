@@ -11,11 +11,6 @@ class ORCAEntryPoint(ParserEntryPoint):
 parser_entry_point = ORCAEntryPoint(
     name='ORCAParser',
     description='Parser for coupled cluster output written in an out text file.',
-    mainfile_name_re='.*\.out.*',
-    #mainfile_name_re='.*\.out$',
-    #mainfile_contents_re=r'Program Version [\d\.]*',
-    #mainfile_contents_re = r'\s*Program Version [\d\.]+ -\s+([A-Z]+)\s+-'
-    #mainfile_contents_re = r'Program Version\s+([\d\.]+)'
-    mainfile_contents_re = r'Program Version\s*([\w_.].*)',
-    #mainfile_contents_re=r'EBB2675 Version [\d\.]*',
+    mainfile_name_re=r'.*\.out.*',
+    mainfile_contents_re = r'\s+\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\**\s*\s+\*\s+O\s+R\s+C\s+A\s+\*\s*\s+\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\**\s*\s*',
 )
