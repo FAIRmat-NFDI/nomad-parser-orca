@@ -1,12 +1,14 @@
 from nomad.config.models.plugins import ParserEntryPoint
 
+
 class ORCAEntryPoint(ParserEntryPoint):
-
     def load(self):
-        from nomad_parser_orca.parsers.parser import ORCAParser
+        from nomad.parsing.parser import MatchingParserInterface
 
-        return ORCAParser(**self.dict())
-
+        return MatchingParserInterface(
+            parser_class_name='nomad_parser_orca.parsers.parser.ORCAParser',
+            **self.dict(),
+        )
 
 parser_entry_point = ORCAEntryPoint(
     name='ORCAParser',
