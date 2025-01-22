@@ -70,7 +70,34 @@ class OutParser(TextParser):
             atoms=atoms
         )
     
+    def get_dft_data(self, source: dict[str, Any]) -> dict[str, Any]:
+        """
+        Extracts DFT-related data, including XC functionals and SCF settings.
+        """
+        dft_data = source.get('single_point', {}).get('self_consistent', {}).get('scf_settings', {})
+        xc_functionals = []
 
+        # Exchange functional
+        if dft_data.get('exchange_functional'):
+            xc_functionals.append({
+                'libxc_name': dft_data.get('exchange_functional'),
+                'name': 'exchange',
+                'weight': dft_data.get('scaling_exchange')
+            })
+
+        # Correlation functional
+        if dft_data.get('correlation_functional'):
+            xc_functionals.append({
+                'libxc_name': dft_data.get('correlation_functional'),
+                'name': 'correlation',
+                'weight': dft_data.get('scaling_correlation')
+            })
+
+        return {
+            #'jacobs_ladder': 'metaGGA', # fix here later
+            'xc_functionals': xc_functionals,
+            'exact_exchange_mixing_factor': dft_data.get('fraction_hf_exchange'),
+        }
 
 
 class ORCAParser(Parser):
@@ -79,37 +106,11 @@ class ORCAParser(Parser):
         info_parser = OutParser(text_parser=OutReader())
         info_parser.filepath = mainfile
         
-        # Initialize the data parser with the Simulation object
+
         data_parser = MetainfoParser(data_object=Simulation())
         data_parser.annotation_key = 'info'
         info_parser.convert(data_parser)
 
-        # # Extract atomic data
-        # atomic_data = info_parser.get_atoms(info_parser.data)
-        # if atomic_data:
-        #     try:
-        #         # Ensure model_system exists
-        #         if not archive.data.model_system:
-        #             logger.error("No model_system section in the archive.")
-        #             return
-
-        #         # Access the first AtomicCell section
-        #         model_system = archive.data.model_system[0]
-        #         if not model_system.cell:
-        #             logger.error("No AtomicCell section in model_system.")
-        #             return
-
-        #         atomic_cell = model_system.cell[0]
-
-        #         # Populate the AtomicCell with parsed data
-        #         atomic_cell.positions = atomic_data['positions']
-        #         atomic_cell.atoms_state = [
-        #             {'chemical_symbol': atom['symbol']} for atom in atomic_data['atoms']
-        #         ]
-
-        #     except Exception as e:
-        #         logger.warning(f"Failed to populate AtomicCell: {e}")
-
-     
+    
         archive.data = data_parser.data_object
         self.info_parser = info_parser

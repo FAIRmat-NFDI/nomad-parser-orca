@@ -69,4 +69,34 @@ atoms_state.AtomsState.chemical_symbol.m_annotations[MAPPING_ANNOTATION_KEY] = d
 )
 
 
+# DFT annotations
+model_method.DFT.m_def.m_annotations[MAPPING_ANNOTATION_KEY] = dict(
+    info=Mapper(mapper=('get_dft_data', ['.@']))
+)
+
+# Map DFT quantities
+model_method.DFT.jacobs_ladder.m_annotations[MAPPING_ANNOTATION_KEY] = dict(
+    info=Mapper(mapper='.jacobs_ladder')
+)
+model_method.DFT.exact_exchange_mixing_factor.m_annotations[MAPPING_ANNOTATION_KEY] = dict(
+    info=Mapper(mapper='.exact_exchange_mixing_factor')
+)
+
+# Map XC Functionals
+model_method.DFT.xc_functionals.m_annotations[MAPPING_ANNOTATION_KEY] = dict(
+    info=Mapper(mapper='.xc_functionals')
+)
+
+# XCFunctional quantities
+model_method.XCFunctional.libxc_name.m_annotations[MAPPING_ANNOTATION_KEY] = dict(
+    info=Mapper(mapper='.libxc_name')
+)
+model_method.XCFunctional.name.m_annotations[MAPPING_ANNOTATION_KEY] = dict(
+    info=Mapper(mapper='.name')
+)
+model_method.XCFunctional.weight.m_annotations[MAPPING_ANNOTATION_KEY] = dict(
+    info=Mapper(mapper='.weight')
+)
+
+
 m_package.__init_metainfo__()
