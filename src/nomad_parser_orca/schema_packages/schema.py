@@ -46,5 +46,27 @@ general.Program.version.m_annotations[MAPPING_ANNOTATION_KEY] = dict(
     info=Mapper(mapper='.program_version')
 )
 
+general.Simulation.model_system.m_annotations[MAPPING_ANNOTATION_KEY] = dict(
+    info=Mapper(mapper='@')
+)
+
+# AtomicCell annotations
+model_system.AtomicCell.m_def.m_annotations[MAPPING_ANNOTATION_KEY] = dict(
+    info=Mapper(mapper=('get_atoms', ['.@']))
+)
+
+# Map `positions` and `atoms_state` quantities to specific keys in the `get_atoms` output
+model_system.AtomicCell.positions.m_annotations[MAPPING_ANNOTATION_KEY] = dict(
+    info=Mapper(mapper='.positions')
+)
+model_system.AtomicCell.atoms_state.m_annotations[MAPPING_ANNOTATION_KEY] = dict(
+    info=Mapper(mapper='.atoms')
+)
+
+# AtomsState quantities
+atoms_state.AtomsState.chemical_symbol.m_annotations[MAPPING_ANNOTATION_KEY] = dict(
+    info=Mapper(mapper='.symbol')
+)
+
 
 m_package.__init_metainfo__()
