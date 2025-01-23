@@ -69,7 +69,45 @@ class OutParser(TextParser):
             positions=np.array(positions, dtype=float),
             atoms=atoms
         )
-    
+
+    def get_basis_sets(self, source: dict[str, Any]) -> list[dict[str, Any]]:
+        """
+        Extracts basis set information for AtomCenteredBasisSet in a structured manner.
+        """
+        # Mapping of basis set roles to their source keys and types
+        basis_set_roles = {
+            'main_basis_set': {'role': 'orbital', 'key': 'main_basis_set'},
+            'aux_c_basis_set': {'role': 'auxiliary_post_hf', 'key': 'auxc_basis_set'},
+            'aux_j_basis_set': {'role': 'auxiliary_scf', 'key': 'auxj_basis_set'},
+            'aux_jk_basis_set': {'role': 'auxiliary_scf', 'key': 'auxjk_basis_set'},
+        }
+
+        # Extract basis set names from the source
+        basis_set_names = source.get('basis_set_name', {})
+        ecp_basis_sets = source.get('ecp_basis_set_name', {}).get('capped_ecp', [])
+
+        # Collect basis sets dynamically
+        basis_sets = []
+        for key, info in basis_set_roles.items():
+            basis_set_name = basis_set_names.get(info['key'])
+            if basis_set_name:
+                basis_sets.append({
+                    'basis_set': basis_set_name,
+                    'type': 'GTO',
+                    'role': info['role'],
+                })
+
+        # Handle capped ECPs
+        for element, basis_set in ecp_basis_sets:
+            basis_sets.append({
+                'basis_set': basis_set,
+                'type': 'GTO',
+                'role': 'cECP',
+                'species_scope': [element],
+            })
+
+        return basis_sets
+
     def get_dft_data(self, source: dict[str, Any]) -> dict[str, Any]:
         """
         Extracts DFT-related data, including XC functionals and SCF settings.

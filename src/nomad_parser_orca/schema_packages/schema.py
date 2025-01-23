@@ -31,6 +31,8 @@ from nomad_simulations.schema_packages import (
     variables,
 )
 
+from nomad_simulations.schema_packages.basis_set import AtomCenteredBasisSet
+
 m_package = SchemaPackage()
 
 # simulation
@@ -55,7 +57,6 @@ model_system.AtomicCell.m_def.m_annotations[MAPPING_ANNOTATION_KEY] = dict(
     info=Mapper(mapper=('get_atoms', ['.@']))
 )
 
-# Map `positions` and `atoms_state` quantities to specific keys in the `get_atoms` output
 model_system.AtomicCell.positions.m_annotations[MAPPING_ANNOTATION_KEY] = dict(
     info=Mapper(mapper='.positions')
 )
@@ -68,13 +69,16 @@ atoms_state.AtomsState.chemical_symbol.m_annotations[MAPPING_ANNOTATION_KEY] = d
     info=Mapper(mapper='.symbol')
 )
 
+# ModelMethod annotations
+model_method.ModelMethod.m_def.m_annotations[MAPPING_ANNOTATION_KEY] = dict(
+    info=Mapper(mapper='@'),
+)
 
 # DFT annotations
 model_method.DFT.m_def.m_annotations[MAPPING_ANNOTATION_KEY] = dict(
     info=Mapper(mapper=('get_dft_data', ['.@']))
 )
 
-# Map DFT quantities
 model_method.DFT.jacobs_ladder.m_annotations[MAPPING_ANNOTATION_KEY] = dict(
     info=Mapper(mapper='.jacobs_ladder')
 )
@@ -82,12 +86,10 @@ model_method.DFT.exact_exchange_mixing_factor.m_annotations[MAPPING_ANNOTATION_K
     info=Mapper(mapper='.exact_exchange_mixing_factor')
 )
 
-# Map XC Functionals
 model_method.DFT.xc_functionals.m_annotations[MAPPING_ANNOTATION_KEY] = dict(
     info=Mapper(mapper='.xc_functionals')
 )
 
-# XCFunctional quantities
 model_method.XCFunctional.libxc_name.m_annotations[MAPPING_ANNOTATION_KEY] = dict(
     info=Mapper(mapper='.libxc_name')
 )
