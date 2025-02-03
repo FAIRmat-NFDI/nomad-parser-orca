@@ -70,43 +70,41 @@ class OutParser(TextParser):
             atoms=atoms
         )
 
-    def get_basis_sets(self, source: dict[str, Any]) -> list[dict[str, Any]]:
-        """
-        Extracts basis set information for AtomCenteredBasisSet in a structured manner.
-        """
-        # Mapping of basis set roles to their source keys and types
-        basis_set_roles = {
-            'main_basis_set': {'role': 'orbital', 'key': 'main_basis_set'},
-            'aux_c_basis_set': {'role': 'auxiliary_post_hf', 'key': 'auxc_basis_set'},
-            'aux_j_basis_set': {'role': 'auxiliary_scf', 'key': 'auxj_basis_set'},
-            'aux_jk_basis_set': {'role': 'auxiliary_scf', 'key': 'auxjk_basis_set'},
-        }
-
-        # Extract basis set names from the source
-        basis_set_names = source.get('basis_set_name', {})
-        ecp_basis_sets = source.get('ecp_basis_set_name', {}).get('capped_ecp', [])
-
-        # Collect basis sets dynamically
-        basis_sets = []
-        for key, info in basis_set_roles.items():
-            basis_set_name = basis_set_names.get(info['key'])
-            if basis_set_name:
+    def get_basis_sets(self, source: dict[str, Any]) -> dict[str, Any]:
+        try:
+            basis_set_roles = {
+                'main_basis_set': {'role': 'orbital', 'key': 'main_basis_set'},
+                'aux_c_basis_set': {'role': 'auxiliary_post_hf', 'key': 'auxc_basis_set'},
+                'aux_j_basis_set': {'role': 'auxiliary_scf', 'key': 'auxj_basis_set'},
+                'aux_jk_basis_set': {'role': 'auxiliary_scf', 'key': 'auxjk_basis_set'},
+            }
+            basis_set_names = source.get('basis_set_name', {})
+            ecp_basis_sets = source.get('ecp_basis_set_name', {}).get('capped_ecp', [])
+            basis_sets = []
+            for key, info in basis_set_roles.items():
+                bs_name = basis_set_names.get(info['key'])
+                if bs_name:
+                    basis_sets.append({
+                        "m_def": "nomad_simulations.schema_packages.basis_set.AtomCenteredBasisSet",
+                        'basis_set': bs_name,
+                        'type': 'GTO',
+                        'role': info['role'],
+                    })
+            for element, bs in ecp_basis_sets:
                 basis_sets.append({
-                    'basis_set': basis_set_name,
+                    "m_def": "nomad_simulations.schema_packages.basis_set.AtomCenteredBasisSet",
+                    'basis_set': bs,
                     'type': 'GTO',
-                    'role': info['role'],
+                    'role': 'cECP',
+                    'species_scope': [element],
                 })
-
-        # Handle capped ECPs
-        for element, basis_set in ecp_basis_sets:
-            basis_sets.append({
-                'basis_set': basis_set,
-                'type': 'GTO',
-                'role': 'cECP',
-                'species_scope': [element],
-            })
-
-        return basis_sets
+            print("get_basis_sets: Extracted basis sets:", basis_sets)
+            # Return a dictionary with the key that matches the container field:
+            return {'basis_set_components': basis_sets}
+        except Exception as e:
+            print("Error in get_basis_sets:", e)
+            # Return an empty structure so that the mapping doesn't break
+            return {'basis_set_components': []}
 
     def get_dft_data(self, source: dict[str, Any]) -> dict[str, Any]:
         """
@@ -130,9 +128,9 @@ class OutParser(TextParser):
                 'name': 'correlation',
                 'weight': dft_data.get('scaling_correlation')
             })
-
+        #print(xc_functionals)
         return {
-            #'jacobs_ladder': 'metaGGA', # fix here later
+            'jacobs_ladder': 'metaGGA', # fix here later
             'xc_functionals': xc_functionals,
             'exact_exchange_mixing_factor': dft_data.get('fraction_hf_exchange'),
         }

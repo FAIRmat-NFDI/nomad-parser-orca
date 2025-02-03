@@ -22,6 +22,7 @@ from nomad.metainfo import SchemaPackage
 from nomad.parsing.file_parser.mapping_parser import MAPPING_ANNOTATION_KEY
 from nomad_simulations.schema_packages import (
     atoms_state,
+    basis_set,
     general,
     model_method,
     model_system,
