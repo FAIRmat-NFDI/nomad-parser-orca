@@ -134,6 +134,20 @@ class OutParser(TextParser):
             'xc_functionals': xc_functionals,
             'exact_exchange_mixing_factor': dft_data.get('fraction_hf_exchange'),
         }
+        
+    def get_numerical_settings(self, source: dict[str, Any]) -> dict[str, Any]:
+        scf_convergence = source.get('single_point', {}) \
+                                .get('self_consistent', {}) \
+                                .get('scf_settings', {})
+
+        if not scf_convergence:
+            return {}
+
+        return {
+                "n_max_iterations": scf_convergence.get("n_max_iterations", 0),
+                "threshold_change": scf_convergence.get("energy_change_tolerance", 1e-8)
+        }
+    
 
 
 class ORCAParser(Parser):
