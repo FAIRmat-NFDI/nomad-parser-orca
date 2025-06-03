@@ -1,14 +1,9 @@
-import re
-from typing import Any
-
 import numpy as np
-import pint
 from nomad.parsing.file_parser import Quantity, TextParser
 from nomad.units import ureg
 
 
 class OutReader(TextParser):
-
     def init_quantities(self):
         re_float = r'[-+]?\d+\.?\d*(?:[Ee][-+]\d+)?'
         re_n = r'\r*\n'
@@ -66,14 +61,14 @@ class OutReader(TextParser):
             ),
             Quantity(
                 'largest_t2_amplitudes',
-                #r'\b\d+[ab]->\d+[ab]\b\s+\b\d+[ab]->\d+[ab]\b\s+([-+]?\d*\.\d+)\b',
-                #r'\b\d+[ab]?->\d+[ab]?\s+\d+[ab]?->\d+[ab]?\s+([-+]?\d*\.\d+)', 
-                #r'(\d+[ab]?->\d+[ab]?)\s+(\d+[ab]?->\d+[ab]?)\s+([-+]?\d*\.\d+)',
-                #r'\b\d+[ab]?->\d+[ab]?\s+\d+[ab]?->\d+[ab]?\s+([-+]?\d*\.\d+)', 
-                #r'\b(\d+[ab]?->\d+[ab]?)\s+(\d+[ab]?->\d+[ab]?)\s+([-+]?\d*\.\d+)\b',
-                r'\b\d+[ab]?\s*->\s*\d+[ab]?\s+\d+[ab]?\s*->\s*\d+[ab]?\s+([-+]?\d*\.\d+)', 
-                repeats=True
-            ), # TODO: find regex that is suitable for all 4 types
+                # r'\b\d+[ab]->\d+[ab]\b\s+\b\d+[ab]->\d+[ab]\b\s+([-+]?\d*\.\d+)\b',
+                # r'\b\d+[ab]?->\d+[ab]?\s+\d+[ab]?->\d+[ab]?\s+([-+]?\d*\.\d+)',
+                # r'(\d+[ab]?->\d+[ab]?)\s+(\d+[ab]?->\d+[ab]?)\s+([-+]?\d*\.\d+)',
+                # r'\b\d+[ab]?->\d+[ab]?\s+\d+[ab]?->\d+[ab]?\s+([-+]?\d*\.\d+)',
+                # r'\b(\d+[ab]?->\d+[ab]?)\s+(\d+[ab]?->\d+[ab]?)\s+([-+]?\d*\.\d+)\b',
+                r'\b\d+[ab]?\s*->\s*\d+[ab]?\s+\d+[ab]?\s*->\s*\d+[ab]?\s+([-+]?\d*\.\d+)',
+                repeats=True,
+            ),  # TODO: find regex that is suitable for all 4 types
             Quantity(
                 'reference_energy',
                 r'E\(0\)\s*\.\.\.\s*(-?[\d\.]+)',
@@ -108,42 +103,52 @@ class OutReader(TextParser):
                 'kc_formation',
                 r'K\(C\) Formation\s*\.+\s*(\S+)',
                 convert=False,
-            )
+            ),
         ]
 
         # Basis set related quantities
         basis_set_quantities = [
             Quantity('basis_set_atom_labels', r'Type\s*(\w+)', repeats=True),
             Quantity('basis_set', r':\s*(\w+)\s*contracted\s*to', repeats=True),
-            Quantity('basis_set_contracted', r'(\w+)\s*pattern', repeats=True), ]
-        
+            Quantity('basis_set_contracted', r'(\w+)\s*pattern', repeats=True),
+        ]
+
         basis_set_naming_quantities = [
             Quantity(
                 'main_basis_set',
-                #r'Your calculation utilizes the basis:\s*(.*)',
+                # r'Your calculation utilizes the basis:\s*(.*)',
                 r'Your calculation utilizes the basis:\s*([^\s].*?)[\s]*\n',
-                repeats=False, convert=False, flatten=False,
+                repeats=False,
+                convert=False,
+                flatten=False,
             ),
             Quantity(
                 'auxj_basis_set',
-                r'----- AuxJ basis set information -----\s*Your calculation utilizes the auxiliary basis:\s*([^\s].*?)(?:\s*\n|$)', 
-                repeats=False, convert=False, flatten=False,
+                r'----- AuxJ basis set information -----\s*Your calculation utilizes the auxiliary basis:\s*([^\s].*?)(?:\s*\n|$)',
+                repeats=False,
+                convert=False,
+                flatten=False,
             ),
             Quantity(
                 'auxjk_basis_set',
-                r'----- AuxJK basis set information -----\s*Your calculation utilizes the auxiliary basis:\s*([^\s].*?)(?:\s*\n|$)', 
-                repeats=False, convert=False, flatten=False,
+                r'----- AuxJK basis set information -----\s*Your calculation utilizes the auxiliary basis:\s*([^\s].*?)(?:\s*\n|$)',
+                repeats=False,
+                convert=False,
+                flatten=False,
             ),
             Quantity(
                 'auxc_basis_set',
                 r'----- AuxC basis set information -----\s*Your calculation utilizes the auxiliary basis:\s*([^\s].*?)(?:\s*\n|$)',
-                repeats=False, convert=False, flatten=False,
+                repeats=False,
+                convert=False,
+                flatten=False,
             ),
             Quantity(
                 'capped_ecp',
-                #r'Group\s*\d+,\s*Type\s*([A-Z][a-z]*)\s*ECP\s*([A-Z]+\(\d+,[A-Z]+\))',
+                # r'Group\s*\d+,\s*Type\s*([A-Z][a-z]*)\s*ECP\s*([A-Z]+\(\d+,[A-Z]+\))',
                 r'Group \d+, Type (\w+)\s+ECP\s+(\w+\(\d+,[A-Z]+\))',
-                repeats=True, convert=False, 
+                repeats=True,
+                convert=False,
             ),
         ]
 
@@ -188,22 +193,26 @@ class OutReader(TextParser):
             Quantity(
                 'main_basis_set',
                 r'Number of basis functions\s*\.+\s*(\d+)',
-                repeats=False, dtype=int,
+                repeats=False,
+                dtype=int,
             ),
             Quantity(
                 'auxj_basis_set',
                 r'   # of basis functions in Aux-J\s*\.+\s*(\d+)',
-                repeats=False, dtype=int,
+                repeats=False,
+                dtype=int,
             ),
             Quantity(
                 'auxjk_basis_set',
                 r'   # of basis functions in Aux-JK\s*\.+\s*(\d+)',
-                repeats=False, dtype=int,
+                repeats=False,
+                dtype=int,
             ),
             Quantity(
                 'auxc_basis_set',
                 r'   # of basis functions in Aux-C\s*\.+\s*(\d+)',
-                repeats=False, dtype=int,
+                repeats=False,
+                dtype=int,
             ),
         ]
 
@@ -459,15 +468,21 @@ class OutReader(TextParser):
                             rf'1\-El\. energy change\s*\.+\s*({re_float})',
                             dtype=float,
                         ),
-                        Quantity('rij', 
-                                r'RI-approximation to the Coulomb term is turned (\w+)',
-                                 convert=False), 
-                        Quantity('cosx', 
-                                 r'RIJ-COSX \(HFX calculated with COS-X\)\)\s*\.\.\.\.\s*(\w+)',
-                                 convert=False),
-                        Quantity('rijk', 
-                                 r'RI-JK \(J\+K treated both via RI\)\s+\.\.\.\.\s+(\w+)', 
-                                 convert=False),
+                        Quantity(
+                            'rij',
+                            r'RI-approximation to the Coulomb term is turned (\w+)',
+                            convert=False,
+                        ),
+                        Quantity(
+                            'cosx',
+                            r'RIJ-COSX \(HFX calculated with COS-X\)\)\s*\.\.\.\.\s*(\w+)',
+                            convert=False,
+                        ),
+                        Quantity(
+                            'rijk',
+                            r'RI-JK \(J\+K treated both via RI\)\s+\.\.\.\.\s+(\w+)',
+                            convert=False,
+                        ),
                     ]
                 ),
             ),
@@ -476,7 +491,6 @@ class OutReader(TextParser):
                 r'DFT GRID GENERATION\s*\-+([\s\S]+?\-{10})',
                 sub_parser=TextParser(quantities=grid_quantities),
             ),
-            
             Quantity(
                 'scf_iterations',
                 r'SCF ITERATIONS\s*\-+([\s\S]+?)\*{10}',
@@ -865,11 +879,13 @@ class OutReader(TextParser):
         ]
 
         localization_quantities = [
-            Quantity('type',
+            Quantity(
+                'type',
                 r'Localization criterion\s*\.+\s*(\S+)',
                 convert=False,
             ),
-            Quantity('n_max_iterations',
+            Quantity(
+                'n_max_iterations',
                 rf'Max. number of iterations\s*\.+\s*({re_float})',
                 dtype=float,
             ),
@@ -879,21 +895,21 @@ class OutReader(TextParser):
                 dtype=float,
                 unit=ureg.hartree,
             ),
-            Quantity('orbital_range',
-                #r'Orbital range for localization\s*\.+\s*(\S+)',
-                #r'Orbital range for localization\s*\.+\s*(\d+\s+to\s+\d+)',
+            Quantity(
+                'orbital_range',
+                # r'Orbital range for localization\s*\.+\s*(\S+)',
+                # r'Orbital range for localization\s*\.+\s*(\d+\s+to\s+\d+)',
                 r'Orbital range for localization\s*\.+\s*(\d+)\s+to\s+(\d+)',
                 convert=False,
             ),
         ]
 
-
         calculation_quantities = [
             Quantity(
                 'cartesian_coordinates',
-                #rf'CARTESIAN COORDINATES \(ANGSTROEM\)\s*\-+\s*([\s\S]+?)(?=\-+\s*{re_n}CARTESIAN COORDINATES \(A\.U\.\))',
+                # rf'CARTESIAN COORDINATES \(ANGSTROEM\)\s*\-+\s*([\s\S]+?)(?=\-+\s*{re_n}CARTESIAN COORDINATES \(A\.U\.\))',
                 rf'CARTESIAN COORDINATES \(ANGSTROEM\)\s*\-+\s*([\s\S]+?){re_n}{re_n}',
-                #str_operation=str_to_cartesian_coordinates,
+                # str_operation=str_to_cartesian_coordinates,
                 repeats=False,
             ),
             Quantity(
@@ -923,7 +939,7 @@ class OutReader(TextParser):
             ),
             Quantity(
                 'mp2',
-                #r'ORCA MP2 CALCULATION([\s\S]+?MP2 TOTAL ENERGY:.+)',
+                # r'ORCA MP2 CALCULATION([\s\S]+?MP2 TOTAL ENERGY:.+)',
                 r'(ORCA MP2 CALCULATION|-{78}\s+ORCA\s+MP2\s+-{78})([\s\S]+?MP2 TOTAL ENERGY:.+)',
                 sub_parser=TextParser(quantities=mp2_quantities),
             ),
@@ -942,9 +958,9 @@ class OutReader(TextParser):
                 'cc',
                 r'ORCA\-MATRIX DRIVEN CI([\s\S]+?E\(CCSD\(T\)\).*)',
                 # optional regex: ECCSDT part is not a must to match
-                #r'ORCA\-MATRIX DRIVEN CI([\s\S]+?)(E\(CCSD\(T\)\).*)?',
+                # r'ORCA\-MATRIX DRIVEN CI([\s\S]+?)(E\(CCSD\(T\)\).*)?',
                 sub_parser=TextParser(quantities=coupled_cluster_quantities),
-            )
+            ),
         ]
 
         geometry_optimization_quantities = [
@@ -982,11 +998,10 @@ class OutReader(TextParser):
             ),
         ]
 
-
         self._quantities = [
             Quantity(
                 'program_version',
-                #r'Program Version\s*([\w_.].*)',
+                # r'Program Version\s*([\w_.].*)',
                 r'Program Version\s*([\d\.]+)',
                 convert=False,
                 flatten=False,
@@ -1002,25 +1017,25 @@ class OutReader(TextParser):
             ),
             Quantity(
                 'input_file',
-                #r'INPUT FILE\s*\=+([\s\S]+?)END OF INPUT',
+                # r'INPUT FILE\s*\=+([\s\S]+?)END OF INPUT',
                 r'INPUT FILE\s*=\s*([\s\S]+?)(?:(?:^=+$|END OF INPUT))',
-                #r'INPUT FILE\s*\=+\s*([\s\S]*?)(?:(?:\|\s*\d+\s*>)[\s\S]*)*END OF INPUT',
-                #sub_parser=TextParser(
+                # r'INPUT FILE\s*\=+\s*([\s\S]*?)(?:(?:\|\s*\d+\s*>)[\s\S]*)*END OF INPUT',
+                # sub_parser=TextParser(
                 #    quantities=[
                 #        Quantity('xc_functional', r'\d+>\s*!\s*(\S+)'),
                 #        Quantity('tier', r'(\w+SCF)'),
                 #    ]
-                #),
+                # ),
             ),
             Quantity(
                 'basis_set_name',
-                #r'----- Orbital basis set information -----([\s\S]+?)\={10}',
+                # r'----- Orbital basis set information -----([\s\S]+?)\={10}',
                 r'----- Orbital basis set information -----([\s\S]+?)\={10}\s*',
                 sub_parser=TextParser(quantities=basis_set_naming_quantities),
             ),
             Quantity(
                 'basis_set_total',
-                #r'----- Orbital basis set information -----([\s\S]+?)\={10}',
+                # r'----- Orbital basis set information -----([\s\S]+?)\={10}',
                 r'ORCA GTO INTEGRAL CALCULATION([\s\S]+?)ORCA SCF',
                 sub_parser=TextParser(quantities=basis_set_statistics_quantities),
             ),

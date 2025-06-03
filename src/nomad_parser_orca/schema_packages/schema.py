@@ -22,17 +22,10 @@ from nomad.metainfo import SchemaPackage
 from nomad.parsing.file_parser.mapping_parser import MAPPING_ANNOTATION_KEY
 from nomad_simulations.schema_packages import (
     atoms_state,
-    basis_set,
     general,
     model_method,
     model_system,
-    numerical_settings,
-    outputs,
-    properties,
-    variables,
 )
-
-from nomad_simulations.schema_packages.basis_set import AtomCenteredBasisSet
 
 m_package = SchemaPackage()
 
@@ -53,27 +46,24 @@ general.Program.version.m_annotations.setdefault(MAPPING_ANNOTATION_KEY, {}).upd
 )
 
 # Model System
-general.Simulation.model_system.m_annotations.setdefault(MAPPING_ANNOTATION_KEY, {}).update(
-    dict(info=Mapper(mapper='@'))
-)
+model_system.ModelSystem.m_def.m_annotations.setdefault(
+    MAPPING_ANNOTATION_KEY, {}
+).update(dict(info=Mapper(mapper=('get_atoms', ['.@']))))
 
-# AtomicCell annotations
-model_system.AtomicCell.m_def.m_annotations.setdefault(MAPPING_ANNOTATION_KEY, {}).update(
-    dict(info=Mapper(mapper=('get_atoms', ['.@'])))
-)
+# 2) Inside ModelSystem, map the returned 'positions' array → ModelSystem.positions
+model_system.ModelSystem.positions.m_annotations.setdefault(
+    MAPPING_ANNOTATION_KEY, {}
+).update(dict(info=Mapper(mapper='.positions')))
 
-model_system.AtomicCell.positions.m_annotations.setdefault(MAPPING_ANNOTATION_KEY, {}).update(
-    dict(info=Mapper(mapper='.positions'))
-)
-
-model_system.AtomicCell.atoms_state.m_annotations.setdefault(MAPPING_ANNOTATION_KEY, {}).update(
-    dict(info=Mapper(mapper='.atoms'))
-)
+# 3) Also map the returned 'atoms' list → ModelSystem.particle_states (AtomsState sub‐section)
+model_system.ModelSystem.particle_states.m_annotations.setdefault(
+    MAPPING_ANNOTATION_KEY, {}
+).update(dict(info=Mapper(mapper='.atoms', sub_section=atoms_state.AtomsState.m_def)))
 
 # AtomsState quantities
-atoms_state.AtomsState.chemical_symbol.m_annotations.setdefault(MAPPING_ANNOTATION_KEY, {}).update(
-    dict(info=Mapper(mapper='.symbol'))
-)
+atoms_state.AtomsState.chemical_symbol.m_annotations.setdefault(
+    MAPPING_ANNOTATION_KEY, {}
+).update(dict(info=Mapper(mapper='.symbol')))
 
 # # ModelMethod annotations
 # model_method.ModelMethod.m_def.m_annotations.setdefault(MAPPING_ANNOTATION_KEY, {}).update(
@@ -85,33 +75,39 @@ model_method.DFT.m_def.m_annotations.setdefault(MAPPING_ANNOTATION_KEY, {}).upda
     dict(info=Mapper(mapper=('get_dft_data', ['.@'])))
 )
 
-model_method.DFT.contributions.m_annotations.setdefault(MAPPING_ANNOTATION_KEY, {}).update(
-    dict(info=Mapper(mapper='.@'))
+model_method.DFT.contributions.m_annotations.setdefault(
+    MAPPING_ANNOTATION_KEY, {}
+).update(dict(info=Mapper(mapper='.@')))
+
+model_method.DFT.jacobs_ladder.m_annotations.setdefault(
+    MAPPING_ANNOTATION_KEY, {}
+).update(dict(info=Mapper(mapper='.jacobs_ladder')))
+
+model_method.DFT.exact_exchange_mixing_factor.m_annotations.setdefault(
+    MAPPING_ANNOTATION_KEY, {}
+).update(dict(info=Mapper(mapper='.exact_exchange_mixing_factor')))
+
+model_method.DFT.xc_functionals.m_annotations.setdefault(
+    MAPPING_ANNOTATION_KEY, {}
+).update(
+    dict(
+        info=Mapper(
+            mapper='.xc_functionals', sub_section=model_method.XCFunctional.m_def
+        )
+    )
 )
 
-model_method.DFT.jacobs_ladder.m_annotations.setdefault(MAPPING_ANNOTATION_KEY, {}).update(
-    dict(info=Mapper(mapper='.jacobs_ladder'))
-)
+model_method.XCFunctional.libxc_name.m_annotations.setdefault(
+    MAPPING_ANNOTATION_KEY, {}
+).update(dict(info=Mapper(mapper='.libxc_name')))
 
-model_method.DFT.exact_exchange_mixing_factor.m_annotations.setdefault(MAPPING_ANNOTATION_KEY, {}).update(
-    dict(info=Mapper(mapper='.exact_exchange_mixing_factor'))
-)
+model_method.XCFunctional.name.m_annotations.setdefault(
+    MAPPING_ANNOTATION_KEY, {}
+).update(dict(info=Mapper(mapper='.name')))
 
-model_method.DFT.xc_functionals.m_annotations.setdefault(MAPPING_ANNOTATION_KEY, {}).update(
-    dict(info=Mapper(mapper='.xc_functionals', sub_section=model_method.XCFunctional.m_def))
-)
-
-model_method.XCFunctional.libxc_name.m_annotations.setdefault(MAPPING_ANNOTATION_KEY, {}).update(
-    dict(info=Mapper(mapper='.libxc_name'))
-)
-
-model_method.XCFunctional.name.m_annotations.setdefault(MAPPING_ANNOTATION_KEY, {}).update(
-    dict(info=Mapper(mapper='.name'))
-)
-
-model_method.XCFunctional.weight.m_annotations.setdefault(MAPPING_ANNOTATION_KEY, {}).update(
-    dict(info=Mapper(mapper='.weight'))
-)
+model_method.XCFunctional.weight.m_annotations.setdefault(
+    MAPPING_ANNOTATION_KEY, {}
+).update(dict(info=Mapper(mapper='.weight')))
 
 
 # numerical_settings.SelfConsistency.m_def.m_annotations.setdefault(MAPPING_ANNOTATION_KEY, {}).update(
