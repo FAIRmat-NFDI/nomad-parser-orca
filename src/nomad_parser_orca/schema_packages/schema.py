@@ -45,12 +45,11 @@ general.Program.version.m_annotations.setdefault(MAPPING_ANNOTATION_KEY, {}).upd
     dict(info=Mapper(mapper='.program_version'))
 )
 
-# Model System
-model_system.ModelSystem.m_def.m_annotations.setdefault(
+general.Simulation.model_system.m_annotations.setdefault(
     MAPPING_ANNOTATION_KEY, {}
 ).update(dict(info=Mapper(mapper=('get_atoms', ['.@']))))
 
-# 2) Inside ModelSystem, map the returned 'positions' array → ModelSystem.positions
+
 model_system.ModelSystem.positions.m_annotations.setdefault(
     MAPPING_ANNOTATION_KEY, {}
 ).update(dict(info=Mapper(mapper='.positions')))
