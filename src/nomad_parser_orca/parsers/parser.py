@@ -1,24 +1,16 @@
-import os
+# src/nomad_parser_orca/parsers/parser.py
+
+import numpy as np
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from nomad.datamodel.datamodel import (
-        EntryArchive,
-    )
-    from structlog.stdlib import (
-        BoundLogger,
-    )
+    from nomad.datamodel.datamodel import EntryArchive
+    from structlog.stdlib import BoundLogger
 
-import numpy as np
-import re
-from nomad.units import ureg
 from nomad.config import config
-from nomad.datamodel.metainfo.workflow import Workflow
-from nomad.parsing.file_parser import Quantity, Parser
-from nomad.parsing.file_parser.mapping_parser import (MetainfoParser,
-                                                      TextParser)
-from nomad_simulations.schema_packages.general import Program, Simulation
-import nomad_parser_orca.schema_packages.schema
+from nomad.parsing.file_parser import Parser
+from nomad.parsing.file_parser.mapping_parser import TextParser, MetainfoParser
+from nomad_simulations.schema_packages.general import Simulation
 from .info_reader import OutReader
 
 configuration = config.get_plugin_entry_point(
@@ -27,140 +19,158 @@ configuration = config.get_plugin_entry_point(
 
 
 def str_to_cartesian_coordinates(val_in):
-    val_in_cleaned = [val.replace('>', '') if isinstance(val, str) else val for val in val_in if val != '>']
-
-    if isinstance(val_in_cleaned, list):
-        symbols = []
-        coordinates = []
-        for i in range(0, len(val_in_cleaned), 4):
-            symbol = val_in_cleaned[i]
-            if isinstance(symbol, str):
-                symbol = symbol.replace('>', '')
-            symbols.append(symbol)
-            coordinates.append(val_in_cleaned[i+1:i+4])
-            #print(coordinates)
-        coordinates = np.array(coordinates, dtype=float)
-        return symbols, coordinates
-    else:
+    """
+    Convert ORCA’s flat list of tokens into (symbols[], positions[n×3]).
+    """
+    cleaned = [v.replace('>', '') if isinstance(v, str) else v
+               for v in val_in if v != '>']
+    if not isinstance(cleaned, list):
         raise ValueError("Expected a list input for cartesian coordinates.")
+    symbols = []
+    coords = []
+    for i in range(0, len(cleaned), 4):
+        sym = cleaned[i]
+        if isinstance(sym, str):
+            sym = sym.replace('>', '')
+        symbols.append(sym)
+        coords.append(cleaned[i+1 : i+4])
+    return symbols, np.array(coords, dtype=float)
+
 
 class OutParser(TextParser):
 
     def get_program_data(self, source: dict[str, Any]) -> dict[str, Any]:
-        return dict(
-            program_name = 'ORCA',
-            program_version = source.get('program_version'),
-        )
-    
+        return {
+            "name": "ORCA",
+            "version": source.get("program_version"),
+        }
+
     def get_atoms(self, source: dict[str, Any]) -> dict[str, Any]:
         """
-        Extracts atomic positions and related data from the source and returns a dictionary.
+        Build a minimal dictionary for one ModelSystem:
+          - "positions": np.ndarray of shape (N,3)
+          - "particle_states": list of {"m_def": AtomsState, "chemical_symbol": …}
         """
-        cartesian_coordinates = source.get('single_point', {}).get('cartesian_coordinates', [])
-        if not cartesian_coordinates:
+        cart = source.get("single_point", {}).get("cartesian_coordinates", [])
+        if not cart:
             return {}
 
-        symbols, positions = str_to_cartesian_coordinates(cartesian_coordinates)
+        symbols, positions = str_to_cartesian_coordinates(cart)
 
-        # Create a list of dictionaries for atoms
-        atoms = [{'symbol': symbol} for symbol in symbols]
-
-        return dict(
-            positions=np.array(positions, dtype=float),
-            atoms=atoms
-        )
-
-    def get_basis_sets(self, source: dict[str, Any]) -> dict[str, Any]:
-        try:
-            basis_set_roles = {
-                'main_basis_set': {'role': 'orbital', 'key': 'main_basis_set'},
-                'aux_c_basis_set': {'role': 'auxiliary_post_hf', 'key': 'auxc_basis_set'},
-                'aux_j_basis_set': {'role': 'auxiliary_scf', 'key': 'auxj_basis_set'},
-                'aux_jk_basis_set': {'role': 'auxiliary_scf', 'key': 'auxjk_basis_set'},
+        # For each symbol, include an "m_def" so NOMAD knows to build an AtomsState:
+        atom_list = [
+            {
+                "m_def": "nomad_simulations.schema_packages.atoms_state.AtomsState",
+                "chemical_symbol": s
             }
-            basis_set_names = source.get('basis_set_name', {})
-            ecp_basis_sets = source.get('ecp_basis_set_name', {}).get('capped_ecp', [])
-            basis_sets = []
-            for key, info in basis_set_roles.items():
-                bs_name = basis_set_names.get(info['key'])
-                if bs_name:
-                    basis_sets.append({
-                        "m_def": "nomad_simulations.schema_packages.basis_set.AtomCenteredBasisSet",
-                        'basis_set': bs_name,
-                        'type': 'GTO',
-                        'role': info['role'],
-                    })
-            for element, bs in ecp_basis_sets:
-                basis_sets.append({
-                    "m_def": "nomad_simulations.schema_packages.basis_set.AtomCenteredBasisSet",
-                    'basis_set': bs,
-                    'type': 'GTO',
-                    'role': 'cECP',
-                    'species_scope': [element],
-                })
-            print("get_basis_sets: Extracted basis sets:", basis_sets)
-            # Return a dictionary with the key that matches the container field:
-            return {'basis_set_components': basis_sets}
-        except Exception as e:
-            print("Error in get_basis_sets:", e)
-            # Return an empty structure so that the mapping doesn't break
-            return {'basis_set_components': []}
+            for s in symbols
+        ]
+
+        return {
+            "positions": positions,
+            "particle_states": atom_list
+        }
 
     def get_dft_data(self, source: dict[str, Any]) -> dict[str, Any]:
-        """
-        Extracts DFT-related data, including XC functionals and SCF settings.
-        """
-        dft_data = source.get('single_point', {}).get('self_consistent', {}).get('scf_settings', {})
-        xc_functionals = []
+        scf = source.get("single_point", {}) \
+                    .get("self_consistent", {}) \
+                    .get("scf_settings", {})
 
-        # Exchange functional
-        if dft_data.get('exchange_functional'):
-            xc_functionals.append({
-                'libxc_name': dft_data.get('exchange_functional'),
-                'name': 'exchange',
-                'weight': dft_data.get('scaling_exchange')
-            })
-
-        # Correlation functional
-        if dft_data.get('correlation_functional'):
-            xc_functionals.append({
-                'libxc_name': dft_data.get('correlation_functional'),
-                'name': 'correlation',
-                'weight': dft_data.get('scaling_correlation')
-            })
-        #print(xc_functionals)
-        return {
-            'jacobs_ladder': 'metaGGA', # fix here later
-            'xc_functionals': xc_functionals,
-            'exact_exchange_mixing_factor': dft_data.get('fraction_hf_exchange'),
-        }
-        
-    def get_numerical_settings(self, source: dict[str, Any]) -> dict[str, Any]:
-        scf_convergence = source.get('single_point', {}) \
-                                .get('self_consistent', {}) \
-                                .get('scf_settings', {})
-
-        if not scf_convergence:
+        if not scf:
             return {}
 
+        xc_list = []
+        if scf.get("exchange_functional"):
+            xc_list.append({
+                "libxc_name": scf["exchange_functional"],
+                "name": "exchange",
+                "weight": scf.get("scaling_exchange", 1.0)
+            })
+        if scf.get("correlation_functional"):
+            xc_list.append({
+                "libxc_name": scf["correlation_functional"],
+                "name": "correlation",
+                "weight": scf.get("scaling_correlation", 1.0)
+            })
+
         return {
-                "n_max_iterations": scf_convergence.get("n_max_iterations", 0),
-                "threshold_change": scf_convergence.get("energy_change_tolerance", 1e-8)
+            "jacobs_ladder": "metaGGA",
+            "exact_exchange_mixing_factor": scf.get("fraction_hf_exchange"),
+            "xc_functionals": xc_list
         }
-    
 
 
 class ORCAParser(Parser):
-    def parse(self, mainfile: str, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
-
+    def parse(self, mainfile: str, archive: "EntryArchive", logger: "BoundLogger") -> None:
+        # 1) Use TextParser→OutReader to get a raw dict
         info_parser = OutParser(text_parser=OutReader())
         info_parser.filepath = mainfile
-        
 
-        data_parser = MetainfoParser(data_object=Simulation())
-        data_parser.annotation_key = 'info'
-        info_parser.convert(data_parser)
+        # We only need MetainfoParser to populate info_parser.data (the raw dict)
+        info_parser.convert(MetainfoParser(data_object=Simulation(), annotation_key="info"))
+        raw = info_parser.data
 
-    
-        archive.data = data_parser.data_object
+        # 2) Build the  "program"  block exactly as needed by Simulation:
+        program_dict = {
+            "name": "ORCA",
+            "version": raw.get("program_version")
+        }
+
+        # 3) Build one ModelSystem entry if Cartesian coords exist:
+        cart = raw.get("single_point", {}).get("cartesian_coordinates", [])
+        if cart:
+            symbols, coords = str_to_cartesian_coordinates(cart)
+
+            ms_entry = {
+                # "positions" → will fill ModelSystem.positions
+                "positions": coords,
+
+                # "particle_states" → list of AtomsState‐dicts (each with "m_def")
+                "particle_states": [
+                    {
+                        "m_def": "nomad_simulations.schema_packages.atoms_state.AtomsState",
+                        "chemical_symbol": s
+                    }
+                    for s in symbols
+                ]
+            }
+            ms_list = [ms_entry]
+        else:
+            ms_list = []
+
+        # 4) Build one DFT/ModelMethod entry if scf exists:
+        scf = raw.get("single_point", {}).get("self_consistent", {}).get("scf_settings", {})
+        if scf:
+            xc_list = []
+            if scf.get("exchange_functional"):
+                xc_list.append({
+                    "libxc_name": scf["exchange_functional"],
+                    "name": "exchange",
+                    "weight": scf.get("scaling_exchange", 1.0)
+                })
+            if scf.get("correlation_functional"):
+                xc_list.append({
+                    "libxc_name": scf["correlation_functional"],
+                    "name": "correlation",
+                    "weight": scf.get("scaling_correlation", 1.0)
+                })
+
+            mm_entry = {
+                "jacobs_ladder": "metaGGA",
+                "exact_exchange_mixing_factor": scf.get("fraction_hf_exchange"),
+                "xc_functionals": xc_list
+            }
+            mm_list = [mm_entry]
+        else:
+            mm_list = []
+
+        # 5) Assemble final dict that matches Simulation’s schema exactly:
+        full_dict = {
+            "program":      program_dict,
+            "model_system": ms_list,
+            "model_method": mm_list
+            # (you can add "outputs", "numerical_settings", etc. here later)
+        }
+      
+        archive.data = Simulation().m_from_dict(full_dict)
         self.info_parser = info_parser
