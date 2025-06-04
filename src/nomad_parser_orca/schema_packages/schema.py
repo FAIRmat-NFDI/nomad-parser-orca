@@ -57,12 +57,12 @@ model_system.ModelSystem.positions.m_annotations.setdefault(
 # 3) Also map the returned 'atoms' list → ModelSystem.particle_states (AtomsState sub‐section)
 model_system.ModelSystem.particle_states.m_annotations.setdefault(
     MAPPING_ANNOTATION_KEY, {}
-).update(dict(info=Mapper(mapper='.atoms', sub_section=atoms_state.AtomsState.m_def)))
+).update(dict(info=Mapper(mapper='.particle_states')))
 
 # AtomsState quantities
 atoms_state.AtomsState.chemical_symbol.m_annotations.setdefault(
     MAPPING_ANNOTATION_KEY, {}
-).update(dict(info=Mapper(mapper='.symbol')))
+).update(dict(info=Mapper(mapper='.chemical_symbol')))
 
 # # ModelMethod annotations
 # model_method.ModelMethod.m_def.m_annotations.setdefault(MAPPING_ANNOTATION_KEY, {}).update(

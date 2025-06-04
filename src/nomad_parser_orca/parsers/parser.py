@@ -63,12 +63,17 @@ class OutParser(TextParser):
         symbols, positions = str_to_cartesian_coordinates(cartesian_coordinates)
 
         # Create a list of dictionaries for atoms
-        atoms = [{'symbol': symbol} for symbol in symbols]
+        #atoms = [{'symbol': symbol} for symbol in symbols]
 
-        return dict(
-            positions=np.array(positions, dtype=float),
-            atoms=atoms
-        )
+        atoms = []
+        for i, sym in enumerate(symbols):
+            atoms.append({"chemical_symbol": sym})
+
+        return [{
+            "positions": positions,
+            "particle_states": atoms
+        }]
+
 
     def get_basis_sets(self, source: dict[str, Any]) -> dict[str, Any]:
         try:
